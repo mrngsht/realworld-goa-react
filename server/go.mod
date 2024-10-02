@@ -2,7 +2,10 @@ module github.com/mrngsht/realworld-goa-react
 
 go 1.23.0
 
-require goa.design/goa/v3 v3.19.1
+require (
+	github.com/magefile/mage v1.15.0
+	goa.design/goa/v3 v3.19.1
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
