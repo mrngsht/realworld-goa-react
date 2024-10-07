@@ -3,6 +3,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -28,6 +30,7 @@ type Migration mg.Namespace
 const (
 	rdbConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable"
 	rdbMigrationDirPath = "./rdb/migrations"
+	rdbSchemaFilePath   = "./rdb/schema.sql"
 )
 
 var (
@@ -48,4 +51,32 @@ func (Migration) Down() error {
 
 func (Migration) Status() error {
 	return sh.RunV("goose", append(gooseOpt, "status")...)
+}
+
+func (Migration) Schema() error {
+	// https://github.com/pressly/goose/issues/278#issuecomment-1921605230
+	pgdump :=
+		`pg_dump realworld \
+  -h localhost \
+  -U postgres \
+  --schema-only \
+  --no-comments \
+  --quote-all-identifiers \
+  -T public.goose_db_version \
+  -T public.goose_db_version_id_seq | sed \
+    -e '/^--.*/d' \
+    -e '/^SET /d' \
+    -e '/^[[:space:]]*$/d' \
+    -e '/^SELECT pg_catalog./d' \
+    -e '/^ALTER TABLE .* OWNER TO "postgres";/d' \
+    -e 's/"public"\.//'`
+
+	out, err := sh.Output("docker", "compose", "exec", "-T", "db", "sh", "-c", pgdump)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(rdbSchemaFilePath, []byte(out), 0644); err != nil {
+		return err
+	}
+	return nil
 }
