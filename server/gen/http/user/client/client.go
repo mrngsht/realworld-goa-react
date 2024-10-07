@@ -20,6 +20,10 @@ type Client struct {
 	// Login Doer is the HTTP client used to make requests to the login endpoint.
 	LoginDoer goahttp.Doer
 
+	// Register Doer is the HTTP client used to make requests to the register
+	// endpoint.
+	RegisterDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -41,6 +45,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		LoginDoer:           doer,
+		RegisterDoer:        doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -68,6 +73,30 @@ func (c *Client) Login() goa.Endpoint {
 		resp, err := c.LoginDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "login", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Register returns an endpoint that makes HTTP requests to the user service
+// register server.
+func (c *Client) Register() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRegisterRequest(c.encoder)
+		decodeResponse = DecodeRegisterResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildRegisterRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RegisterDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "register", err)
 		}
 		return decodeResponse(resp)
 	}

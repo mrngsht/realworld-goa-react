@@ -19,9 +19,23 @@ type LoginRequestBody struct {
 	Password string `form:"password" json:"password" xml:"password"`
 }
 
+// RegisterRequestBody is the type of the "user" service "register" endpoint
+// HTTP request body.
+type RegisterRequestBody struct {
+	Username string `form:"username" json:"username" xml:"username"`
+	Email    string `form:"email" json:"email" xml:"email"`
+	Password string `form:"password" json:"password" xml:"password"`
+}
+
 // LoginResponseBody is the type of the "user" service "login" endpoint HTTP
 // response body.
 type LoginResponseBody struct {
+	User *UserTypeResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
+}
+
+// RegisterResponseBody is the type of the "user" service "register" endpoint
+// HTTP response body.
+type RegisterResponseBody struct {
 	User *UserTypeResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
@@ -44,6 +58,17 @@ func NewLoginRequestBody(p *user.LoginPayload) *LoginRequestBody {
 	return body
 }
 
+// NewRegisterRequestBody builds the HTTP request body from the payload of the
+// "register" endpoint of the "user" service.
+func NewRegisterRequestBody(p *user.RegisterPayload) *RegisterRequestBody {
+	body := &RegisterRequestBody{
+		Username: p.Username,
+		Email:    p.Email,
+		Password: p.Password,
+	}
+	return body
+}
+
 // NewLoginResultOK builds a "user" service "login" endpoint result from a HTTP
 // "OK" response.
 func NewLoginResultOK(body *LoginResponseBody) *user.LoginResult {
@@ -53,8 +78,31 @@ func NewLoginResultOK(body *LoginResponseBody) *user.LoginResult {
 	return v
 }
 
+// NewRegisterResultOK builds a "user" service "register" endpoint result from
+// a HTTP "OK" response.
+func NewRegisterResultOK(body *RegisterResponseBody) *user.RegisterResult {
+	v := &user.RegisterResult{}
+	v.User = unmarshalUserTypeResponseBodyToUserUserType(body.User)
+
+	return v
+}
+
 // ValidateLoginResponseBody runs the validations defined on LoginResponseBody
 func ValidateLoginResponseBody(body *LoginResponseBody) (err error) {
+	if body.User == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
+	}
+	if body.User != nil {
+		if err2 := ValidateUserTypeResponseBody(body.User); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateRegisterResponseBody runs the validations defined on
+// RegisterResponseBody
+func ValidateRegisterResponseBody(body *RegisterResponseBody) (err error) {
 	if body.User == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}

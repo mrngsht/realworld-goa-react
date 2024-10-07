@@ -59,6 +59,47 @@ func DecodeLoginRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 	}
 }
 
+// EncodeRegisterResponse returns an encoder for responses returned by the user
+// register endpoint.
+func EncodeRegisterResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*user.RegisterResult)
+		enc := encoder(ctx, w)
+		body := NewRegisterResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeRegisterRequest returns a decoder for requests sent to the user
+// register endpoint.
+func DecodeRegisterRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			body RegisterRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return nil, gerr
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateRegisterRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRegisterPayload(&body)
+
+		return payload, nil
+	}
+}
+
 // marshalUserUserTypeToUserTypeResponseBody builds a value of type
 // *UserTypeResponseBody from a value of type *user.UserType.
 func marshalUserUserTypeToUserTypeResponseBody(v *user.UserType) *UserTypeResponseBody {

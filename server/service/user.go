@@ -18,3 +18,12 @@ func (u User) Login(ctx context.Context, payload *user.LoginPayload) (res *user.
 		},
 	}, nil
 }
+
+func (u User) Register(ctx context.Context, payload *user.RegisterPayload) (res *user.RegisterResult, err error) {
+	return &user.RegisterResult{
+		User: &user.UserType{
+			Email:    payload.Email,
+			Username: "taro",
+		},
+	}, nil
+}

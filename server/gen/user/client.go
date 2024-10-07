@@ -15,13 +15,15 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	LoginEndpoint goa.Endpoint
+	LoginEndpoint    goa.Endpoint
+	RegisterEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(login goa.Endpoint) *Client {
+func NewClient(login, register goa.Endpoint) *Client {
 	return &Client{
-		LoginEndpoint: login,
+		LoginEndpoint:    login,
+		RegisterEndpoint: register,
 	}
 }
 
@@ -33,4 +35,14 @@ func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, 
 		return
 	}
 	return ires.(*LoginResult), nil
+}
+
+// Register calls the "register" endpoint of the "user" service.
+func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *RegisterResult, err error) {
+	var ires any
+	ires, err = c.RegisterEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*RegisterResult), nil
 }

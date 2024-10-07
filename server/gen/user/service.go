@@ -15,6 +15,8 @@ import (
 type Service interface {
 	// Login implements login.
 	Login(context.Context, *LoginPayload) (res *LoginResult, err error)
+	// Register implements register.
+	Register(context.Context, *RegisterPayload) (res *RegisterResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -31,7 +33,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"login"}
+var MethodNames = [2]string{"login", "register"}
 
 // LoginPayload is the payload type of the user service login method.
 type LoginPayload struct {
@@ -41,6 +43,18 @@ type LoginPayload struct {
 
 // LoginResult is the result type of the user service login method.
 type LoginResult struct {
+	User *UserType
+}
+
+// RegisterPayload is the payload type of the user service register method.
+type RegisterPayload struct {
+	Username string
+	Email    string
+	Password string
+}
+
+// RegisterResult is the result type of the user service register method.
+type RegisterResult struct {
 	User *UserType
 }
 

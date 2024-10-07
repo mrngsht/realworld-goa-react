@@ -23,7 +23,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"hermann.swift@bernhard.com\",\n      \"password\": \"Pariatur saepe placeat a perferendis occaecati assumenda.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"shemar.barton@barton.net\",\n      \"password\": \"Enim ab commodi odio voluptate.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 		if err != nil {
@@ -31,6 +31,30 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 		}
 	}
 	v := &user.LoginPayload{
+		Email:    body.Email,
+		Password: body.Password,
+	}
+
+	return v, nil
+}
+
+// BuildRegisterPayload builds the payload for the user register endpoint from
+// CLI flags.
+func BuildRegisterPayload(userRegisterBody string) (*user.RegisterPayload, error) {
+	var err error
+	var body RegisterRequestBody
+	{
+		err = json.Unmarshal([]byte(userRegisterBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"javon_bartell@wehner.net\",\n      \"password\": \"Voluptatibus ut nostrum laboriosam aliquid cum.\",\n      \"username\": \"Voluptas aut veniam sed ut et enim.\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &user.RegisterPayload{
+		Username: body.Username,
 		Email:    body.Email,
 		Password: body.Password,
 	}

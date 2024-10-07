@@ -22,15 +22,15 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `user login
+	return `user (login|register)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` user login --body '{
-      "email": "hermann.swift@bernhard.com",
-      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
+      "email": "shemar.barton@barton.net",
+      "password": "Enim ab commodi odio voluptate."
    }'` + "\n" +
 		""
 }
@@ -49,9 +49,13 @@ func ParseEndpoint(
 
 		userLoginFlags    = flag.NewFlagSet("login", flag.ExitOnError)
 		userLoginBodyFlag = userLoginFlags.String("body", "REQUIRED", "")
+
+		userRegisterFlags    = flag.NewFlagSet("register", flag.ExitOnError)
+		userRegisterBodyFlag = userRegisterFlags.String("body", "REQUIRED", "")
 	)
 	userFlags.Usage = userUsage
 	userLoginFlags.Usage = userLoginUsage
+	userRegisterFlags.Usage = userRegisterUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -90,6 +94,9 @@ func ParseEndpoint(
 			case "login":
 				epf = userLoginFlags
 
+			case "register":
+				epf = userRegisterFlags
+
 			}
 
 		}
@@ -118,6 +125,9 @@ func ParseEndpoint(
 			case "login":
 				endpoint = c.Login()
 				data, err = userc.BuildLoginPayload(*userLoginBodyFlag)
+			case "register":
+				endpoint = c.Register()
+				data, err = userc.BuildRegisterPayload(*userRegisterBodyFlag)
 			}
 		}
 	}
@@ -136,6 +146,7 @@ Usage:
 
 COMMAND:
     login: Login implements login.
+    register: Register implements register.
 
 Additional help:
     %[1]s user COMMAND --help
@@ -149,8 +160,23 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "hermann.swift@bernhard.com",
-      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
+      "email": "shemar.barton@barton.net",
+      "password": "Enim ab commodi odio voluptate."
+   }'
+`, os.Args[0])
+}
+
+func userRegisterUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user register -body JSON
+
+Register implements register.
+    -body JSON: 
+
+Example:
+    %[1]s user register --body '{
+      "email": "javon_bartell@wehner.net",
+      "password": "Voluptatibus ut nostrum laboriosam aliquid cum.",
+      "username": "Voluptas aut veniam sed ut et enim."
    }'
 `, os.Args[0])
 }

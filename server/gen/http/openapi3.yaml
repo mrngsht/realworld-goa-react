@@ -6,6 +6,36 @@ info:
 servers:
     - url: http://localhost:8080
 paths:
+    /api/users:
+        post:
+            tags:
+                - user
+            summary: register user
+            operationId: user#register
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RegisterRequestBody'
+                        example:
+                            email: javon_bartell@wehner.net
+                            password: Voluptatibus ut nostrum laboriosam aliquid cum.
+                            username: Voluptas aut veniam sed ut et enim.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginResponseBody'
+                            example:
+                                user:
+                                    bio: Et optio qui.
+                                    email: sedrick@terryauer.net
+                                    image: Temporibus dolorem illo dolores esse et.
+                                    token: Laboriosam quae autem sed ipsa est ratione.
+                                    username: Nihil pariatur a.
     /api/users/login:
         post:
             tags:
@@ -19,8 +49,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: hermann.swift@bernhard.com
-                            password: Pariatur saepe placeat a perferendis occaecati assumenda.
+                            email: shemar.barton@barton.net
+                            password: Enim ab commodi odio voluptate.
             responses:
                 "200":
                     description: OK response.
@@ -30,11 +60,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Beatae et.
-                                    email: savanna@hauck.name
-                                    image: Amet pariatur sit omnis aut aliquid corrupti.
-                                    token: Nisi nihil aut labore.
-                                    username: Enim ab commodi odio voluptate.
+                                    bio: Et optio qui.
+                                    email: sedrick@terryauer.net
+                                    image: Temporibus dolorem illo dolores esse et.
+                                    token: Laboriosam quae autem sed ipsa est ratione.
+                                    username: Nihil pariatur a.
 components:
     schemas:
         LoginRequestBody:
@@ -42,14 +72,14 @@ components:
             properties:
                 email:
                     type: string
-                    example: delfina_hartmann@terry.net
+                    example: erna_mcdermott@starkschultz.biz
                     format: email
                 password:
                     type: string
-                    example: Fuga adipisci nostrum quae aut.
+                    example: Eligendi expedita.
             example:
-                email: emily_cole@dietrich.net
-                password: Officiis qui quia voluptas laboriosam.
+                email: jennyfer@west.net
+                password: Error occaecati quis earum.
             required:
                 - email
                 - password
@@ -60,38 +90,59 @@ components:
                     $ref: '#/components/schemas/UserType'
             example:
                 user:
-                    bio: Beatae et.
-                    email: savanna@hauck.name
-                    image: Amet pariatur sit omnis aut aliquid corrupti.
-                    token: Nisi nihil aut labore.
-                    username: Enim ab commodi odio voluptate.
+                    bio: Et optio qui.
+                    email: sedrick@terryauer.net
+                    image: Temporibus dolorem illo dolores esse et.
+                    token: Laboriosam quae autem sed ipsa est ratione.
+                    username: Nihil pariatur a.
             required:
                 - user
+        RegisterRequestBody:
+            type: object
+            properties:
+                email:
+                    type: string
+                    example: clotilde@haley.biz
+                    format: email
+                password:
+                    type: string
+                    example: Veniam voluptatem quis.
+                username:
+                    type: string
+                    example: Consequatur corporis rem et animi quam.
+            example:
+                email: tabitha_rogahn@blanda.net
+                password: Qui temporibus minus enim.
+                username: Quas quis.
+            required:
+                - username
+                - email
+                - password
         UserType:
             type: object
             properties:
                 bio:
                     type: string
-                    example: Eveniet consequuntur non voluptas quo debitis quia.
+                    example: Quo voluptatibus et voluptatem asperiores praesentium vel.
                 email:
                     type: string
-                    example: cade.trantow@hamill.biz
+                    example: candice@kesslerspinka.com
                     format: email
                 image:
                     type: string
-                    example: Pariatur et minima minima dolorem aut.
+                    example: Necessitatibus ab.
                 token:
                     type: string
-                    example: Cupiditate qui consequuntur error laboriosam.
+                    example: Ea rem sequi deleniti suscipit enim.
                 username:
                     type: string
-                    example: Eveniet consequatur non laborum nesciunt exercitationem voluptas.
+                    example: Iste quibusdam maiores.
             example:
-                bio: Neque distinctio eligendi perspiciatis voluptatem dolore.
-                email: nathanial_jacobson@ebert.info
-                image: Quas in voluptatibus ut alias.
-                token: Et qui earum qui exercitationem dicta.
-                username: Accusamus facilis et doloremque.
+                bio: Aliquid voluptatem adipisci magnam placeat.
+                email: yolanda@kling.net
+                image: Itaque maiores atque ea.
+                token: Non quis officiis.
+                username: Quia illo porro itaque odit ex velit.
             required:
                 - email
                 - token

@@ -19,9 +19,23 @@ type LoginRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// RegisterRequestBody is the type of the "user" service "register" endpoint
+// HTTP request body.
+type RegisterRequestBody struct {
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+}
+
 // LoginResponseBody is the type of the "user" service "login" endpoint HTTP
 // response body.
 type LoginResponseBody struct {
+	User *UserTypeResponseBody `form:"user" json:"user" xml:"user"`
+}
+
+// RegisterResponseBody is the type of the "user" service "register" endpoint
+// HTTP response body.
+type RegisterResponseBody struct {
 	User *UserTypeResponseBody `form:"user" json:"user" xml:"user"`
 }
 
@@ -44,6 +58,16 @@ func NewLoginResponseBody(res *user.LoginResult) *LoginResponseBody {
 	return body
 }
 
+// NewRegisterResponseBody builds the HTTP response body from the result of the
+// "register" endpoint of the "user" service.
+func NewRegisterResponseBody(res *user.RegisterResult) *RegisterResponseBody {
+	body := &RegisterResponseBody{}
+	if res.User != nil {
+		body.User = marshalUserUserTypeToUserTypeResponseBody(res.User)
+	}
+	return body
+}
+
 // NewLoginPayload builds a user service login endpoint payload.
 func NewLoginPayload(body *LoginRequestBody) *user.LoginPayload {
 	v := &user.LoginPayload{
@@ -54,8 +78,37 @@ func NewLoginPayload(body *LoginRequestBody) *user.LoginPayload {
 	return v
 }
 
+// NewRegisterPayload builds a user service register endpoint payload.
+func NewRegisterPayload(body *RegisterRequestBody) *user.RegisterPayload {
+	v := &user.RegisterPayload{
+		Username: *body.Username,
+		Email:    *body.Email,
+		Password: *body.Password,
+	}
+
+	return v
+}
+
 // ValidateLoginRequestBody runs the validations defined on LoginRequestBody
 func ValidateLoginRequestBody(body *LoginRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	if body.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	return
+}
+
+// ValidateRegisterRequestBody runs the validations defined on
+// RegisterRequestBody
+func ValidateRegisterRequestBody(body *RegisterRequestBody) (err error) {
+	if body.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
+	}
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}

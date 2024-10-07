@@ -14,6 +14,31 @@ produces:
     - application/xml
     - application/gob
 paths:
+    /api/users:
+        post:
+            tags:
+                - user
+            summary: register user
+            operationId: user#register
+            parameters:
+                - name: RegisterRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UserRegisterRequestBody'
+                    required:
+                        - username
+                        - email
+                        - password
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/UserRegisterResponseBody'
+                        required:
+                            - user
+            schemes:
+                - http
     /api/users/login:
         post:
             tags:
@@ -45,14 +70,14 @@ definitions:
         properties:
             email:
                 type: string
-                example: marta.herman@schroederthiel.com
+                example: saul_shanahan@strosinrutherford.biz
                 format: email
             password:
                 type: string
-                example: Incidunt quia neque.
+                example: Eveniet consequatur non laborum nesciunt exercitationem voluptas.
         example:
-            email: collin.zulauf@raynor.biz
-            password: Necessitatibus tempora aut sit.
+            email: isabell@schusterfisher.net
+            password: Consectetur quos.
         required:
             - email
             - password
@@ -64,11 +89,48 @@ definitions:
                 $ref: '#/definitions/UserType'
         example:
             user:
-                bio: Beatae et.
-                email: savanna@hauck.name
-                image: Amet pariatur sit omnis aut aliquid corrupti.
-                token: Nisi nihil aut labore.
-                username: Enim ab commodi odio voluptate.
+                bio: Et optio qui.
+                email: sedrick@terryauer.net
+                image: Temporibus dolorem illo dolores esse et.
+                token: Laboriosam quae autem sed ipsa est ratione.
+                username: Nihil pariatur a.
+        required:
+            - user
+    UserRegisterRequestBody:
+        title: UserRegisterRequestBody
+        type: object
+        properties:
+            email:
+                type: string
+                example: kariane_yost@fritschbogan.name
+                format: email
+            password:
+                type: string
+                example: Animi tempora facere officiis totam.
+            username:
+                type: string
+                example: Quam earum quis quae quos et illo.
+        example:
+            email: dallin.auer@stamm.name
+            password: Accusamus et ut.
+            username: Dolor nesciunt.
+        required:
+            - username
+            - email
+            - password
+    UserRegisterResponseBody:
+        title: UserRegisterResponseBody
+        type: object
+        properties:
+            user:
+                $ref: '#/definitions/UserType'
+        example:
+            user:
+                bio: Et optio qui.
+                email: sedrick@terryauer.net
+                image: Temporibus dolorem illo dolores esse et.
+                token: Laboriosam quae autem sed ipsa est ratione.
+                username: Nihil pariatur a.
         required:
             - user
     UserType:
@@ -77,26 +139,26 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Voluptas aut veniam sed ut et enim.
+                example: Ullam ut ex minus.
             email:
                 type: string
-                example: aaron@raynor.org
+                example: julien@rosenbaum.org
                 format: email
             image:
                 type: string
-                example: Sint cum sapiente dolorum velit accusamus.
+                example: Nam ipsam reiciendis sit autem.
             token:
                 type: string
-                example: Et optio qui.
+                example: Dolore praesentium dicta vel facilis reprehenderit.
             username:
                 type: string
-                example: Temporibus dolorem illo dolores esse et.
+                example: Sed quasi.
         example:
-            bio: Quis natus.
-            email: hilda_schowalter@powlowskikuhic.name
-            image: Sint at eum sint omnis impedit.
-            token: Fuga vitae temporibus ducimus ut.
-            username: Sequi fugiat illo velit tenetur.
+            bio: Quis necessitatibus.
+            email: moises@witting.info
+            image: Aut sit est cum dolorum aut praesentium.
+            token: Tempora consequuntur et.
+            username: Perspiciatis provident.
         required:
             - email
             - token

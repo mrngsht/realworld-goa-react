@@ -11,3 +11,8 @@ package server
 func LoginUserPath() string {
 	return "/api/users/login"
 }
+
+// RegisterUserPath returns the URL path to the user service register HTTP endpoint.
+func RegisterUserPath() string {
+	return "/api/users"
+}
