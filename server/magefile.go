@@ -26,7 +26,7 @@ func (Goa) Gen() error {
 type Migration mg.Namespace
 
 const (
-	rdbConnectionString = "user=postgres dbname=realworld sslmode=disable"
+	rdbConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable"
 	rdbMigrationDirPath = "./rdb/migrations"
 )
 
