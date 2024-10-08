@@ -6,7 +6,7 @@ CREATE TABLE "user_auth_password_" (
     "created_at_" timestamp with time zone NOT NULL,
     "updated_at_" timestamp with time zone NOT NULL,
     "user_id_" "uuid" NOT NULL,
-    "password_hash_" "text"
+    "password_hash_" "text" NOT NULL
 );
 CREATE TABLE "user_profile_" (
     "created_at_" timestamp with time zone NOT NULL,

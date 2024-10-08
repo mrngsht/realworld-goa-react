@@ -7,6 +7,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/mrngsht/realworld-goa-react/rdb"
 )
 
 func Setup() error {
@@ -14,6 +15,9 @@ func Setup() error {
 		return err
 	}
 	if err := sh.RunV("go", "install", "github.com/pressly/goose/v3/cmd/goose@v3.22.1"); err != nil {
+		return err
+	}
+	if err := sh.RunV("go", "install", "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0"); err != nil {
 		return err
 	}
 	return nil
@@ -28,13 +32,12 @@ func (Goa) Gen() error {
 type Migration mg.Namespace
 
 const (
-	rdbConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable"
 	rdbMigrationDirPath = "./rdb/migrations"
 	rdbSchemaFilePath   = "./rdb/schema.sql"
 )
 
 var (
-	gooseOpt = []string{"-dir", rdbMigrationDirPath, "postgres", rdbConnectionString}
+	gooseOpt = []string{"-dir", rdbMigrationDirPath, "postgres", rdb.LocalConnectionString}
 )
 
 func (Migration) New(name string) error {
@@ -79,4 +82,14 @@ func (Migration) Schema() error {
 		return err
 	}
 	return nil
+}
+
+type Sqlc mg.Namespace
+
+const (
+	rdbSqlcYamlPath = "rdb/sqlc.yaml"
+)
+
+func (Sqlc) Gen() error {
+	return sh.RunV("sqlc", "generate", "-f", rdbSqlcYamlPath)
 }

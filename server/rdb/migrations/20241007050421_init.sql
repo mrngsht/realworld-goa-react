@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS user_auth_password_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   updated_at_ TIMESTAMPTZ NOT NULL,
   user_id_ UUID NOT NULL,
-  password_hash_ TEXT,
+  password_hash_ TEXT NOT NULL,
   PRIMARY KEY (user_id_),
   CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_)
 );

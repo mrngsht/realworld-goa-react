@@ -1,17 +1,27 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 
 	goahttp "goa.design/goa/v3/http"
 
 	"github.com/mrngsht/realworld-goa-react/gen/http/user/server"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
+	"github.com/mrngsht/realworld-goa-react/rdb"
 	"github.com/mrngsht/realworld-goa-react/service"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	s := &service.User{}
+	db, err := sql.Open("postgres", rdb.LocalConnectionString)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	s := service.NewUser(db)
 	endpoints := user.NewEndpoints(s)
 	mux := goahttp.NewMuxer()
 	dec := goahttp.RequestDecoder
