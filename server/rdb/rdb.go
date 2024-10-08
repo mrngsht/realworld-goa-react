@@ -3,31 +3,25 @@ package rdb
 import (
 	"context"
 	"database/sql"
-	"fmt"
+
+	"github.com/cockroachdb/errors"
+	"github.com/mrngsht/realworld-goa-react/rdb/internal"
+
+	_ "github.com/lib/pq"
 )
 
 const (
-	LocalConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable"
+	LocalConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable timezone=UTC"
 )
 
+func OpenLocalRDB() (*sql.DB, error) {
+	return sql.Open("postgres", LocalConnectionString)
+}
+
+func IsErrNoRows(err error) bool {
+	return errors.Is(err, sql.ErrNoRows)
+}
+
 func Tx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
-	tx, beginErr := db.BeginTx(ctx, nil)
-	if beginErr != nil {
-		return beginErr
-	}
-
-	defer func() {
-		if panicErr := recover(); panicErr != nil {
-			err = fmt.Errorf("panic error %v", panicErr)
-		}
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if err := txFunc(ctx, tx); err != nil {
-		return err
-	}
-
-	return tx.Commit()
+	return internal.Tx(ctx, db, txFunc)
 }

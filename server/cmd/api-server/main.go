@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"net/http"
 
 	goahttp "goa.design/goa/v3/http"
@@ -10,12 +9,10 @@ import (
 	"github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/rdb"
 	"github.com/mrngsht/realworld-goa-react/service"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := sql.Open("postgres", rdb.LocalConnectionString)
+	db, err := rdb.OpenLocalRDB()
 	if err != nil {
 		panic(err)
 	}

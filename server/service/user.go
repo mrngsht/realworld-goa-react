@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 
+	"github.com/mrngsht/realworld-goa-react/ctxtime"
 	"github.com/mrngsht/realworld-goa-react/domain/user"
 	goa "github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/rdb"
@@ -52,7 +52,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 	if err := rdb.Tx(ctx, u.rdb, func(ctx context.Context, tx *sql.Tx) error {
 		q = q.WithTx(tx)
 
-		now := time.Now()
+		now := ctxtime.Now(ctx)
 		userID := uuid.New()
 
 		if err := q.InsertUser(ctx, sqlcgen.InsertUserParams{

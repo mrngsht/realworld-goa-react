@@ -7,3 +7,10 @@ sql:
       go:
         package: "sqlcgen"
         out: "./sqlcgen"
+  - engine: "postgresql"
+    queries: "./queries_for_test"
+    schema: "./schema.sql"
+    gen:
+      go:
+        package: "sqlctest"
+        out: "./rdbtest/sqlctest"
