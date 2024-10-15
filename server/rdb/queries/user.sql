@@ -14,10 +14,20 @@ VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
 
 -- name: InsertUserProfile :exec
 INSERT INTO user_profile_
-(created_at_, updated_at_, user_id_, username_, email_, bio_, image_url_) 
-VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2, $3, $4, $5);
+(created_at_, updated_at_, user_id_, username_, bio_, image_url_) 
+VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2, $3, $4);
 
 -- name: InsertUserProfileMutation :exec
 INSERT INTO user_profile_mutation_
-(created_at_, user_id_, username_, email_, bio_, image_url_) 
-VALUES ($1, $2, $3, $4, $5, $6);
+(created_at_, user_id_, username_, bio_, image_url_) 
+VALUES ($1, $2, $3, $4, $5);
+
+-- name: InsertUserEmail :exec
+INSERT INTO user_email_
+(created_at_, updated_at_, user_id_, email_) 
+VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
+
+-- name: InsertUserEmailMutation :exec
+INSERT INTO user_email_mutation_
+(created_at_, user_id_, email_) 
+VALUES ($1, $2, $3);

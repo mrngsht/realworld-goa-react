@@ -57,16 +57,49 @@ func (q *Queries) InsertUserAuthPassword(ctx context.Context, arg InsertUserAuth
 	return err
 }
 
+const insertUserEmail = `-- name: InsertUserEmail :exec
+INSERT INTO user_email_
+(created_at_, updated_at_, user_id_, email_) 
+VALUES ($3, $3, $1, $2)
+`
+
+type InsertUserEmailParams struct {
+	UserID    uuid.UUID
+	Email     string
+	CreatedAt time.Time
+}
+
+func (q *Queries) InsertUserEmail(ctx context.Context, arg InsertUserEmailParams) error {
+	_, err := q.db.ExecContext(ctx, insertUserEmail, arg.UserID, arg.Email, arg.CreatedAt)
+	return err
+}
+
+const insertUserEmailMutation = `-- name: InsertUserEmailMutation :exec
+INSERT INTO user_email_mutation_
+(created_at_, user_id_, email_) 
+VALUES ($1, $2, $3)
+`
+
+type InsertUserEmailMutationParams struct {
+	CreatedAt time.Time
+	UserID    uuid.UUID
+	Email     string
+}
+
+func (q *Queries) InsertUserEmailMutation(ctx context.Context, arg InsertUserEmailMutationParams) error {
+	_, err := q.db.ExecContext(ctx, insertUserEmailMutation, arg.CreatedAt, arg.UserID, arg.Email)
+	return err
+}
+
 const insertUserProfile = `-- name: InsertUserProfile :exec
 INSERT INTO user_profile_
-(created_at_, updated_at_, user_id_, username_, email_, bio_, image_url_) 
-VALUES ($6, $6, $1, $2, $3, $4, $5)
+(created_at_, updated_at_, user_id_, username_, bio_, image_url_) 
+VALUES ($5, $5, $1, $2, $3, $4)
 `
 
 type InsertUserProfileParams struct {
 	UserID    uuid.UUID
 	Username  string
-	Email     string
 	Bio       string
 	ImageUrl  string
 	CreatedAt time.Time
@@ -76,7 +109,6 @@ func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfilePa
 	_, err := q.db.ExecContext(ctx, insertUserProfile,
 		arg.UserID,
 		arg.Username,
-		arg.Email,
 		arg.Bio,
 		arg.ImageUrl,
 		arg.CreatedAt,
@@ -86,15 +118,14 @@ func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfilePa
 
 const insertUserProfileMutation = `-- name: InsertUserProfileMutation :exec
 INSERT INTO user_profile_mutation_
-(created_at_, user_id_, username_, email_, bio_, image_url_) 
-VALUES ($1, $2, $3, $4, $5, $6)
+(created_at_, user_id_, username_, bio_, image_url_) 
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type InsertUserProfileMutationParams struct {
 	CreatedAt time.Time
 	UserID    uuid.UUID
 	Username  string
-	Email     string
 	Bio       string
 	ImageUrl  string
 }
@@ -104,7 +135,6 @@ func (q *Queries) InsertUserProfileMutation(ctx context.Context, arg InsertUserP
 		arg.CreatedAt,
 		arg.UserID,
 		arg.Username,
-		arg.Email,
 		arg.Bio,
 		arg.ImageUrl,
 	)

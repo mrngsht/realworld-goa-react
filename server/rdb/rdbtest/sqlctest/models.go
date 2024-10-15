@@ -22,12 +22,24 @@ type UserAuthPassword struct {
 	PasswordHash string
 }
 
+type UserEmail struct {
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+	Email     string
+}
+
+type UserEmailMutation struct {
+	CreatedAt time.Time
+	UserID    uuid.UUID
+	Email     string
+}
+
 type UserProfile struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	UserID    uuid.UUID
 	Username  string
-	Email     string
 	Bio       string
 	ImageUrl  string
 }
@@ -36,7 +48,6 @@ type UserProfileMutation struct {
 	CreatedAt time.Time
 	UserID    uuid.UUID
 	Username  string
-	Email     string
 	Bio       string
 	ImageUrl  string
 }

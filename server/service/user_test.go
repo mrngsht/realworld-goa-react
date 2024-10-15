@@ -38,10 +38,30 @@ func TestUser_Register(t *testing.T) {
 
 		p, err := q.GetUserProfileByUsername(ctx, payload.Username)
 		require.NoError(t, err)
-		assert.Equal(t, payload.Email, p.Email)
 		assert.Equal(t, "", p.Bio)
 		assert.Equal(t, "", p.ImageUrl)
 		assert.Equal(t, executedAt, p.CreatedAt)
+
+		pms, err := q.ListUserProfileMutationByUserID(ctx, p.UserID)
+		require.NoError(t, err)
+		require.Len(t, pms, 1)
+		pm := pms[0]
+		assert.Equal(t, payload.Username, pm.Username)
+		assert.Equal(t, "", pm.Bio)
+		assert.Equal(t, "", pm.ImageUrl)
+		assert.Equal(t, executedAt, pm.CreatedAt)
+
+		e, err := q.GetUserEmailByID(ctx, p.UserID)
+		require.NoError(t, err)
+		assert.Equal(t, payload.Email, e.Email)
+		assert.Equal(t, executedAt, e.CreatedAt)
+
+		ems, err := q.ListUserEmailMutationByUserID(ctx, p.UserID)
+		require.NoError(t, err)
+		require.Len(t, ems, 1)
+		em := ems[0]
+		assert.Equal(t, payload.Email, em.Email)
+		assert.Equal(t, executedAt, em.CreatedAt)
 
 		u, err := q.GetUserByID(ctx, p.UserID)
 		require.NoError(t, err)

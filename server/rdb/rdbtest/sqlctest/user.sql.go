@@ -42,8 +42,26 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const getUserEmailByID = `-- name: GetUserEmailByID :one
+SELECT created_at_, updated_at_, user_id_, email_ FROM user_email_
+WHERE user_id_ = $1
+LIMIT 1
+`
+
+func (q *Queries) GetUserEmailByID(ctx context.Context, userID uuid.UUID) (UserEmail, error) {
+	row := q.db.QueryRowContext(ctx, getUserEmailByID, userID)
+	var i UserEmail
+	err := row.Scan(
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+		&i.Email,
+	)
+	return i, err
+}
+
 const getUserProfileByUsername = `-- name: GetUserProfileByUsername :one
-SELECT created_at_, updated_at_, user_id_, username_, email_, bio_, image_url_ FROM user_profile_
+SELECT created_at_, updated_at_, user_id_, username_, bio_, image_url_ FROM user_profile_
 WHERE username_ = $1
 LIMIT 1
 `
@@ -56,15 +74,42 @@ func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string)
 		&i.UpdatedAt,
 		&i.UserID,
 		&i.Username,
-		&i.Email,
 		&i.Bio,
 		&i.ImageUrl,
 	)
 	return i, err
 }
 
+const listUserEmailMutationByUserID = `-- name: ListUserEmailMutationByUserID :many
+SELECT created_at_, user_id_, email_ FROM user_email_mutation_
+WHERE user_id_ = $1
+`
+
+func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserEmailMutation, error) {
+	rows, err := q.db.QueryContext(ctx, listUserEmailMutationByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserEmailMutation
+	for rows.Next() {
+		var i UserEmailMutation
+		if err := rows.Scan(&i.CreatedAt, &i.UserID, &i.Email); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUserProfileMutationByUserID = `-- name: ListUserProfileMutationByUserID :many
-SELECT created_at_, user_id_, username_, email_, bio_, image_url_ FROM user_profile_mutation_
+SELECT created_at_, user_id_, username_, bio_, image_url_ FROM user_profile_mutation_
 WHERE user_id_ = $1
 `
 
@@ -81,7 +126,6 @@ func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, userID uu
 			&i.CreatedAt,
 			&i.UserID,
 			&i.Username,
-			&i.Email,
 			&i.Bio,
 			&i.ImageUrl,
 		); err != nil {

@@ -65,7 +65,6 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		if err := q.InsertUserProfile(ctx, sqlcgen.InsertUserProfileParams{
 			UserID:    userID,
 			Username:  payload.Username,
-			Email:     payload.Email,
 			Bio:       "",
 			ImageUrl:  "",
 			CreatedAt: now,
@@ -75,9 +74,23 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
 			UserID:    userID,
 			Username:  payload.Username,
-			Email:     payload.Email,
 			Bio:       "",
 			ImageUrl:  "",
+			CreatedAt: now,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := q.InsertUserEmail(ctx, sqlcgen.InsertUserEmailParams{
+			UserID:    userID,
+			Email:     payload.Email,
+			CreatedAt: now,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+		if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{
+			UserID:    userID,
+			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
 			return errors.WithStack(err)
