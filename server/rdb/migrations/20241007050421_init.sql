@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS user_profile_ (
   bio_ TEXT NOT NULL,
   image_url_ TEXT NOT NULL,
   PRIMARY KEY (user_id_),
+  UNIQUE (username_),
+  UNIQUE (email_),
   CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_)
 );
 
