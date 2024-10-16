@@ -29,7 +29,7 @@ func TestUser_Register(t *testing.T) {
 			Email:    "succeed@example.com",
 			Password: "succeed",
 		}
-		res, err := svc.Register(ctx, payload)
+		res, err := svc.Register(ctx, payload) // Act
 		require.NoError(t, err)
 
 		assert.Equal(t, payload.Username, res.User.Username)
@@ -87,7 +87,7 @@ func TestUser_Register(t *testing.T) {
 				Email:    "dup_username_different_email@example.com",
 				Password: "dup_username_different_password",
 			}
-			_, err := svc.Register(ctx, payload)
+			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUserUsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
@@ -114,7 +114,7 @@ func TestUser_Register(t *testing.T) {
 				Email:    "dup_email@example.com",
 				Password: "dup_email_different_password",
 			}
-			_, err := svc.Register(ctx, payload)
+			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUserEmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
