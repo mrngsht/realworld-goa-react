@@ -39,6 +39,42 @@ type RegisterResponseBody struct {
 	User *UserTypeResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
+// RegisterUsernameAlreadyUsedResponseBody is the type of the "user" service
+// "register" endpoint HTTP response body for the "UsernameAlreadyUsed" error.
+type RegisterUsernameAlreadyUsedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// RegisterEmailAlreadyUsedResponseBody is the type of the "user" service
+// "register" endpoint HTTP response body for the "EmailAlreadyUsed" error.
+type RegisterEmailAlreadyUsedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // UserTypeResponseBody is used to define fields on response body types.
 type UserTypeResponseBody struct {
 	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
@@ -87,6 +123,36 @@ func NewRegisterResultOK(body *RegisterResponseBody) *user.RegisterResult {
 	return v
 }
 
+// NewRegisterUsernameAlreadyUsed builds a user service register endpoint
+// UsernameAlreadyUsed error.
+func NewRegisterUsernameAlreadyUsed(body *RegisterUsernameAlreadyUsedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewRegisterEmailAlreadyUsed builds a user service register endpoint
+// EmailAlreadyUsed error.
+func NewRegisterEmailAlreadyUsed(body *RegisterEmailAlreadyUsedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // ValidateLoginResponseBody runs the validations defined on LoginResponseBody
 func ValidateLoginResponseBody(body *LoginResponseBody) (err error) {
 	if body.User == nil {
@@ -114,6 +180,54 @@ func ValidateRegisterResponseBody(body *RegisterResponseBody) (err error) {
 	return
 }
 
+// ValidateRegisterUsernameAlreadyUsedResponseBody runs the validations defined
+// on register_UsernameAlreadyUsed_response_body
+func ValidateRegisterUsernameAlreadyUsedResponseBody(body *RegisterUsernameAlreadyUsedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateRegisterEmailAlreadyUsedResponseBody runs the validations defined on
+// register_EmailAlreadyUsed_response_body
+func ValidateRegisterEmailAlreadyUsedResponseBody(body *RegisterEmailAlreadyUsedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateUserTypeResponseBody runs the validations defined on
 // UserTypeResponseBody
 func ValidateUserTypeResponseBody(body *UserTypeResponseBody) (err error) {
@@ -131,9 +245,6 @@ func ValidateUserTypeResponseBody(body *UserTypeResponseBody) (err error) {
 	}
 	if body.Image == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("image", "body"))
-	}
-	if body.Email != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
 	return
 }

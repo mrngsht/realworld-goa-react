@@ -22,6 +22,11 @@ SELECT * FROM user_email_
 WHERE user_id_ = $1
 LIMIT 1;
 
+-- name: GetUserEmailByEmail :one
+SELECT * FROM user_email_
+WHERE email_ = $1
+LIMIT 1;
+
 -- name: ListUserEmailMutationByUserID :many
 SELECT * FROM user_email_mutation_
 WHERE user_id_ = $1;

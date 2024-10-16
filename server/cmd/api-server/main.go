@@ -7,12 +7,12 @@ import (
 
 	"github.com/mrngsht/realworld-goa-react/gen/http/user/server"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
-	"github.com/mrngsht/realworld-goa-react/rdb"
+	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/service"
 )
 
 func main() {
-	db, err := rdb.OpenLocalRDB()
+	db, err := myrdb.OpenLocalRDB()
 	if err != nil {
 		panic(err)
 	}

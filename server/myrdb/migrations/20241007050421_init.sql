@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS user_profile_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   updated_at_ TIMESTAMPTZ NOT NULL,
   user_id_ UUID NOT NULL,
-  username_ VARCHAR(24) NOT NULL,
+  username_ VARCHAR(64) NOT NULL,
   bio_ TEXT NOT NULL,
   image_url_ TEXT NOT NULL,
   PRIMARY KEY (user_id_),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS user_profile_ (
 CREATE TABLE IF NOT EXISTS user_profile_mutation_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   user_id_ UUID NOT NULL,
-  username_ VARCHAR(24) NOT NULL,
+  username_ VARCHAR(64) NOT NULL,
   bio_ TEXT NOT NULL,
   image_url_ TEXT NOT NULL,
   CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_)

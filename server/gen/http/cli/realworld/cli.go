@@ -29,8 +29,8 @@ func UsageCommands() string {
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` user login --body '{
-      "email": "shemar.barton@barton.net",
-      "password": "Enim ab commodi odio voluptate."
+      "email": "hermann.swift@bernhard.com",
+      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
    }'` + "\n" +
 		""
 }
@@ -160,8 +160,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "shemar.barton@barton.net",
-      "password": "Enim ab commodi odio voluptate."
+      "email": "hermann.swift@bernhard.com",
+      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
    }'
 `, os.Args[0])
 }
@@ -174,9 +174,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "javon_bartell@wehner.net",
-      "password": "Voluptatibus ut nostrum laboriosam aliquid cum.",
-      "username": "Voluptas aut veniam sed ut et enim."
+      "email": "valentina@grimeskerluke.info",
+      "password": "2hu",
+      "username": "k{3, 32}"
    }'
 `, os.Args[0])
 }

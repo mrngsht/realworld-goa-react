@@ -28,6 +28,10 @@ func NewClient(login, register goa.Endpoint) *Client {
 }
 
 // Login calls the "login" endpoint of the "user" service.
+// Login may return the following errors:
+//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailAlreadyUsed" (type *goa.ServiceError)
+//   - error: internal error
 func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, err error) {
 	var ires any
 	ires, err = c.LoginEndpoint(ctx, p)
@@ -38,6 +42,10 @@ func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, 
 }
 
 // Register calls the "register" endpoint of the "user" service.
+// Register may return the following errors:
+//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailAlreadyUsed" (type *goa.ServiceError)
+//   - error: internal error
 func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *RegisterResult, err error) {
 	var ires any
 	ires, err = c.RegisterEndpoint(ctx, p)

@@ -4,19 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
-	"github.com/mrngsht/realworld-goa-react/rdb"
-	"github.com/mrngsht/realworld-goa-react/rdb/internal"
-	"github.com/mrngsht/realworld-goa-react/rdb/rdbtest/sqlctest"
+	"github.com/mrngsht/realworld-goa-react/myrdb"
+	"github.com/mrngsht/realworld-goa-react/myrdb/internal"
+	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
 )
 
 func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlctest.Queries) {
 	t.Helper()
 
-	db, err := rdb.OpenLocalRDB()
+	db, err := myrdb.OpenLocalRDB()
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +27,7 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlctest.Queries) {
 		panic(err)
 	}
 
-	internal.Tx = func(ctx context.Context, _ *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) error {
+	internal.Tx = func(ctx context.Context, _ *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
 		savePointName := uuid.New().String()
 
 		_, err = tx.ExecContext(ctx, fmt.Sprintf(`SAVEPOINT "%s"`, savePointName))
@@ -58,8 +59,12 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlctest.Queries) {
 	}
 
 	t.Cleanup(func() {
-		tx.Rollback()
-		db.Close()
+		if err := tx.Rollback(); err != nil {
+			log.Default().Printf("test tx rollback error: %v", err)
+		}
+		if err := db.Close(); err != nil {
+			log.Default().Printf("test db close error: %v", err)
+		}
 	})
 
 	return db, sqlctest.New(db).WithTx(tx)

@@ -9,7 +9,7 @@ import (
 
 var Tx = DefaultTx
 
-func DefaultTx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) error {
+func DefaultTx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return errors.WithStack(err)

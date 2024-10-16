@@ -10,6 +10,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	user "github.com/mrngsht/realworld-goa-react/gen/user"
 	goa "goa.design/goa/v3/pkg"
@@ -23,7 +24,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"shemar.barton@barton.net\",\n      \"password\": \"Enim ab commodi odio voluptate.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"hermann.swift@bernhard.com\",\n      \"password\": \"Pariatur saepe placeat a perferendis occaecati assumenda.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 		if err != nil {
@@ -46,9 +47,16 @@ func BuildRegisterPayload(userRegisterBody string) (*user.RegisterPayload, error
 	{
 		err = json.Unmarshal([]byte(userRegisterBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"javon_bartell@wehner.net\",\n      \"password\": \"Voluptatibus ut nostrum laboriosam aliquid cum.\",\n      \"username\": \"Voluptas aut veniam sed ut et enim.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"valentina@grimeskerluke.info\",\n      \"password\": \"2hu\",\n      \"username\": \"k{3, 32}\"\n   }'")
 		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-z0-9_]{3, 32}$"))
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+		if utf8.RuneCountInString(body.Password) < 6 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 6, true))
+		}
+		if utf8.RuneCountInString(body.Password) > 128 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 128, false))
+		}
 		if err != nil {
 			return nil, err
 		}

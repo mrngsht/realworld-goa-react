@@ -4,9 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mrngsht/realworld-goa-react/ctxtime/ctxtimetest"
+	"github.com/mrngsht/realworld-goa-react/design"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
-	"github.com/mrngsht/realworld-goa-react/rdb/rdbtest"
+	"github.com/mrngsht/realworld-goa-react/myrdb"
+	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest"
+	"github.com/mrngsht/realworld-goa-react/mytime/mytimetest"
 	"github.com/mrngsht/realworld-goa-react/service"
 	"github.com/mrngsht/realworld-goa-react/service/servicetest"
 	"github.com/stretchr/testify/assert"
@@ -20,12 +22,12 @@ func TestUser_Register(t *testing.T) {
 	svc := service.NewUser(rdb)
 
 	t.Run("succeed", func(t *testing.T) {
-		executedAt := ctxtimetest.AdjustTimeForTest(time.Now())
-		ctx := ctxtimetest.WithFixedNow(t, ctx, executedAt)
+		executedAt := mytimetest.AdjustTimeForTest(time.Now())
+		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
 		payload := &user.RegisterPayload{
-			Username: "taro",
-			Email:    "taro@example.com",
-			Password: "taro_pass",
+			Username: "succeed",
+			Email:    "succeed@example.com",
+			Password: "succeed",
 		}
 		res, err := svc.Register(ctx, payload)
 		require.NoError(t, err)
@@ -66,5 +68,59 @@ func TestUser_Register(t *testing.T) {
 		u, err := q.GetUserByID(ctx, p.UserID)
 		require.NoError(t, err)
 		assert.Equal(t, executedAt, u.CreatedAt)
+	})
+
+	t.Run("username already used", func(t *testing.T) {
+		{ // 1st: expect to succeed
+			payload := &user.RegisterPayload{
+				Username: "dup_username",
+				Email:    "dup_username@example.com",
+				Password: "dup_username",
+			}
+			_, err := svc.Register(ctx, payload)
+			require.NoError(t, err)
+		}
+
+		{ // 2nd: expect to fail
+			payload := &user.RegisterPayload{
+				Username: "dup_username",
+				Email:    "dup_username_different_email@example.com",
+				Password: "dup_username_different_password",
+			}
+			_, err := svc.Register(ctx, payload)
+			require.Error(t, err)
+			assert.Equal(t, design.ErrorUserUsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
+
+			_, err = q.GetUserEmailByEmail(ctx, payload.Email)
+			require.Error(t, err)
+			assert.True(t, myrdb.IsErrNoRows(err))
+		}
+	})
+
+	t.Run("email already used", func(t *testing.T) {
+		{ // 1st: expect to succeed
+			payload := &user.RegisterPayload{
+				Username: "dup_email",
+				Email:    "dup_email@example.com",
+				Password: "dup_email",
+			}
+			_, err := svc.Register(ctx, payload)
+			require.NoError(t, err)
+		}
+
+		{ // 2nd: expect to fail
+			payload := &user.RegisterPayload{
+				Username: "dup_email_different_username",
+				Email:    "dup_email@example.com",
+				Password: "dup_email_different_password",
+			}
+			_, err := svc.Register(ctx, payload)
+			require.Error(t, err)
+			assert.Equal(t, design.ErrorUserEmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
+
+			_, err = q.GetUserProfileByUsername(ctx, payload.Username)
+			require.Error(t, err)
+			assert.True(t, myrdb.IsErrNoRows(err))
+		}
 	})
 }

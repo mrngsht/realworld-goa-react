@@ -3,16 +3,16 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 
-	"github.com/mrngsht/realworld-goa-react/ctxtime"
 	"github.com/mrngsht/realworld-goa-react/domain/user"
 	goa "github.com/mrngsht/realworld-goa-react/gen/user"
-	"github.com/mrngsht/realworld-goa-react/rdb"
-	"github.com/mrngsht/realworld-goa-react/rdb/sqlcgen"
+	"github.com/mrngsht/realworld-goa-react/myerr"
+	"github.com/mrngsht/realworld-goa-react/myrdb"
+	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
+	"github.com/mrngsht/realworld-goa-react/mytime"
 )
 
 type User struct {
@@ -36,9 +36,13 @@ func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.Lo
 
 func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *goa.RegisterResult, err error) {
 	defer func() {
-		// FIXME:
-		if err != nil {
-			log.Default().Printf("err: %+v\n", err)
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case user.ErrUsernameAlreadyUsed:
+				err = goa.MakeUsernameAlreadyUsed(err)
+			case user.ErrEmailAlreadyUsed:
+				err = goa.MakeEmailAlreadyUsed(err)
+			}
 		}
 	}()
 
@@ -49,10 +53,10 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		return nil, errors.WithStack(err)
 	}
 
-	if err := rdb.Tx(ctx, u.rdb, func(ctx context.Context, tx *sql.Tx) error {
+	if err := myrdb.Tx(ctx, u.rdb, func(ctx context.Context, tx *sql.Tx) error {
 		q = q.WithTx(tx)
 
-		now := ctxtime.Now(ctx)
+		now := mytime.Now(ctx)
 		userID := uuid.New()
 
 		if err := q.InsertUser(ctx, sqlcgen.InsertUserParams{
@@ -69,6 +73,9 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 			ImageUrl:  "",
 			CreatedAt: now,
 		}); err != nil {
+			if myrdb.IsErrUniqueViolation(err) {
+				return user.ErrUsernameAlreadyUsed
+			}
 			return errors.WithStack(err)
 		}
 		if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
@@ -86,6 +93,9 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
+			if myrdb.IsErrUniqueViolation(err) {
+				return user.ErrEmailAlreadyUsed
+			}
 			return errors.WithStack(err)
 		}
 		if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{

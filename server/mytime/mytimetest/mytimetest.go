@@ -1,11 +1,11 @@
-package ctxtimetest
+package mytimetest
 
 import (
 	"context"
 	"testing"
 	"time"
 
-	"github.com/mrngsht/realworld-goa-react/ctxtime/internal"
+	"github.com/mrngsht/realworld-goa-react/mytime/internal"
 )
 
 func init() {

@@ -8,6 +8,8 @@
 package server
 
 import (
+	"unicode/utf8"
+
 	user "github.com/mrngsht/realworld-goa-react/gen/user"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -39,6 +41,42 @@ type RegisterResponseBody struct {
 	User *UserTypeResponseBody `form:"user" json:"user" xml:"user"`
 }
 
+// RegisterUsernameAlreadyUsedResponseBody is the type of the "user" service
+// "register" endpoint HTTP response body for the "UsernameAlreadyUsed" error.
+type RegisterUsernameAlreadyUsedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RegisterEmailAlreadyUsedResponseBody is the type of the "user" service
+// "register" endpoint HTTP response body for the "EmailAlreadyUsed" error.
+type RegisterEmailAlreadyUsedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // UserTypeResponseBody is used to define fields on response body types.
 type UserTypeResponseBody struct {
 	Email    string `form:"email" json:"email" xml:"email"`
@@ -64,6 +102,34 @@ func NewRegisterResponseBody(res *user.RegisterResult) *RegisterResponseBody {
 	body := &RegisterResponseBody{}
 	if res.User != nil {
 		body.User = marshalUserUserTypeToUserTypeResponseBody(res.User)
+	}
+	return body
+}
+
+// NewRegisterUsernameAlreadyUsedResponseBody builds the HTTP response body
+// from the result of the "register" endpoint of the "user" service.
+func NewRegisterUsernameAlreadyUsedResponseBody(res *goa.ServiceError) *RegisterUsernameAlreadyUsedResponseBody {
+	body := &RegisterUsernameAlreadyUsedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRegisterEmailAlreadyUsedResponseBody builds the HTTP response body from
+// the result of the "register" endpoint of the "user" service.
+func NewRegisterEmailAlreadyUsedResponseBody(res *goa.ServiceError) *RegisterEmailAlreadyUsedResponseBody {
+	body := &RegisterEmailAlreadyUsedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
 	}
 	return body
 }
@@ -115,8 +181,21 @@ func ValidateRegisterRequestBody(body *RegisterRequestBody) (err error) {
 	if body.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
 	}
+	if body.Username != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", *body.Username, "^[a-z0-9_]{3, 32}$"))
+	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) < 6 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 6, true))
+		}
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) > 128 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 128, false))
+		}
 	}
 	return
 }

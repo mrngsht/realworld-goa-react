@@ -9,6 +9,8 @@ package user
 
 import (
 	"context"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // user
@@ -64,4 +66,14 @@ type UserType struct {
 	Username string
 	Bio      string
 	Image    string
+}
+
+// MakeUsernameAlreadyUsed builds a goa.ServiceError from an error.
+func MakeUsernameAlreadyUsed(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "UsernameAlreadyUsed", false, false, false)
+}
+
+// MakeEmailAlreadyUsed builds a goa.ServiceError from an error.
+func MakeEmailAlreadyUsed(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "EmailAlreadyUsed", false, false, false)
 }

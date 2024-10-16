@@ -7,7 +7,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mrngsht/realworld-goa-react/rdb"
+	rdb "github.com/mrngsht/realworld-goa-react/myrdb"
 )
 
 func Setup() error {
@@ -32,8 +32,8 @@ func (Goa) Gen() error {
 type Migration mg.Namespace
 
 const (
-	rdbMigrationDirPath = "./rdb/migrations"
-	rdbSchemaFilePath   = "./rdb/schema.sql"
+	rdbMigrationDirPath = "./myrdb/migrations"
+	rdbSchemaFilePath   = "./myrdb/schema.sql"
 )
 
 var (
@@ -87,7 +87,7 @@ func (Migration) Schema() error {
 type Sqlc mg.Namespace
 
 const (
-	rdbSqlcYamlPath = "rdb/sqlc.yaml"
+	rdbSqlcYamlPath = "myrdb/sqlc.yaml"
 )
 
 func (Sqlc) Gen() error {
