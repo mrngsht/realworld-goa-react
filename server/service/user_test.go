@@ -17,7 +17,7 @@ import (
 
 func TestUser_Register(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, q := rdbtest.CreateRDB(t, ctx)
+	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
 
 	svc := service.NewUser(rdb)
 
@@ -38,13 +38,13 @@ func TestUser_Register(t *testing.T) {
 		assert.Equal(t, "", res.User.Bio)
 		assert.Equal(t, "", res.User.Image)
 
-		p, err := q.GetUserProfileByUsername(ctx, payload.Username)
+		p, err := qt.GetUserProfileByUsername(ctx, payload.Username)
 		require.NoError(t, err)
 		assert.Equal(t, "", p.Bio)
 		assert.Equal(t, "", p.ImageUrl)
 		assert.Equal(t, executedAt, p.CreatedAt)
 
-		pms, err := q.ListUserProfileMutationByUserID(ctx, p.UserID)
+		pms, err := qt.ListUserProfileMutationByUserID(ctx, p.UserID)
 		require.NoError(t, err)
 		require.Len(t, pms, 1)
 		pm := pms[0]
@@ -53,19 +53,19 @@ func TestUser_Register(t *testing.T) {
 		assert.Equal(t, "", pm.ImageUrl)
 		assert.Equal(t, executedAt, pm.CreatedAt)
 
-		e, err := q.GetUserEmailByID(ctx, p.UserID)
+		e, err := qt.GetUserEmailByID(ctx, p.UserID)
 		require.NoError(t, err)
 		assert.Equal(t, payload.Email, e.Email)
 		assert.Equal(t, executedAt, e.CreatedAt)
 
-		ems, err := q.ListUserEmailMutationByUserID(ctx, p.UserID)
+		ems, err := qt.ListUserEmailMutationByUserID(ctx, p.UserID)
 		require.NoError(t, err)
 		require.Len(t, ems, 1)
 		em := ems[0]
 		assert.Equal(t, payload.Email, em.Email)
 		assert.Equal(t, executedAt, em.CreatedAt)
 
-		u, err := q.GetUserByID(ctx, p.UserID)
+		u, err := qt.GetUserByID(ctx, p.UserID)
 		require.NoError(t, err)
 		assert.Equal(t, executedAt, u.CreatedAt)
 	})
@@ -91,7 +91,7 @@ func TestUser_Register(t *testing.T) {
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUserUsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
-			_, err = q.GetUserEmailByEmail(ctx, payload.Email)
+			_, err = qt.GetUserEmailByEmail(ctx, payload.Email)
 			require.Error(t, err)
 			assert.True(t, myrdb.IsErrNoRows(err))
 		}
@@ -118,7 +118,7 @@ func TestUser_Register(t *testing.T) {
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUserEmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
-			_, err = q.GetUserProfileByUsername(ctx, payload.Username)
+			_, err = qt.GetUserProfileByUsername(ctx, payload.Username)
 			require.Error(t, err)
 			assert.True(t, myrdb.IsErrNoRows(err))
 		}

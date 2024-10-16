@@ -12,9 +12,10 @@ import (
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/internal"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
+	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 )
 
-func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlctest.Queries) {
+func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlcgen.Queries, *sqlctest.Queries) {
 	t.Helper()
 
 	db, err := myrdb.OpenLocalRDB()
@@ -67,5 +68,5 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlctest.Queries) {
 		}
 	})
 
-	return db, sqlctest.New(db).WithTx(tx)
+	return db, sqlcgen.New(db).WithTx(tx), sqlctest.New(db).WithTx(tx)
 }
