@@ -40,19 +40,20 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlcgen.Queries, *s
 			if panicErr := recover(); panicErr != nil {
 				err = errors.Errorf("panic error %v", panicErr)
 			}
+
 			if err != nil {
 				if _, rollbackErr := tx.ExecContext(ctx, fmt.Sprintf(`ROLLBACK TO SAVEPOINT "%s"`, savePointName)); err != nil {
 					err = errors.Join(err, rollbackErr)
+				}
+			} else {
+				_, err = tx.ExecContext(ctx, fmt.Sprintf(`RELEASE SAVEPOINT "%s"`, savePointName))
+				if err != nil {
+					err = errors.WithStack(err)
 				}
 			}
 		}()
 
 		if err := txFunc(ctx, tx); err != nil {
-			return errors.WithStack(err)
-		}
-
-		_, err = tx.ExecContext(ctx, fmt.Sprintf(`RELEASE SAVEPOINT "%s"`, savePointName))
-		if err != nil {
 			return errors.WithStack(err)
 		}
 

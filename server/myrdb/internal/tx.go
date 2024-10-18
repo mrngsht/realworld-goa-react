@@ -19,18 +19,19 @@ func DefaultTx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context,
 		if panicErr := recover(); panicErr != nil {
 			err = errors.Errorf("panic error %v", panicErr)
 		}
+
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
 				err = errors.Join(err, rollbackErr)
+			}
+		} else {
+			if err := tx.Commit(); err != nil {
+				err = errors.WithStack(err)
 			}
 		}
 	}()
 
 	if err := txFunc(ctx, tx); err != nil {
-		return errors.WithStack(err)
-	}
-
-	if err := tx.Commit(); err != nil {
 		return errors.WithStack(err)
 	}
 
