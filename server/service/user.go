@@ -26,6 +26,34 @@ func NewUser(rdb *sql.DB) User {
 var _ goa.Service = User{}
 
 func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
+
+	q := sqlcgen.New(u.rdb)
+
+	userID, err := q.GetUserIDByEmail(ctx, payload.Email)
+	if err != nil {
+		if myrdb.IsErrNoRows(err) {
+			return nil, user.ErrEmailNotFound
+		}
+		return nil, errors.WithStack(err)
+	}
+
+	storedPasswordHash, err := q.GetPasswordHashByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	matched, err := user.MatchPassword([]byte(storedPasswordHash), []byte(payload.Password))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if !matched {
+		return nil, user.ErrPasswordIsIncorrect
+	}
+
+	// generate JWT token
+
 	return &goa.LoginResult{
 		User: &goa.UserType{
 			Email:    payload.Email,

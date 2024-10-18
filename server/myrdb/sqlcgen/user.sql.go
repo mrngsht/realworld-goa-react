@@ -12,9 +12,23 @@ import (
 	"github.com/google/uuid"
 )
 
+const getPasswordHashByUserID = `-- name: GetPasswordHashByUserID :one
+SELECT password_hash_ FROM user_auth_password_ 
+WHERE user_id_ = $1
+LIMIT 1
+`
+
+func (q *Queries) GetPasswordHashByUserID(ctx context.Context, userID uuid.UUID) (string, error) {
+	row := q.db.QueryRowContext(ctx, getPasswordHashByUserID, userID)
+	var password_hash_ string
+	err := row.Scan(&password_hash_)
+	return password_hash_, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id_ FROM user_
 WHERE id_ = $1
+LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
@@ -22,6 +36,19 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (uuid.UUID, error) 
 	var id_ uuid.UUID
 	err := row.Scan(&id_)
 	return id_, err
+}
+
+const getUserIDByEmail = `-- name: GetUserIDByEmail :one
+SELECT user_id_ FROM user_email_ 
+WHERE email_ = $1
+LIMIT 1
+`
+
+func (q *Queries) GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, getUserIDByEmail, email)
+	var user_id_ uuid.UUID
+	err := row.Scan(&user_id_)
+	return user_id_, err
 }
 
 const insertUser = `-- name: InsertUser :exec

@@ -1,6 +1,7 @@
 -- name: GetUser :one
 SELECT id_ FROM user_
-WHERE id_ = $1;
+WHERE id_ = $1
+LIMIT 1;
 
 -- name: InsertUser :exec
 INSERT INTO user_
@@ -31,3 +32,13 @@ VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
 INSERT INTO user_email_mutation_
 (created_at_, user_id_, email_) 
 VALUES ($1, $2, $3);
+
+-- name: GetPasswordHashByUserID :one
+SELECT password_hash_ FROM user_auth_password_ 
+WHERE user_id_ = $1
+LIMIT 1;
+
+-- name: GetUserIDByEmail :one
+SELECT user_id_ FROM user_email_ 
+WHERE email_ = $1
+LIMIT 1;
