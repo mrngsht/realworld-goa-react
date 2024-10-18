@@ -26,6 +26,14 @@ func NewUser(rdb *sql.DB) User {
 var _ goa.Service = User{}
 
 func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
+	defer func() {
+		// FIXME*
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+
+			}
+		}
+	}()
 
 	q := sqlcgen.New(u.rdb)
 

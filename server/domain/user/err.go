@@ -9,4 +9,5 @@ var (
 	ErrEmailAlreadyUsed    = myerr.NewAppErr("email already used")
 	ErrEmailNotFound       = myerr.NewAppErr("email not found")
 	ErrPasswordIsIncorrect = myerr.NewAppErr("password is incorrect")
+	ErrTokenHasExpired     = myerr.NewAppErr("token has expired")
 )
