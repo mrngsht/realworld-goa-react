@@ -1,8 +1,3 @@
--- name: GetUser :one
-SELECT id_ FROM user_
-WHERE id_ = $1
-LIMIT 1;
-
 -- name: InsertUser :exec
 INSERT INTO user_
 (created_at_, id_) 
@@ -41,4 +36,13 @@ LIMIT 1;
 -- name: GetUserIDByEmail :one
 SELECT user_id_ FROM user_email_ 
 WHERE email_ = $1
+LIMIT 1;
+
+-- name: GetUserProfileByUserID :one
+SELECT 
+  username_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE user_id_ = $1
 LIMIT 1;

@@ -7,7 +7,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	rdb "github.com/mrngsht/realworld-goa-react/myrdb"
+	"github.com/mrngsht/realworld-goa-react/config"
 )
 
 func Setup() error {
@@ -37,7 +37,7 @@ const (
 )
 
 var (
-	gooseOpt = []string{"-dir", rdbMigrationDirPath, "postgres", rdb.LocalConnectionString}
+	gooseOpt = []string{"-dir", rdbMigrationDirPath, "postgres", config.C.RDBConnectionString}
 )
 
 func (Migration) New(name string) error {

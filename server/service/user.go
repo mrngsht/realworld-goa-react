@@ -52,12 +52,24 @@ func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.Lo
 		return nil, user.ErrPasswordIsIncorrect
 	}
 
-	// generate JWT token
+	token, err := user.IssueToken(userID, mytime.Now(ctx))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	profile, err := q.GetUserProfileByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
 
 	return &goa.LoginResult{
 		User: &goa.UserType{
 			Email:    payload.Email,
-			Username: "taro",
+			Token:    token,
+			Username: profile.Username,
+			Bio:      profile.Bio,
+			Image:    profile.ImageUrl,
 		},
 	}, nil
 }

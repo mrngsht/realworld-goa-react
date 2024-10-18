@@ -5,18 +5,15 @@ import (
 	"database/sql"
 
 	"github.com/cockroachdb/errors"
+	"github.com/mrngsht/realworld-goa-react/config"
 	"github.com/mrngsht/realworld-goa-react/myrdb/internal"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
-const (
-	LocalConnectionString = "host=localhost user=postgres password=postgres dbname=realworld sslmode=disable timezone=UTC"
-)
-
 func OpenLocalRDB() (*sql.DB, error) {
-	return sql.Open("postgres", LocalConnectionString)
+	return sql.Open("postgres", config.C.RDBConnectionString)
 }
 
 func IsErrNoRows(err error) bool {

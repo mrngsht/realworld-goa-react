@@ -25,19 +25,6 @@ func (q *Queries) GetPasswordHashByUserID(ctx context.Context, userID uuid.UUID)
 	return password_hash_, err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id_ FROM user_
-WHERE id_ = $1
-LIMIT 1
-`
-
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
-	var id_ uuid.UUID
-	err := row.Scan(&id_)
-	return id_, err
-}
-
 const getUserIDByEmail = `-- name: GetUserIDByEmail :one
 SELECT user_id_ FROM user_email_ 
 WHERE email_ = $1
@@ -49,6 +36,29 @@ func (q *Queries) GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID
 	var user_id_ uuid.UUID
 	err := row.Scan(&user_id_)
 	return user_id_, err
+}
+
+const getUserProfileByUserID = `-- name: GetUserProfileByUserID :one
+SELECT 
+  username_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE user_id_ = $1
+LIMIT 1
+`
+
+type GetUserProfileByUserIDRow struct {
+	Username string
+	Bio      string
+	ImageUrl string
+}
+
+func (q *Queries) GetUserProfileByUserID(ctx context.Context, userID uuid.UUID) (GetUserProfileByUserIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileByUserID, userID)
+	var i GetUserProfileByUserIDRow
+	err := row.Scan(&i.Username, &i.Bio, &i.ImageUrl)
+	return i, err
 }
 
 const insertUser = `-- name: InsertUser :exec
