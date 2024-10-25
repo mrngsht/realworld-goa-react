@@ -10,12 +10,11 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
-	"github.com/mrngsht/realworld-goa-react/myrdb/internal"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
 	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 )
 
-func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlcgen.Queries, *sqlctest.Queries) {
+func CreateRDB(t *testing.T, ctx context.Context) (*testdb, *sqlcgen.Queries, *sqlctest.Queries) {
 	t.Helper()
 
 	db, err := myrdb.OpenLocalRDB()
@@ -23,41 +22,9 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlcgen.Queries, *s
 		panic(err)
 	}
 
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := db.DB.BeginTx(ctx, nil)
 	if err != nil {
 		panic(err)
-	}
-
-	internal.Tx = func(ctx context.Context, _ *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
-		savePointName := uuid.New().String()
-
-		_, err = tx.ExecContext(ctx, fmt.Sprintf(`SAVEPOINT "%s"`, savePointName))
-		if err != nil {
-			return errors.WithStack(err)
-		}
-
-		defer func() {
-			if panicErr := recover(); panicErr != nil {
-				err = errors.Errorf("panic error %v", panicErr)
-			}
-
-			if err != nil {
-				if _, rollbackErr := tx.ExecContext(ctx, fmt.Sprintf(`ROLLBACK TO SAVEPOINT "%s"`, savePointName)); err != nil {
-					err = errors.Join(err, rollbackErr)
-				}
-			} else {
-				_, err = tx.ExecContext(ctx, fmt.Sprintf(`RELEASE SAVEPOINT "%s"`, savePointName))
-				if err != nil {
-					err = errors.WithStack(err)
-				}
-			}
-		}()
-
-		if err := txFunc(ctx, tx); err != nil {
-			return errors.WithStack(err)
-		}
-
-		return nil
 	}
 
 	t.Cleanup(func() {
@@ -69,5 +36,38 @@ func CreateRDB(t *testing.T, ctx context.Context) (*sql.DB, *sqlcgen.Queries, *s
 		}
 	})
 
-	return db, sqlcgen.New(db).WithTx(tx), sqlctest.New(db).WithTx(tx)
+	return &testdb{Tx: tx, savePointName: uuid.New().String()}, sqlcgen.New(tx), sqlctest.New(tx)
+}
+
+type testdb struct {
+	*sql.Tx
+
+	savePointName string
+}
+
+var _ myrdb.RDB = (*testdb)(nil)
+var _ myrdb.TxDB = (*testdb)(nil)
+
+func (t *testdb) BeginTx(context.Context, *sql.TxOptions) (myrdb.TxDB, error) {
+	_, err := t.Exec(fmt.Sprintf(`SAVEPOINT "%s"`, t.savePointName))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return t, nil
+}
+
+func (t *testdb) Commit() error {
+	_, err := t.Exec(fmt.Sprintf(`RELEASE SAVEPOINT "%s"`, t.savePointName))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+func (t *testdb) Rollback() error {
+	_, err := t.Exec(fmt.Sprintf(`ROLLBACK TO SAVEPOINT "%s"`, t.savePointName))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }

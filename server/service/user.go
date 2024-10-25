@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
@@ -16,10 +15,10 @@ import (
 )
 
 type User struct {
-	rdb *sql.DB
+	rdb myrdb.RDB
 }
 
-func NewUser(rdb *sql.DB) User {
+func NewUser(rdb myrdb.RDB) User {
 	return User{rdb: rdb}
 }
 
@@ -103,8 +102,8 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		return nil, errors.WithStack(err)
 	}
 
-	if err := myrdb.Tx(ctx, u.rdb, func(ctx context.Context, tx *sql.Tx) error {
-		q = q.WithTx(tx)
+	if err := myrdb.Tx(ctx, u.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+		q = sqlcgen.New(tx)
 
 		now := mytime.Now(ctx)
 		userID := uuid.New()

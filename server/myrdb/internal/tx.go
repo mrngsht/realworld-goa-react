@@ -9,8 +9,17 @@ import (
 
 var Tx = DefaultTx
 
-func DefaultTx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
-	tx, err := db.BeginTx(ctx, nil)
+type TxStarter interface {
+	BeginTx(context.Context, *sql.TxOptions) (*sql.Tx, error)
+}
+
+type TxEnder interface {
+	Rollback() error
+	Commit() error
+}
+
+func DefaultTx(ctx context.Context, txStarter TxStarter, txFunc func(ctx context.Context, txEnder TxEnder) error) (err error) {
+	tx, err := txStarter.BeginTx(ctx, nil)
 	if err != nil {
 		return errors.WithStack(err)
 	}

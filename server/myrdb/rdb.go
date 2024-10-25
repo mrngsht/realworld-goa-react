@@ -6,28 +6,65 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/mrngsht/realworld-goa-react/config"
-	"github.com/mrngsht/realworld-goa-react/myrdb/internal"
+	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
-func OpenLocalRDB() (*sql.DB, error) {
-	return sql.Open("postgres", config.C.RDBConnectionString)
+func OpenLocalRDB() (*rdb, error) {
+	sqldb, err := sql.Open("postgres", config.C.RDBConnectionString)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &rdb{sqldb}, nil
 }
 
-func IsErrNoRows(err error) bool {
-	return errors.Is(err, sql.ErrNoRows)
+type rdb struct {
+	*sql.DB
 }
 
-const pqUniqueViolationCode = pq.ErrorCode("23505")
+var _ RDB = (*rdb)(nil)
 
-func IsErrUniqueViolation(err error) bool {
-	// ref: https://github.com/go-gorm/gorm/issues/4135#issuecomment-790584782
-	var pqErr *pq.Error
-	return errors.As(err, &pqErr) && pqErr.Code == pqUniqueViolationCode
+func (r rdb) BeginTx(ctx context.Context, opts *sql.TxOptions) (TxDB, error) {
+	return r.DB.BeginTx(ctx, opts)
 }
 
-func Tx(ctx context.Context, db *sql.DB, txFunc func(ctx context.Context, tx *sql.Tx) error) (err error) {
-	return internal.Tx(ctx, db, txFunc)
+type RDB interface {
+	sqlcgen.DBTX
+	BeginTx(context.Context, *sql.TxOptions) (TxDB, error)
+}
+
+type TxDB interface {
+	sqlcgen.DBTX
+	Rollback() error
+	Commit() error
+}
+
+func Tx(ctx context.Context, db RDB, txFunc func(context.Context, TxDB) error) (err error) {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	defer func() {
+		if panicErr := recover(); panicErr != nil {
+			err = errors.Errorf("panic error %v", panicErr)
+		}
+
+		if err != nil {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				err = errors.Join(err, rollbackErr)
+			}
+		} else {
+			if err := tx.Commit(); err != nil {
+				err = errors.WithStack(err)
+			}
+		}
+	}()
+
+	if err := txFunc(ctx, tx); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
 }
