@@ -52,6 +52,10 @@ func EncodeLoginRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 // DecodeLoginResponse returns a decoder for responses returned by the user
 // login endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeLoginResponse may return the following errors:
+//   - "EmailNotFound" (type *goa.ServiceError): http.StatusBadRequest
+//   - "PasswordIsIncorrect" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -82,6 +86,41 @@ func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			}
 			res := NewLoginResultOK(&body)
 			return res, nil
+		case http.StatusBadRequest:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "EmailNotFound":
+				var (
+					body LoginEmailNotFoundResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("user", "login", err)
+				}
+				err = ValidateLoginEmailNotFoundResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("user", "login", err)
+				}
+				return nil, NewLoginEmailNotFound(&body)
+			case "PasswordIsIncorrect":
+				var (
+					body LoginPasswordIsIncorrectResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("user", "login", err)
+				}
+				err = ValidateLoginPasswordIsIncorrectResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("user", "login", err)
+				}
+				return nil, NewLoginPasswordIsIncorrect(&body)
+			default:
+				body, _ := io.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("user", "login", resp.StatusCode, string(body))
+			}
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("user", "login", resp.StatusCode, string(body))

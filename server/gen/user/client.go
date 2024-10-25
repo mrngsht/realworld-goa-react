@@ -31,6 +31,8 @@ func NewClient(login, register goa.Endpoint) *Client {
 // Login may return the following errors:
 //   - "UsernameAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailNotFound" (type *goa.ServiceError)
+//   - "PasswordIsIncorrect" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, err error) {
 	var ires any
@@ -45,6 +47,8 @@ func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, 
 // Register may return the following errors:
 //   - "UsernameAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailNotFound" (type *goa.ServiceError)
+//   - "PasswordIsIncorrect" (type *goa.ServiceError)
 //   - error: internal error
 func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *RegisterResult, err error) {
 	var ires any

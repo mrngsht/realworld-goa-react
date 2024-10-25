@@ -77,3 +77,13 @@ func MakeUsernameAlreadyUsed(err error) *goa.ServiceError {
 func MakeEmailAlreadyUsed(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "EmailAlreadyUsed", false, false, false)
 }
+
+// MakeEmailNotFound builds a goa.ServiceError from an error.
+func MakeEmailNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "EmailNotFound", false, false, false)
+}
+
+// MakePasswordIsIncorrect builds a goa.ServiceError from an error.
+func MakePasswordIsIncorrect(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "PasswordIsIncorrect", false, false, false)
+}

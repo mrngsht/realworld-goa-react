@@ -2,48 +2,26 @@ package design
 
 import . "goa.design/goa/v3/dsl"
 
-const (
-	ErrorUserUsernameAlreadyUsed = "UsernameAlreadyUsed"
-	ErrorUserEmailAlreadyUsed    = "EmailAlreadyUsed"
-)
-
-var (
-	AttributeUserRequestUsername = func() string {
-		return AttributeWithName("username", String, func() {
-			Pattern(`^[a-z0-9_]{3, 32}$`)
-		})
-	}
-	AttributeUserRequestEmail = func() string {
-		return AttributeWithName("email", String, func() {
-			Format(FormatEmail)
-		})
-	}
-	AttributeUserRequestPassword = func() string {
-		return AttributeWithName("password", String, func() {
-			MinLength(6)
-			MaxLength(128)
-		})
-	}
-)
-
 var _ = Service("user", func() {
 	Description("user")
 
-	Error(ErrorUserUsernameAlreadyUsed)
-	Error(ErrorUserEmailAlreadyUsed)
+	Error(ErrorUser_UsernameAlreadyUsed)
+	Error(ErrorUser_EmailAlreadyUsed)
+	Error(ErrorUser_EmailNotFound)
+	Error(ErrorUser_PasswordIsIncorrect)
 
 	Method("login", func() {
 		HTTP(func() {
 			POST("users/login")
 			Response(StatusOK)
+			Response(ErrorUser_EmailNotFound, StatusBadRequest)
+			Response(ErrorUser_PasswordIsIncorrect, StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeWithName("email", String, func() {
-					Format(FormatEmail)
-				}),
-				AttributeWithName("password", String),
+				AttributeUser_RequestEmail(),
+				AttributeUser_RequestPassword(),
 			)
 		})
 
@@ -58,15 +36,15 @@ var _ = Service("user", func() {
 		HTTP(func() {
 			POST("users")
 			Response(StatusOK)
-			Response(ErrorUserUsernameAlreadyUsed, StatusBadRequest)
-			Response(ErrorUserEmailAlreadyUsed, StatusBadRequest)
+			Response(ErrorUser_UsernameAlreadyUsed, StatusBadRequest)
+			Response(ErrorUser_EmailAlreadyUsed, StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeUserRequestUsername(),
-				AttributeUserRequestEmail(),
-				AttributeUserRequestPassword(),
+				AttributeUser_RequestUsername(),
+				AttributeUser_RequestEmail(),
+				AttributeUser_RequestPassword(),
 			)
 		})
 
@@ -77,6 +55,32 @@ var _ = Service("user", func() {
 		})
 	})
 })
+
+const (
+	ErrorUser_UsernameAlreadyUsed = "UsernameAlreadyUsed"
+	ErrorUser_EmailAlreadyUsed    = "EmailAlreadyUsed"
+	ErrorUser_EmailNotFound       = "EmailNotFound"
+	ErrorUser_PasswordIsIncorrect = "PasswordIsIncorrect"
+)
+
+var (
+	AttributeUser_RequestUsername = func() string {
+		return AttributeWithName("username", String, func() {
+			Pattern(`^[a-z0-9_]{3, 32}$`)
+		})
+	}
+	AttributeUser_RequestEmail = func() string {
+		return AttributeWithName("email", String, func() {
+			Format(FormatEmail)
+		})
+	}
+	AttributeUser_RequestPassword = func() string {
+		return AttributeWithName("password", String, func() {
+			MinLength(6)
+			MaxLength(128)
+		})
+	}
+)
 
 var UserType = Type("UserType", func() {
 	Required(

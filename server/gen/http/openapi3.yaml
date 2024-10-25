@@ -19,9 +19,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/RegisterRequestBody'
                         example:
-                            email: valentina@grimeskerluke.info
-                            password: 2hu
-                            username: k{3, 32}
+                            email: alverta@marvin.com
+                            password: g4r
+                            username: i{3, 32}
             responses:
                 "200":
                     description: OK response.
@@ -31,11 +31,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Sit aliquam rerum voluptatem rerum.
-                                    email: Expedita non vel velit explicabo eveniet repudiandae.
-                                    image: Quos ea minima labore.
-                                    token: Et quam eos dolorum incidunt quia.
-                                    username: Doloribus provident.
+                                    bio: Doloribus provident.
+                                    email: Perferendis occaecati assumenda.
+                                    image: Sit aliquam rerum voluptatem rerum.
+                                    token: Expedita non vel velit explicabo eveniet repudiandae.
+                                    username: Et quam eos dolorum incidunt quia.
                 "400":
                     description: 'EmailAlreadyUsed: Bad Request response.'
                     content:
@@ -56,7 +56,7 @@ paths:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
                             email: hermann.swift@bernhard.com
-                            password: Pariatur saepe placeat a perferendis occaecati assumenda.
+                            password: 24h
             responses:
                 "200":
                     description: OK response.
@@ -66,11 +66,17 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Sit aliquam rerum voluptatem rerum.
-                                    email: Expedita non vel velit explicabo eveniet repudiandae.
-                                    image: Quos ea minima labore.
-                                    token: Et quam eos dolorum incidunt quia.
-                                    username: Doloribus provident.
+                                    bio: Doloribus provident.
+                                    email: Perferendis occaecati assumenda.
+                                    image: Sit aliquam rerum voluptatem rerum.
+                                    token: Expedita non vel velit explicabo eveniet repudiandae.
+                                    username: Et quam eos dolorum incidunt quia.
+                "400":
+                    description: 'PasswordIsIncorrect: Bad Request response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
 components:
     schemas:
         Error:
@@ -95,7 +101,7 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: true
+                    example: false
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
@@ -119,14 +125,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: eliza@goodwin.org
+                    example: ceasar@schuppe.org
                     format: email
                 password:
                     type: string
-                    example: Culpa impedit.
+                    example: kb8
+                    minLength: 6
+                    maxLength: 128
             example:
-                email: elian@glovermitchell.info
-                password: Adipisci nostrum quae aut nihil voluptatibus nisi.
+                email: nia.muller@mayert.biz
+                password: qza
             required:
                 - email
                 - password
@@ -137,11 +145,11 @@ components:
                     $ref: '#/components/schemas/UserType'
             example:
                 user:
-                    bio: Sit aliquam rerum voluptatem rerum.
-                    email: Expedita non vel velit explicabo eveniet repudiandae.
-                    image: Quos ea minima labore.
-                    token: Et quam eos dolorum incidunt quia.
-                    username: Doloribus provident.
+                    bio: Doloribus provident.
+                    email: Perferendis occaecati assumenda.
+                    image: Sit aliquam rerum voluptatem rerum.
+                    token: Expedita non vel velit explicabo eveniet repudiandae.
+                    username: Et quam eos dolorum incidunt quia.
             required:
                 - user
         RegisterRequestBody:
@@ -149,21 +157,21 @@ components:
             properties:
                 email:
                     type: string
-                    example: vanessa@terryrowe.info
+                    example: eugene.kovacek@koeppkris.biz
                     format: email
                 password:
                     type: string
-                    example: 8dp
+                    example: oz2
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: c{3, 32}
+                    example: e{3, 32}
                     pattern: ^[a-z0-9_]{3, 32}$
             example:
-                email: keith@bartoletti.name
-                password: poe
-                username: y{3, 32}
+                email: lemuel_jast@kerluke.net
+                password: 9ae
+                username: g{3, 32}
             required:
                 - username
                 - email
@@ -173,25 +181,25 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Eveniet consequatur non laborum nesciunt exercitationem voluptas.
+                    example: Eveniet consequuntur non voluptas quo debitis quia.
                 email:
                     type: string
-                    example: Aut voluptas.
+                    example: Illum repellendus.
                 image:
                     type: string
-                    example: Eveniet consequuntur non voluptas quo debitis quia.
+                    example: Pariatur et minima minima dolorem aut.
                 token:
                     type: string
-                    example: Illum dicta illum.
+                    example: Qui consequuntur error laboriosam numquam eveniet.
                 username:
                     type: string
-                    example: Cupiditate qui consequuntur error laboriosam.
+                    example: Non laborum nesciunt exercitationem voluptas.
             example:
-                bio: Officiis vero voluptatum.
-                email: Pariatur et minima minima dolorem aut.
-                image: Quam aut aliquam consequatur vel nostrum qui.
-                token: Debitis vero explicabo quod occaecati veritatis.
-                username: Possimus deleniti quas ad aliquam.
+                bio: Quam aut aliquam consequatur vel nostrum qui.
+                email: Debitis vero explicabo quod occaecati veritatis.
+                image: Vel voluptatem deserunt.
+                token: Possimus deleniti quas ad aliquam.
+                username: Officiis vero voluptatum.
             required:
                 - email
                 - token

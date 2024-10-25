@@ -65,42 +65,57 @@ paths:
                         $ref: '#/definitions/UserLoginResponseBody'
                         required:
                             - user
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/UserLoginPasswordIsIncorrectResponseBody'
             schemes:
                 - http
 definitions:
-    UserLoginRequestBody:
-        title: UserLoginRequestBody
+    UserLoginEmailNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
         properties:
-            email:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
                 type: string
-                example: elena@breitenbergbrekke.info
-                format: email
-            password:
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
                 type: string
-                example: Consequatur labore ea qui veniam voluptatibus.
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: login_EmailNotFound_response_body result type (default view)
         example:
-            email: kathlyn@mckenzie.net
-            password: Perferendis nesciunt aliquid et dolore praesentium dicta.
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
         required:
-            - email
-            - password
-    UserLoginResponseBody:
-        title: UserLoginResponseBody
-        type: object
-        properties:
-            user:
-                $ref: '#/definitions/UserType'
-        example:
-            user:
-                bio: Sit aliquam rerum voluptatem rerum.
-                email: Expedita non vel velit explicabo eveniet repudiandae.
-                image: Quos ea minima labore.
-                token: Et quam eos dolorum incidunt quia.
-                username: Doloribus provident.
-        required:
-            - user
-    UserRegisterEmailAlreadyUsedResponseBody:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    UserLoginPasswordIsIncorrectResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
         properties:
@@ -128,14 +143,91 @@ definitions:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
-        description: register_EmailAlreadyUsed_response_body result type (default view)
+        description: login_PasswordIsIncorrect_response_body result type (default view)
         example:
             fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    UserLoginRequestBody:
+        title: UserLoginRequestBody
+        type: object
+        properties:
+            email:
+                type: string
+                example: hilda_schowalter@powlowskikuhic.name
+                format: email
+            password:
+                type: string
+                example: vkl
+                minLength: 6
+                maxLength: 128
+        example:
+            email: raphael_treutel@gusikowskipaucek.com
+            password: a6n
+        required:
+            - email
+            - password
+    UserLoginResponseBody:
+        title: UserLoginResponseBody
+        type: object
+        properties:
+            user:
+                $ref: '#/definitions/UserType'
+        example:
+            user:
+                bio: Doloribus provident.
+                email: Perferendis occaecati assumenda.
+                image: Sit aliquam rerum voluptatem rerum.
+                token: Expedita non vel velit explicabo eveniet repudiandae.
+                username: Et quam eos dolorum incidunt quia.
+        required:
+            - user
+    UserRegisterEmailAlreadyUsedResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: register_EmailAlreadyUsed_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
         required:
             - name
             - id
@@ -149,21 +241,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: bethel_harvey@gulgowskirath.com
+                example: wilber@hilpert.org
                 format: email
             password:
                 type: string
-                example: bjb
+                example: b5e
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: 0{3, 32}
+                example: q{3, 32}
                 pattern: ^[a-z0-9_]{3, 32}$
         example:
-            email: murray.jaskolski@hoeger.com
-            password: 2n5
-            username: u{3, 32}
+            email: emelie.hoppe@beckerprosacco.com
+            password: dx8
+            username: e{3, 32}
         required:
             - username
             - email
@@ -176,11 +268,11 @@ definitions:
                 $ref: '#/definitions/UserType'
         example:
             user:
-                bio: Sit aliquam rerum voluptatem rerum.
-                email: Expedita non vel velit explicabo eveniet repudiandae.
-                image: Quos ea minima labore.
-                token: Et quam eos dolorum incidunt quia.
-                username: Doloribus provident.
+                bio: Doloribus provident.
+                email: Perferendis occaecati assumenda.
+                image: Sit aliquam rerum voluptatem rerum.
+                token: Expedita non vel velit explicabo eveniet repudiandae.
+                username: Et quam eos dolorum incidunt quia.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -210,15 +302,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: register_UsernameAlreadyUsed_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -235,7 +327,7 @@ definitions:
                 example: Nam itaque fugiat sit quis.
             email:
                 type: string
-                example: Ipsum quaerat quia.
+                example: Quaerat quia.
             image:
                 type: string
                 example: Reprehenderit fugit eum voluptas voluptas et laboriosam.

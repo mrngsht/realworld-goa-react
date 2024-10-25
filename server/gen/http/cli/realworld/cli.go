@@ -30,7 +30,7 @@ func UsageCommands() string {
 func UsageExamples() string {
 	return os.Args[0] + ` user login --body '{
       "email": "hermann.swift@bernhard.com",
-      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
+      "password": "24h"
    }'` + "\n" +
 		""
 }
@@ -161,7 +161,7 @@ Login implements login.
 Example:
     %[1]s user login --body '{
       "email": "hermann.swift@bernhard.com",
-      "password": "Pariatur saepe placeat a perferendis occaecati assumenda."
+      "password": "24h"
    }'
 `, os.Args[0])
 }
@@ -174,9 +174,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "valentina@grimeskerluke.info",
-      "password": "2hu",
-      "username": "k{3, 32}"
+      "email": "alverta@marvin.com",
+      "password": "g4r",
+      "username": "i{3, 32}"
    }'
 `, os.Args[0])
 }
