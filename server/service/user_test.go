@@ -16,6 +16,70 @@ import (
 )
 
 func TestUser_Login(t *testing.T) {
+	ctx := servicetest.NewContext()
+	rdb, _, _ := rdbtest.CreateRDB(t, ctx)
+
+	svc := service.NewUser(rdb)
+
+	t.Run("succeed", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "succeed",
+			Email:    "succeed@example.com",
+			Password: "password",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Email, res.User.Email)
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, "", res.User.Bio)
+		assert.Equal(t, "", res.User.Image)
+		assert.NotEmpty(t, res.User.Token)
+	})
+
+	t.Run("email not found", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "emailnotfound",
+			Email:    "emailnotfound@example.com",
+			Password: "password",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+			Email:    "WRONG_EMAIL_ADDRESS@example.com",
+			Password: registerPayload.Password,
+		})
+		require.Error(t, err)
+		assert.Equal(t, design.ErrorUser_EmailNotFound, servicetest.GoaServiceErrorName(err))
+
+		assert.Empty(t, res)
+	})
+
+	t.Run("password is incorrect", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "incorrectpass",
+			Email:    "incorrectpass@example.com",
+			Password: "password",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+			Email:    registerPayload.Email,
+			Password: "INCORRECT_PASSWORD",
+		})
+		require.Error(t, err)
+		assert.Equal(t, design.ErrorUser_PasswordIsIncorrect, servicetest.GoaServiceErrorName(err))
+
+		assert.Empty(t, res)
+	})
 }
 
 func TestUser_Register(t *testing.T) {
@@ -30,7 +94,7 @@ func TestUser_Register(t *testing.T) {
 		payload := &user.RegisterPayload{
 			Username: "succeed",
 			Email:    "succeed@example.com",
-			Password: "succeed",
+			Password: "password",
 		}
 		res, err := svc.Register(ctx, payload) // Act
 		require.NoError(t, err)
@@ -78,7 +142,7 @@ func TestUser_Register(t *testing.T) {
 			payload := &user.RegisterPayload{
 				Username: "dup_username",
 				Email:    "dup_username@example.com",
-				Password: "dup_username",
+				Password: "password",
 			}
 			_, err := svc.Register(ctx, payload)
 			require.NoError(t, err)
@@ -88,7 +152,7 @@ func TestUser_Register(t *testing.T) {
 			payload := &user.RegisterPayload{
 				Username: "dup_username",
 				Email:    "dup_username_different_email@example.com",
-				Password: "dup_username_different_password",
+				Password: "password",
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
@@ -105,7 +169,7 @@ func TestUser_Register(t *testing.T) {
 			payload := &user.RegisterPayload{
 				Username: "dup_email",
 				Email:    "dup_email@example.com",
-				Password: "dup_email",
+				Password: "password",
 			}
 			_, err := svc.Register(ctx, payload)
 			require.NoError(t, err)
@@ -115,7 +179,7 @@ func TestUser_Register(t *testing.T) {
 			payload := &user.RegisterPayload{
 				Username: "dup_email_different_username",
 				Email:    "dup_email@example.com",
-				Password: "dup_email_different_password",
+				Password: "password",
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)

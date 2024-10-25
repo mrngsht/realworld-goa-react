@@ -73,7 +73,7 @@ func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.Lo
 	}
 
 	return &goa.LoginResult{
-		User: &goa.UserType{
+		User: &goa.User{
 			Email:    payload.Email,
 			Token:    token,
 			Username: profile.Username,
@@ -169,7 +169,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 	}
 
 	return &goa.RegisterResult{
-		User: &goa.UserType{
+		User: &goa.User{
 			Email:    payload.Email,
 			Username: payload.Username,
 			Token:    "TODO",
