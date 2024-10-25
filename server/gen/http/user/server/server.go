@@ -18,9 +18,10 @@ import (
 
 // Server lists the user service endpoint HTTP handlers.
 type Server struct {
-	Mounts   []*MountPoint
-	Login    http.Handler
-	Register http.Handler
+	Mounts         []*MountPoint
+	Login          http.Handler
+	Register       http.Handler
+	GetCurrentUser http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -52,9 +53,11 @@ func New(
 		Mounts: []*MountPoint{
 			{"Login", "POST", "/api/users/login"},
 			{"Register", "POST", "/api/users"},
+			{"GetCurrentUser", "GET", "/api/user"},
 		},
-		Login:    NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
-		Register: NewRegisterHandler(e.Register, mux, decoder, encoder, errhandler, formatter),
+		Login:          NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
+		Register:       NewRegisterHandler(e.Register, mux, decoder, encoder, errhandler, formatter),
+		GetCurrentUser: NewGetCurrentUserHandler(e.GetCurrentUser, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -65,6 +68,7 @@ func (s *Server) Service() string { return "user" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Login = m(s.Login)
 	s.Register = m(s.Register)
+	s.GetCurrentUser = m(s.GetCurrentUser)
 }
 
 // MethodNames returns the methods served.
@@ -74,6 +78,7 @@ func (s *Server) MethodNames() []string { return user.MethodNames[:] }
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountLoginHandler(mux, h.Login)
 	MountRegisterHandler(mux, h.Register)
+	MountGetCurrentUserHandler(mux, h.GetCurrentUser)
 }
 
 // Mount configures the mux to serve the user endpoints.
@@ -171,6 +176,50 @@ func NewRegisterHandler(
 			return
 		}
 		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetCurrentUserHandler configures the mux to serve the "user" service
+// "getCurrentUser" endpoint.
+func MountGetCurrentUserHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/user", f)
+}
+
+// NewGetCurrentUserHandler creates a HTTP handler which loads the HTTP request
+// and calls the "user" service "getCurrentUser" endpoint.
+func NewGetCurrentUserHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeGetCurrentUserResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "getCurrentUser")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		var err error
+		res, err := endpoint(ctx, nil)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

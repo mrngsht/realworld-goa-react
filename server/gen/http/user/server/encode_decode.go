@@ -184,6 +184,18 @@ func EncodeRegisterError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
+// EncodeGetCurrentUserResponse returns an encoder for responses returned by
+// the user getCurrentUser endpoint.
+func EncodeGetCurrentUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*user.GetCurrentUserResult)
+		enc := encoder(ctx, w)
+		body := NewGetCurrentUserResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
 // marshalUserUserToUserResponseBody builds a value of type *UserResponseBody
 // from a value of type *user.User.
 func marshalUserUserToUserResponseBody(v *user.User) *UserResponseBody {

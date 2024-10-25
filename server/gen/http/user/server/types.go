@@ -41,6 +41,12 @@ type RegisterResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
+// GetCurrentUserResponseBody is the type of the "user" service
+// "getCurrentUser" endpoint HTTP response body.
+type GetCurrentUserResponseBody struct {
+	User *UserResponseBody `form:"user" json:"user" xml:"user"`
+}
+
 // LoginEmailNotFoundResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "EmailNotFound" error.
 type LoginEmailNotFoundResponseBody struct {
@@ -136,6 +142,16 @@ func NewLoginResponseBody(res *user.LoginResult) *LoginResponseBody {
 // "register" endpoint of the "user" service.
 func NewRegisterResponseBody(res *user.RegisterResult) *RegisterResponseBody {
 	body := &RegisterResponseBody{}
+	if res.User != nil {
+		body.User = marshalUserUserToUserResponseBody(res.User)
+	}
+	return body
+}
+
+// NewGetCurrentUserResponseBody builds the HTTP response body from the result
+// of the "getCurrentUser" endpoint of the "user" service.
+func NewGetCurrentUserResponseBody(res *user.GetCurrentUserResult) *GetCurrentUserResponseBody {
+	body := &GetCurrentUserResponseBody{}
 	if res.User != nil {
 		body.User = marshalUserUserToUserResponseBody(res.User)
 	}

@@ -178,3 +178,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		},
 	}, nil
 }
+
+func (u User) GetCurrentUser(ctx context.Context) (*goa.GetCurrentUserResult, error) {
+	return nil, nil
+}

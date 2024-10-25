@@ -15,15 +15,17 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	LoginEndpoint    goa.Endpoint
-	RegisterEndpoint goa.Endpoint
+	LoginEndpoint          goa.Endpoint
+	RegisterEndpoint       goa.Endpoint
+	GetCurrentUserEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(login, register goa.Endpoint) *Client {
+func NewClient(login, register, getCurrentUser goa.Endpoint) *Client {
 	return &Client{
-		LoginEndpoint:    login,
-		RegisterEndpoint: register,
+		LoginEndpoint:          login,
+		RegisterEndpoint:       register,
+		GetCurrentUserEndpoint: getCurrentUser,
 	}
 }
 
@@ -57,4 +59,20 @@ func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *Registe
 		return
 	}
 	return ires.(*RegisterResult), nil
+}
+
+// GetCurrentUser calls the "getCurrentUser" endpoint of the "user" service.
+// GetCurrentUser may return the following errors:
+//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailAlreadyUsed" (type *goa.ServiceError)
+//   - "EmailNotFound" (type *goa.ServiceError)
+//   - "PasswordIsIncorrect" (type *goa.ServiceError)
+//   - error: internal error
+func (c *Client) GetCurrentUser(ctx context.Context) (res *GetCurrentUserResult, err error) {
+	var ires any
+	ires, err = c.GetCurrentUserEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(*GetCurrentUserResult), nil
 }

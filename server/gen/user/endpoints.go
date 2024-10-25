@@ -15,15 +15,17 @@ import (
 
 // Endpoints wraps the "user" service endpoints.
 type Endpoints struct {
-	Login    goa.Endpoint
-	Register goa.Endpoint
+	Login          goa.Endpoint
+	Register       goa.Endpoint
+	GetCurrentUser goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "user" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Login:    NewLoginEndpoint(s),
-		Register: NewRegisterEndpoint(s),
+		Login:          NewLoginEndpoint(s),
+		Register:       NewRegisterEndpoint(s),
+		GetCurrentUser: NewGetCurrentUserEndpoint(s),
 	}
 }
 
@@ -31,6 +33,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Login = m(e.Login)
 	e.Register = m(e.Register)
+	e.GetCurrentUser = m(e.GetCurrentUser)
 }
 
 // NewLoginEndpoint returns an endpoint function that calls the method "login"
@@ -48,5 +51,13 @@ func NewRegisterEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*RegisterPayload)
 		return s.Register(ctx, p)
+	}
+}
+
+// NewGetCurrentUserEndpoint returns an endpoint function that calls the method
+// "getCurrentUser" of service "user".
+func NewGetCurrentUserEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		return s.GetCurrentUser(ctx)
 	}
 }

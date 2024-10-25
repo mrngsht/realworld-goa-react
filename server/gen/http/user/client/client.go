@@ -24,6 +24,10 @@ type Client struct {
 	// endpoint.
 	RegisterDoer goahttp.Doer
 
+	// GetCurrentUser Doer is the HTTP client used to make requests to the
+	// getCurrentUser endpoint.
+	GetCurrentUserDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -46,6 +50,7 @@ func NewClient(
 	return &Client{
 		LoginDoer:           doer,
 		RegisterDoer:        doer,
+		GetCurrentUserDoer:  doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -97,6 +102,25 @@ func (c *Client) Register() goa.Endpoint {
 		resp, err := c.RegisterDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "register", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GetCurrentUser returns an endpoint that makes HTTP requests to the user
+// service getCurrentUser server.
+func (c *Client) GetCurrentUser() goa.Endpoint {
+	var (
+		decodeResponse = DecodeGetCurrentUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGetCurrentUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetCurrentUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "getCurrentUser", err)
 		}
 		return decodeResponse(resp)
 	}

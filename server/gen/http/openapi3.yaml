@@ -6,6 +6,26 @@ info:
 servers:
     - url: http://localhost:8080
 paths:
+    /api/user:
+        get:
+            tags:
+                - user
+            summary: getCurrentUser user
+            operationId: user#getCurrentUser
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginResponseBody'
+                            example:
+                                user:
+                                    bio: Doloribus provident.
+                                    email: Perferendis occaecati assumenda.
+                                    image: Sit aliquam rerum voluptatem rerum.
+                                    token: Expedita non vel velit explicabo eveniet repudiandae.
+                                    username: Et quam eos dolorum incidunt quia.
     /api/users:
         post:
             tags:

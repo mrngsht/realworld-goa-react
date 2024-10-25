@@ -16,3 +16,8 @@ func LoginUserPath() string {
 func RegisterUserPath() string {
 	return "/api/users"
 }
+
+// GetCurrentUserUserPath returns the URL path to the user service getCurrentUser HTTP endpoint.
+func GetCurrentUserUserPath() string {
+	return "/api/user"
+}

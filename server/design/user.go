@@ -54,6 +54,20 @@ var _ = Service("user", func() {
 			)
 		})
 	})
+
+	Method("getCurrentUser", func() {
+		HTTP(func() {
+			GET("user")
+			Response(StatusOK)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("user", Type_User),
+			)
+		})
+	})
+
 })
 
 const (

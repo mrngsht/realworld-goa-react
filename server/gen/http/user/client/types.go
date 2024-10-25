@@ -39,6 +39,12 @@ type RegisterResponseBody struct {
 	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
+// GetCurrentUserResponseBody is the type of the "user" service
+// "getCurrentUser" endpoint HTTP response body.
+type GetCurrentUserResponseBody struct {
+	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
+}
+
 // LoginEmailNotFoundResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "EmailNotFound" error.
 type LoginEmailNotFoundResponseBody struct {
@@ -219,6 +225,15 @@ func NewRegisterEmailAlreadyUsed(body *RegisterEmailAlreadyUsedResponseBody) *go
 	return v
 }
 
+// NewGetCurrentUserResultOK builds a "user" service "getCurrentUser" endpoint
+// result from a HTTP "OK" response.
+func NewGetCurrentUserResultOK(body *GetCurrentUserResponseBody) *user.GetCurrentUserResult {
+	v := &user.GetCurrentUserResult{}
+	v.User = unmarshalUserResponseBodyToUserUser(body.User)
+
+	return v
+}
+
 // ValidateLoginResponseBody runs the validations defined on LoginResponseBody
 func ValidateLoginResponseBody(body *LoginResponseBody) (err error) {
 	if body.User == nil {
@@ -235,6 +250,20 @@ func ValidateLoginResponseBody(body *LoginResponseBody) (err error) {
 // ValidateRegisterResponseBody runs the validations defined on
 // RegisterResponseBody
 func ValidateRegisterResponseBody(body *RegisterResponseBody) (err error) {
+	if body.User == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
+	}
+	if body.User != nil {
+		if err2 := ValidateUserResponseBody(body.User); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateGetCurrentUserResponseBody runs the validations defined on
+// GetCurrentUserResponseBody
+func ValidateGetCurrentUserResponseBody(body *GetCurrentUserResponseBody) (err error) {
 	if body.User == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}
