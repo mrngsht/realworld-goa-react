@@ -27,10 +27,12 @@ var _ goa.Service = User{}
 
 func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
 	defer func() {
-		// FIXME*
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
-
+			case user.ErrEmailNotFound:
+				err = goa.MakeEmailNotFound(err)
+			case user.ErrPasswordIsIncorrect:
+				err = goa.MakePasswordIsIncorrect(err)
 			}
 		}
 	}()
