@@ -72,6 +72,37 @@ paths:
             schemes:
                 - http
 definitions:
+    User:
+        title: User
+        type: object
+        properties:
+            bio:
+                type: string
+                example: Nam itaque fugiat sit quis.
+            email:
+                type: string
+                example: Quaerat quia.
+            image:
+                type: string
+                example: Reprehenderit fugit eum voluptas voluptas et laboriosam.
+            token:
+                type: string
+                example: Et fugiat atque nostrum adipisci enim.
+            username:
+                type: string
+                example: Aut doloremque.
+        example:
+            bio: Qui modi temporibus dolorem.
+            email: Autem sed ipsa est.
+            image: Dolores esse et non voluptas aut.
+            token: Non nihil.
+            username: A harum et.
+        required:
+            - email
+            - token
+            - username
+            - bio
+            - image
     UserLoginEmailNotFoundResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -182,7 +213,7 @@ definitions:
         type: object
         properties:
             user:
-                $ref: '#/definitions/UserType'
+                $ref: '#/definitions/User'
         example:
             user:
                 bio: Doloribus provident.
@@ -265,7 +296,7 @@ definitions:
         type: object
         properties:
             user:
-                $ref: '#/definitions/UserType'
+                $ref: '#/definitions/User'
         example:
             user:
                 bio: Doloribus provident.
@@ -318,34 +349,3 @@ definitions:
             - temporary
             - timeout
             - fault
-    UserType:
-        title: UserType
-        type: object
-        properties:
-            bio:
-                type: string
-                example: Nam itaque fugiat sit quis.
-            email:
-                type: string
-                example: Quaerat quia.
-            image:
-                type: string
-                example: Reprehenderit fugit eum voluptas voluptas et laboriosam.
-            token:
-                type: string
-                example: Et fugiat atque nostrum adipisci enim.
-            username:
-                type: string
-                example: Aut doloremque.
-        example:
-            bio: Qui modi temporibus dolorem.
-            email: Autem sed ipsa est.
-            image: Dolores esse et non voluptas aut.
-            token: Non nihil.
-            username: A harum et.
-        required:
-            - email
-            - token
-            - username
-            - bio
-            - image

@@ -20,14 +20,14 @@ var _ = Service("user", func() {
 
 		Payload(func() {
 			Required(
-				AttributeUser_RequestEmail(),
-				AttributeUser_RequestPassword(),
+				AttributeWithName("email", String, DefUser_RequestEmail),
+				AttributeWithName("password", String, DefUser_RequestPassword),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", UserType),
+				AttributeWithName("user", Type_User),
 			)
 		})
 	})
@@ -42,15 +42,15 @@ var _ = Service("user", func() {
 
 		Payload(func() {
 			Required(
-				AttributeUser_RequestUsername(),
-				AttributeUser_RequestEmail(),
-				AttributeUser_RequestPassword(),
+				AttributeWithName("username", String, DefUser_RequestUsername),
+				AttributeWithName("email", String, DefUser_RequestEmail),
+				AttributeWithName("password", String, DefUser_RequestPassword),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", UserType),
+				AttributeWithName("user", Type_User),
 			)
 		})
 	})
@@ -64,30 +64,26 @@ const (
 )
 
 var (
-	AttributeUser_RequestUsername = func() string {
-		return AttributeWithName("username", String, func() {
-			Pattern(`^[a-z0-9_]{3, 32}$`)
-		})
+	DefUser_RequestUsername = func() {
+		Pattern(`^[a-z0-9_]{3, 32}$`)
 	}
-	AttributeUser_RequestEmail = func() string {
-		return AttributeWithName("email", String, func() {
-			Format(FormatEmail)
-		})
+	DefUser_RequestEmail = func() {
+		Format(FormatEmail)
 	}
-	AttributeUser_RequestPassword = func() string {
-		return AttributeWithName("password", String, func() {
-			MinLength(6)
-			MaxLength(128)
-		})
+	DefUser_RequestPassword = func() {
+		MinLength(6)
+		MaxLength(128)
 	}
 )
 
-var UserType = Type("UserType", func() {
-	Required(
-		AttributeWithName("email", String),
-		AttributeWithName("token", String),
-		AttributeWithName("username", String),
-		AttributeWithName("bio", String),
-		AttributeWithName("image", String),
-	)
-})
+var (
+	Type_User = Type("User", func() {
+		Required(
+			AttributeWithName("email", String),
+			AttributeWithName("token", String),
+			AttributeWithName("username", String),
+			AttributeWithName("bio", String),
+			AttributeWithName("image", String),
+		)
+	})
+)

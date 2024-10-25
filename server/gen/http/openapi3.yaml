@@ -142,7 +142,7 @@ components:
             type: object
             properties:
                 user:
-                    $ref: '#/components/schemas/UserType'
+                    $ref: '#/components/schemas/User'
             example:
                 user:
                     bio: Doloribus provident.
@@ -176,7 +176,7 @@ components:
                 - username
                 - email
                 - password
-        UserType:
+        User:
             type: object
             properties:
                 bio:

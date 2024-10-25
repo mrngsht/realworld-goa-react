@@ -32,13 +32,13 @@ type RegisterRequestBody struct {
 // LoginResponseBody is the type of the "user" service "login" endpoint HTTP
 // response body.
 type LoginResponseBody struct {
-	User *UserTypeResponseBody `form:"user" json:"user" xml:"user"`
+	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
 // RegisterResponseBody is the type of the "user" service "register" endpoint
 // HTTP response body.
 type RegisterResponseBody struct {
-	User *UserTypeResponseBody `form:"user" json:"user" xml:"user"`
+	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
 // LoginEmailNotFoundResponseBody is the type of the "user" service "login"
@@ -113,8 +113,8 @@ type RegisterEmailAlreadyUsedResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// UserTypeResponseBody is used to define fields on response body types.
-type UserTypeResponseBody struct {
+// UserResponseBody is used to define fields on response body types.
+type UserResponseBody struct {
 	Email    string `form:"email" json:"email" xml:"email"`
 	Token    string `form:"token" json:"token" xml:"token"`
 	Username string `form:"username" json:"username" xml:"username"`
@@ -127,7 +127,7 @@ type UserTypeResponseBody struct {
 func NewLoginResponseBody(res *user.LoginResult) *LoginResponseBody {
 	body := &LoginResponseBody{}
 	if res.User != nil {
-		body.User = marshalUserUserTypeToUserTypeResponseBody(res.User)
+		body.User = marshalUserUserToUserResponseBody(res.User)
 	}
 	return body
 }
@@ -137,7 +137,7 @@ func NewLoginResponseBody(res *user.LoginResult) *LoginResponseBody {
 func NewRegisterResponseBody(res *user.RegisterResult) *RegisterResponseBody {
 	body := &RegisterResponseBody{}
 	if res.User != nil {
-		body.User = marshalUserUserTypeToUserTypeResponseBody(res.User)
+		body.User = marshalUserUserToUserResponseBody(res.User)
 	}
 	return body
 }

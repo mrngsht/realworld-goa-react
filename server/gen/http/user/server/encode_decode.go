@@ -184,10 +184,10 @@ func EncodeRegisterError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
-// marshalUserUserTypeToUserTypeResponseBody builds a value of type
-// *UserTypeResponseBody from a value of type *user.UserType.
-func marshalUserUserTypeToUserTypeResponseBody(v *user.UserType) *UserTypeResponseBody {
-	res := &UserTypeResponseBody{
+// marshalUserUserToUserResponseBody builds a value of type *UserResponseBody
+// from a value of type *user.User.
+func marshalUserUserToUserResponseBody(v *user.User) *UserResponseBody {
+	res := &UserResponseBody{
 		Email:    v.Email,
 		Token:    v.Token,
 		Username: v.Username,

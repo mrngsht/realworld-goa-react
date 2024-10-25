@@ -15,6 +15,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestUser_Login(t *testing.T) {
+}
+
 func TestUser_Register(t *testing.T) {
 	ctx := servicetest.NewContext()
 	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
@@ -89,7 +92,7 @@ func TestUser_Register(t *testing.T) {
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
-			assert.Equal(t, design.ErrorUserUsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
+			assert.Equal(t, design.ErrorUser_UsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
 			_, err = qt.GetUserEmailByEmail(ctx, payload.Email)
 			require.Error(t, err)
@@ -116,7 +119,7 @@ func TestUser_Register(t *testing.T) {
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
-			assert.Equal(t, design.ErrorUserEmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
+			assert.Equal(t, design.ErrorUser_EmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
 			_, err = qt.GetUserProfileByUsername(ctx, payload.Username)
 			require.Error(t, err)

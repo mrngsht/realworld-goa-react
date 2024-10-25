@@ -45,7 +45,7 @@ type LoginPayload struct {
 
 // LoginResult is the result type of the user service login method.
 type LoginResult struct {
-	User *UserType
+	User *User
 }
 
 // RegisterPayload is the payload type of the user service register method.
@@ -57,10 +57,10 @@ type RegisterPayload struct {
 
 // RegisterResult is the result type of the user service register method.
 type RegisterResult struct {
-	User *UserType
+	User *User
 }
 
-type UserType struct {
+type User struct {
 	Email    string
 	Token    string
 	Username string

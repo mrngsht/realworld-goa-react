@@ -238,10 +238,10 @@ func DecodeRegisterResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
-// unmarshalUserTypeResponseBodyToUserUserType builds a value of type
-// *user.UserType from a value of type *UserTypeResponseBody.
-func unmarshalUserTypeResponseBodyToUserUserType(v *UserTypeResponseBody) *user.UserType {
-	res := &user.UserType{
+// unmarshalUserResponseBodyToUserUser builds a value of type *user.User from a
+// value of type *UserResponseBody.
+func unmarshalUserResponseBodyToUserUser(v *UserResponseBody) *user.User {
+	res := &user.User{
 		Email:    *v.Email,
 		Token:    *v.Token,
 		Username: *v.Username,

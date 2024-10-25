@@ -30,13 +30,13 @@ type RegisterRequestBody struct {
 // LoginResponseBody is the type of the "user" service "login" endpoint HTTP
 // response body.
 type LoginResponseBody struct {
-	User *UserTypeResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
+	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
 // RegisterResponseBody is the type of the "user" service "register" endpoint
 // HTTP response body.
 type RegisterResponseBody struct {
-	User *UserTypeResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
+	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
 // LoginEmailNotFoundResponseBody is the type of the "user" service "login"
@@ -111,8 +111,8 @@ type RegisterEmailAlreadyUsedResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// UserTypeResponseBody is used to define fields on response body types.
-type UserTypeResponseBody struct {
+// UserResponseBody is used to define fields on response body types.
+type UserResponseBody struct {
 	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	Token    *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
@@ -145,7 +145,7 @@ func NewRegisterRequestBody(p *user.RegisterPayload) *RegisterRequestBody {
 // "OK" response.
 func NewLoginResultOK(body *LoginResponseBody) *user.LoginResult {
 	v := &user.LoginResult{}
-	v.User = unmarshalUserTypeResponseBodyToUserUserType(body.User)
+	v.User = unmarshalUserResponseBodyToUserUser(body.User)
 
 	return v
 }
@@ -184,7 +184,7 @@ func NewLoginPasswordIsIncorrect(body *LoginPasswordIsIncorrectResponseBody) *go
 // a HTTP "OK" response.
 func NewRegisterResultOK(body *RegisterResponseBody) *user.RegisterResult {
 	v := &user.RegisterResult{}
-	v.User = unmarshalUserTypeResponseBodyToUserUserType(body.User)
+	v.User = unmarshalUserResponseBodyToUserUser(body.User)
 
 	return v
 }
@@ -225,7 +225,7 @@ func ValidateLoginResponseBody(body *LoginResponseBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}
 	if body.User != nil {
-		if err2 := ValidateUserTypeResponseBody(body.User); err2 != nil {
+		if err2 := ValidateUserResponseBody(body.User); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -239,7 +239,7 @@ func ValidateRegisterResponseBody(body *RegisterResponseBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}
 	if body.User != nil {
-		if err2 := ValidateUserTypeResponseBody(body.User); err2 != nil {
+		if err2 := ValidateUserResponseBody(body.User); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -342,9 +342,8 @@ func ValidateRegisterEmailAlreadyUsedResponseBody(body *RegisterEmailAlreadyUsed
 	return
 }
 
-// ValidateUserTypeResponseBody runs the validations defined on
-// UserTypeResponseBody
-func ValidateUserTypeResponseBody(body *UserTypeResponseBody) (err error) {
+// ValidateUserResponseBody runs the validations defined on UserResponseBody
+func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
