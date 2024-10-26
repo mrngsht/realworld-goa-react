@@ -79,7 +79,7 @@ const (
 
 var (
 	DefUser_RequestUsername = func() {
-		Pattern(`^[a-z0-9_]{3, 32}$`)
+		Pattern(`^[a-zA-Z0-9_]{3,32}$`)
 	}
 	DefUser_RequestEmail = func() {
 		Format(FormatEmail)

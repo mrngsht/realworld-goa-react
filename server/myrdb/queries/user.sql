@@ -46,3 +46,8 @@ SELECT
 FROM user_profile_
 WHERE user_id_ = $1
 LIMIT 1;
+
+-- name: GetUserEmailByUserID :one
+SELECT email_ FROM user_email_ 
+WHERE user_id_ = $1
+LIMIT 1;

@@ -21,11 +21,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Doloribus provident.
-                                    email: Perferendis occaecati assumenda.
-                                    image: Sit aliquam rerum voluptatem rerum.
-                                    token: Expedita non vel velit explicabo eveniet repudiandae.
-                                    username: Et quam eos dolorum incidunt quia.
+                                    bio: Quos ea minima labore.
+                                    email: Eveniet repudiandae velit et.
+                                    image: Corporis sit facilis ut ut sunt.
+                                    token: Eos dolorum incidunt quia corporis doloribus provident.
+                                    username: Sit aliquam rerum voluptatem rerum.
     /api/users:
         post:
             tags:
@@ -39,9 +39,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/RegisterRequestBody'
                         example:
-                            email: alverta@marvin.com
-                            password: g4r
-                            username: i{3, 32}
+                            email: terence@lubowitz.org
+                            password: qfb
+                            username: L8P
             responses:
                 "200":
                     description: OK response.
@@ -51,11 +51,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Doloribus provident.
-                                    email: Perferendis occaecati assumenda.
-                                    image: Sit aliquam rerum voluptatem rerum.
-                                    token: Expedita non vel velit explicabo eveniet repudiandae.
-                                    username: Et quam eos dolorum incidunt quia.
+                                    bio: Quos ea minima labore.
+                                    email: Eveniet repudiandae velit et.
+                                    image: Corporis sit facilis ut ut sunt.
+                                    token: Eos dolorum incidunt quia corporis doloribus provident.
+                                    username: Sit aliquam rerum voluptatem rerum.
                 "400":
                     description: 'EmailAlreadyUsed: Bad Request response.'
                     content:
@@ -75,8 +75,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: hermann.swift@bernhard.com
-                            password: 24h
+                            email: ottilie_parker@bartolettidamore.info
+                            password: cm1
             responses:
                 "200":
                     description: OK response.
@@ -86,11 +86,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Doloribus provident.
-                                    email: Perferendis occaecati assumenda.
-                                    image: Sit aliquam rerum voluptatem rerum.
-                                    token: Expedita non vel velit explicabo eveniet repudiandae.
-                                    username: Et quam eos dolorum incidunt quia.
+                                    bio: Quos ea minima labore.
+                                    email: Eveniet repudiandae velit et.
+                                    image: Corporis sit facilis ut ut sunt.
+                                    token: Eos dolorum incidunt quia corporis doloribus provident.
+                                    username: Sit aliquam rerum voluptatem rerum.
                 "400":
                     description: 'PasswordIsIncorrect: Bad Request response.'
                     content:
@@ -105,7 +105,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: false
+                    example: true
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -127,11 +127,11 @@ components:
                     description: Is the error a timeout?
                     example: false
             example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
             required:
                 - name
@@ -145,16 +145,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: ceasar@schuppe.org
+                    example: ceasar@larsonhammes.name
                     format: email
                 password:
                     type: string
-                    example: kb8
+                    example: 4og
                     minLength: 6
                     maxLength: 128
             example:
-                email: nia.muller@mayert.biz
-                password: qza
+                email: dallin.auer@stamm.name
+                password: eav
             required:
                 - email
                 - password
@@ -165,11 +165,11 @@ components:
                     $ref: '#/components/schemas/User'
             example:
                 user:
-                    bio: Doloribus provident.
-                    email: Perferendis occaecati assumenda.
-                    image: Sit aliquam rerum voluptatem rerum.
-                    token: Expedita non vel velit explicabo eveniet repudiandae.
-                    username: Et quam eos dolorum incidunt quia.
+                    bio: Quos ea minima labore.
+                    email: Eveniet repudiandae velit et.
+                    image: Corporis sit facilis ut ut sunt.
+                    token: Eos dolorum incidunt quia corporis doloribus provident.
+                    username: Sit aliquam rerum voluptatem rerum.
             required:
                 - user
         RegisterRequestBody:
@@ -177,21 +177,21 @@ components:
             properties:
                 email:
                     type: string
-                    example: eugene.kovacek@koeppkris.biz
+                    example: maymie.muller@westlemke.info
                     format: email
                 password:
                     type: string
-                    example: oz2
+                    example: 9j5
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: e{3, 32}
-                    pattern: ^[a-z0-9_]{3, 32}$
+                    example: mTF
+                    pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                email: lemuel_jast@kerluke.net
-                password: 9ae
-                username: g{3, 32}
+                email: yolanda@kling.net
+                password: vyn
+                username: QQaE
             required:
                 - username
                 - email
@@ -201,25 +201,25 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Eveniet consequuntur non voluptas quo debitis quia.
+                    example: Aliquam consequatur vel nostrum.
                 email:
                     type: string
-                    example: Illum repellendus.
+                    example: Dolorem aut temporibus debitis vero.
                 image:
                     type: string
-                    example: Pariatur et minima minima dolorem aut.
+                    example: Ea vel voluptatem.
                 token:
                     type: string
-                    example: Qui consequuntur error laboriosam numquam eveniet.
+                    example: Quod occaecati veritatis alias possimus deleniti quas.
                 username:
                     type: string
-                    example: Non laborum nesciunt exercitationem voluptas.
+                    example: Aliquam et officiis vero voluptatum aut quam.
             example:
-                bio: Quam aut aliquam consequatur vel nostrum qui.
-                email: Debitis vero explicabo quod occaecati veritatis.
-                image: Vel voluptatem deserunt.
-                token: Possimus deleniti quas ad aliquam.
-                username: Officiis vero voluptatum.
+                bio: Earum quis quae quos et illo voluptate.
+                email: In numquam.
+                image: Sit itaque debitis.
+                token: Aut numquam voluptate quia quam rerum.
+                username: Ut laudantium molestiae iste consectetur quos hic.
             required:
                 - email
                 - token

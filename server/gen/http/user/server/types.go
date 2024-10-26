@@ -272,7 +272,7 @@ func ValidateRegisterRequestBody(body *RegisterRequestBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
 	}
 	if body.Username != nil {
-		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", *body.Username, "^[a-z0-9_]{3, 32}$"))
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", *body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))

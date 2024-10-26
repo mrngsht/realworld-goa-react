@@ -9,11 +9,19 @@ import (
 	"github.com/mrngsht/realworld-goa-react/config"
 )
 
+type Claims struct {
+	jwt.RegisteredClaims
+
+	UserID string `json:"userId"`
+}
+
 func IssueToken(userID uuid.UUID, issuedAt time.Time) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iat": issuedAt.Unix(),
-		"exp": issuedAt.Add(1 * time.Hour).Unix(),
-		"uid": userID.String(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(issuedAt),
+			ExpiresAt: jwt.NewNumericDate(issuedAt.Add(1 * time.Hour)),
+		},
+		UserID: userID.String(),
 	})
 	tokenString, err := token.SignedString(config.C.PasswordAuthHmacKey)
 	if err != nil {
@@ -27,7 +35,8 @@ type Token struct {
 }
 
 func ParseAndVerifyToken(tokenString string, now time.Time) (Token, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+	var claims Claims
+	_, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
@@ -37,29 +46,17 @@ func ParseAndVerifyToken(tokenString string, now time.Time) (Token, error) {
 		return Token{}, errors.WithStack(err)
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return Token{}, errors.Errorf("failed to cast token.Claims to jwt.MapClaims")
+	if claims.ExpiresAt == nil {
+		return Token{}, errors.Errorf("claim[exp] value is nil")
 	}
-
-	exp, ok := claims["exp"].(int64)
-	if !ok {
-		return Token{}, errors.Errorf("claim[exp] value is invalid: %v\n", claims["exp"])
-	}
-	expt := time.Unix(exp, 0)
-	if now.After(expt) {
+	if now.After(claims.ExpiresAt.Time) {
 		return Token{}, ErrTokenHasExpired
 	}
 
-	uid, ok := claims["uid"].(string)
-	if !ok {
-		return Token{}, errors.Errorf("claim[uid] value is invalid: %v\n", claims["uid"])
+	userID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return Token{}, errors.Errorf(`claim[userID] value is empty or invalid ("%s"): %v`, claims.UserID, err)
 	}
 
-	uUUID, err := uuid.Parse(uid)
-	if !ok {
-		return Token{}, errors.WithStack(err)
-	}
-
-	return Token{UserID: uUUID}, nil
+	return Token{UserID: userID}, nil
 }

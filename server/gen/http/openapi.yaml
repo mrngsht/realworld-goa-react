@@ -93,25 +93,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Nam itaque fugiat sit quis.
+                example: Non nihil.
             email:
                 type: string
-                example: Quaerat quia.
+                example: Sit quis.
             image:
                 type: string
-                example: Reprehenderit fugit eum voluptas voluptas et laboriosam.
+                example: A harum et.
             token:
                 type: string
-                example: Et fugiat atque nostrum adipisci enim.
+                example: Reprehenderit fugit eum voluptas voluptas et laboriosam.
             username:
                 type: string
-                example: Aut doloremque.
+                example: Autem sed ipsa est.
         example:
-            bio: Qui modi temporibus dolorem.
-            email: Autem sed ipsa est.
-            image: Dolores esse et non voluptas aut.
-            token: Non nihil.
-            username: A harum et.
+            bio: Sapiente dolorum velit accusamus laborum.
+            email: Qui modi temporibus dolorem.
+            image: Velit omnis ut dolorem aperiam ducimus.
+            token: Dolores esse et non voluptas aut.
+            username: Sed ut et enim sunt sint.
         required:
             - email
             - token
@@ -126,11 +126,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Doloribus provident.
-                email: Perferendis occaecati assumenda.
-                image: Sit aliquam rerum voluptatem rerum.
-                token: Expedita non vel velit explicabo eveniet repudiandae.
-                username: Et quam eos dolorum incidunt quia.
+                bio: Quos ea minima labore.
+                email: Eveniet repudiandae velit et.
+                image: Corporis sit facilis ut ut sunt.
+                token: Eos dolorum incidunt quia corporis doloribus provident.
+                username: Sit aliquam rerum voluptatem rerum.
         required:
             - user
     UserLoginEmailNotFoundResponseBody:
@@ -156,11 +156,11 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: login_EmailNotFound_response_body result type (default view)
         example:
             fault: false
@@ -168,7 +168,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -183,7 +183,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -206,11 +206,11 @@ definitions:
                 example: false
         description: login_PasswordIsIncorrect_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -225,16 +225,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: hilda_schowalter@powlowskikuhic.name
+                example: aniyah_king@bosco.biz
                 format: email
             password:
                 type: string
-                example: vkl
+                example: ty7
                 minLength: 6
                 maxLength: 128
         example:
-            email: raphael_treutel@gusikowskipaucek.com
-            password: a6n
+            email: vern_jacobson@thiel.org
+            password: f2a
         required:
             - email
             - password
@@ -246,11 +246,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Doloribus provident.
-                email: Perferendis occaecati assumenda.
-                image: Sit aliquam rerum voluptatem rerum.
-                token: Expedita non vel velit explicabo eveniet repudiandae.
-                username: Et quam eos dolorum incidunt quia.
+                bio: Quos ea minima labore.
+                email: Eveniet repudiandae velit et.
+                image: Corporis sit facilis ut ut sunt.
+                token: Eos dolorum incidunt quia corporis doloribus provident.
+                username: Sit aliquam rerum voluptatem rerum.
         required:
             - user
     UserRegisterEmailAlreadyUsedResponseBody:
@@ -260,7 +260,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -288,7 +288,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -302,21 +302,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: wilber@hilpert.org
+                example: gaetano_lindgren@steuber.info
                 format: email
             password:
                 type: string
-                example: b5e
+                example: 9wx
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: q{3, 32}
-                pattern: ^[a-z0-9_]{3, 32}$
+                example: OmWfz
+                pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: emelie.hoppe@beckerprosacco.com
-            password: dx8
-            username: e{3, 32}
+            email: verlie@kuhnwehner.biz
+            password: 1ux
+            username: 0jB
         required:
             - username
             - email
@@ -329,11 +329,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Doloribus provident.
-                email: Perferendis occaecati assumenda.
-                image: Sit aliquam rerum voluptatem rerum.
-                token: Expedita non vel velit explicabo eveniet repudiandae.
-                username: Et quam eos dolorum incidunt quia.
+                bio: Quos ea minima labore.
+                email: Eveniet repudiandae velit et.
+                image: Corporis sit facilis ut ut sunt.
+                token: Eos dolorum incidunt quia corporis doloribus provident.
+                username: Sit aliquam rerum voluptatem rerum.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -343,7 +343,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.

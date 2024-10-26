@@ -26,7 +26,7 @@ func Run() error {
 	enc := goahttp.ResponseEncoder
 	svr := server.New(endpoints, mux, dec, enc, nil, nil)
 
-	svr.Use(userAuthorizationMiddleware())
+	svr.Use(newUserAuthorizationMiddleware())
 
 	server.Mount(mux, svr)
 	httpsvr := &http.Server{

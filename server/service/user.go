@@ -8,6 +8,7 @@ import (
 
 	"github.com/mrngsht/realworld-goa-react/domain/user"
 	goa "github.com/mrngsht/realworld-goa-react/gen/user"
+	"github.com/mrngsht/realworld-goa-react/myctx"
 	"github.com/mrngsht/realworld-goa-react/myerr"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
@@ -180,5 +181,34 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 }
 
 func (u User) GetCurrentUser(ctx context.Context) (*goa.GetCurrentUserResult, error) {
-	return nil, nil
+	q := sqlcgen.New(u.rdb)
+
+	userID := myctx.MustGetRequestUserID(ctx)
+
+	email, err := q.GetUserEmailByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	profile, err := q.GetUserProfileByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	token, err := user.IssueToken(userID, mytime.Now(ctx))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &goa.GetCurrentUserResult{
+		User: &goa.User{
+			Email:    email,
+			Token:    token,
+			Username: profile.Username,
+			Bio:      profile.Bio,
+			Image:    profile.ImageUrl,
+		},
+	}, nil
 }
