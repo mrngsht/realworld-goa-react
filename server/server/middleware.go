@@ -1,7 +1,10 @@
 package server
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
+	"runtime"
 	"strings"
 
 	"github.com/cockroachdb/errors"
@@ -59,4 +62,38 @@ func authorize(r *http.Request) (*domainUser.Token, error) {
 	}
 
 	return &token, nil
+}
+
+func panicRecoverMiddleware() func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				rec := recover()
+				if rec == nil {
+					return
+				}
+
+				err, ok := rec.(error)
+				if !ok {
+					err = fmt.Errorf("%v", rec)
+				}
+
+				var stack []byte
+				{
+					stack = make([]byte, 4<<10) // 4kb
+					length := runtime.Stack(stack, true)
+					stack = stack[:length]
+				}
+
+				slog.ErrorContext(r.Context(), "PANIC RECOVERED",
+					"message", err.Error(),
+					"stack trace", string(stack),
+				)
+
+				http.Error(w, "internal server error", http.StatusInternalServerError)
+			}()
+
+			h.ServeHTTP(w, r)
+		})
+	}
 }
