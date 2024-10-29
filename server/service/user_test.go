@@ -191,3 +191,32 @@ func TestUser_Register(t *testing.T) {
 		}
 	})
 }
+
+func TestUser_GetCurrentUser(t *testing.T) {
+	ctx := servicetest.NewContext()
+	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+
+	svc := service.NewUser(rdb)
+
+	t.Run("succeed", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "succeed",
+			Email:    "succeed@example.com",
+			Password: "password",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		p, err := qt.GetUserProfileByUsername(ctx, registerPayload.Username)
+		require.NoError(t, err)
+
+		res, err := svc.GetCurrentUser(servicetest.SetRequestUser(ctx, p.UserID)) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Email, res.User.Email)
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, "", res.User.Bio)
+		assert.Equal(t, "", res.User.Image)
+		assert.NotEmpty(t, res.User.Token)
+	})
+}

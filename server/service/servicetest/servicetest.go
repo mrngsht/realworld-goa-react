@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
+	"github.com/mrngsht/realworld-goa-react/myctx"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -16,4 +18,8 @@ func GoaServiceErrorName(err error) string {
 		return serr.GoaErrorName()
 	}
 	return "NOT_GOA_SERVICE_ERROR"
+}
+
+func SetRequestUser(ctx context.Context, userID uuid.UUID) context.Context {
+	return myctx.SetRequestUserID(ctx, userID)
 }
