@@ -26,6 +26,8 @@ func Run() error {
 
 	s := service.NewUser(db)
 	endpoints := user.NewEndpoints(s)
+	endpoints.Use(newErrorHandler())
+
 	mux := goahttp.NewMuxer()
 	dec := goahttp.RequestDecoder
 	enc := goahttp.ResponseEncoder

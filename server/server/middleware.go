@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/mrngsht/realworld-goa-react/mytime"
 
 	user "github.com/mrngsht/realworld-goa-react/gen/http/user/server"
+	goa "goa.design/goa/v3/pkg"
 )
 
 var (
@@ -94,6 +96,24 @@ func panicRecoverMiddleware() func(http.Handler) http.Handler {
 			}()
 
 			h.ServeHTTP(w, r)
+		})
+	}
+}
+
+func newErrorHandlerMiddleware() func(goa.Endpoint) goa.Endpoint {
+	return func(e goa.Endpoint) goa.Endpoint {
+		return goa.Endpoint(func(ctx context.Context, req interface{}) (interface{}, error) {
+			res, err := e(ctx, req)
+			if err == nil {
+				return res, err
+			}
+			if serr := (*goa.ServiceError)(nil); errors.As(err, &serr) {
+				//already handled
+				return res, err
+			}
+
+			slog.ErrorContext(ctx, "UNHANDLED ERROR", "err", fmt.Sprintf("%+v", err))
+			return res, goa.NewServiceError(errors.New("internal server error"), "internal server error", false, false, true)
 		})
 	}
 }
