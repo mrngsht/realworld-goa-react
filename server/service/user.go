@@ -103,21 +103,22 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		return nil, errors.WithStack(err)
 	}
 
+	var userID = uuid.Nil
 	if err := myrdb.Tx(ctx, u.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
 		q = sqlcgen.New(tx)
 
 		now := mytime.Now(ctx)
-		userID := uuid.New()
+		newUserID := uuid.New()
 
 		if err := q.InsertUser(ctx, sqlcgen.InsertUserParams{
 			CreatedAt: now,
-			ID:        userID,
+			ID:        newUserID,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
 		if err := q.InsertUserProfile(ctx, sqlcgen.InsertUserProfileParams{
-			UserID:    userID,
+			UserID:    newUserID,
 			Username:  payload.Username,
 			Bio:       "",
 			ImageUrl:  "",
@@ -129,7 +130,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 			return errors.WithStack(err)
 		}
 		if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
-			UserID:    userID,
+			UserID:    newUserID,
 			Username:  payload.Username,
 			Bio:       "",
 			ImageUrl:  "",
@@ -139,7 +140,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		}
 
 		if err := q.InsertUserEmail(ctx, sqlcgen.InsertUserEmailParams{
-			UserID:    userID,
+			UserID:    newUserID,
 			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
@@ -149,7 +150,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 			return errors.WithStack(err)
 		}
 		if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{
-			UserID:    userID,
+			UserID:    newUserID,
 			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
@@ -157,15 +158,22 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		}
 
 		if err := q.InsertUserAuthPassword(ctx, sqlcgen.InsertUserAuthPasswordParams{
-			UserID:       userID,
+			UserID:       newUserID,
 			PasswordHash: string(passwordHash),
 			CreatedAt:    now,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
+		userID = newUserID
+
 		return nil
 	}); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	token, err := user.IssueToken(userID, mytime.Now(ctx))
+	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -173,7 +181,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 		User: &goa.User{
 			Email:    payload.Email,
 			Username: payload.Username,
-			Token:    "TODO",
+			Token:    token,
 			Bio:      "",
 			Image:    "",
 		},

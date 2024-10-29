@@ -101,7 +101,7 @@ func TestUser_Register(t *testing.T) {
 
 		assert.Equal(t, payload.Username, res.User.Username)
 		assert.Equal(t, payload.Email, res.User.Email)
-		assert.Equal(t, "TODO", res.User.Token) // FIXME
+		assert.NotEmpty(t, res.User.Token)
 		assert.Equal(t, "", res.User.Bio)
 		assert.Equal(t, "", res.User.Image)
 
