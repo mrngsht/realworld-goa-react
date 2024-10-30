@@ -8,6 +8,7 @@ import (
 
 type (
 	ctxKeyRequestUserID struct{}
+	ctxKeyRequestID     struct{}
 )
 
 func SetRequestUserID(ctx context.Context, userID uuid.UUID) context.Context {
@@ -32,4 +33,20 @@ func GetRequestUserID(ctx context.Context) *uuid.UUID {
 		panic("ctx value of request userID is empty or invalid")
 	}
 	return &userID
+}
+
+func SetRequestID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, ctxKeyRequestID{}, id)
+}
+
+func GetRequestID(ctx context.Context) string {
+	v := ctx.Value(ctxKeyRequestID{})
+	if v == nil {
+		return ""
+	}
+	requestID, ok := v.(string)
+	if !ok {
+		return "" // fail safe
+	}
+	return requestID
 }

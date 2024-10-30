@@ -1,9 +1,7 @@
 package server
 
 import (
-	"log/slog"
 	"net/http"
-	"os"
 
 	goahttp "goa.design/goa/v3/http"
 
@@ -15,9 +13,6 @@ import (
 )
 
 func Run() error {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
-
 	db, err := myrdb.OpenLocalRDB()
 	if err != nil {
 		return errors.WithStack(err)
@@ -26,15 +21,17 @@ func Run() error {
 
 	s := service.NewUser(db)
 	endpoints := user.NewEndpoints(s)
-	endpoints.Use(newErrorHandler())
+	endpoints.Use(newErrorHandlerMiddleware())
 
 	mux := goahttp.NewMuxer()
 	dec := goahttp.RequestDecoder
 	enc := goahttp.ResponseEncoder
 	svr := server.New(endpoints, mux, dec, enc, nil, nil)
 
-	svr.Use(panicRecoverMiddleware())
+	svr.Use(newPanicRecoverMiddleware())
 	svr.Use(newUserAuthorizationMiddleware())
+	svr.Use(newRequestLogMiddleware())
+	svr.Use(newRequestIDMiddleware())
 
 	server.Mount(mux, svr)
 	httpsvr := &http.Server{
