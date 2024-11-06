@@ -51,3 +51,20 @@ LIMIT 1;
 SELECT email_ FROM user_email_ 
 WHERE user_id_ = $1
 LIMIT 1;
+
+-- name: UpdateUserEmail :exec
+UPDATE user_email_
+SET updated_at_ = $2, email_ = $3
+WHERE user_id_ = $1;
+
+-- name: UpdateUserAuthPasswordHash :exec
+UPDATE user_auth_password_
+SET updated_at_ = $2, password_hash_ = $3
+WHERE user_id_ = $1;
+
+-- name: UpdateUserProfile :exec
+UPDATE user_profile_
+SET updated_at_ = $2, username_ = $3, bio_ = $4, image_url_ = $5 
+WHERE user_id_ = $1;
+
+

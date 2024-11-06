@@ -219,4 +219,90 @@ func (u User) GetCurrentUser(ctx context.Context) (*goa.GetCurrentUserResult, er
 			Image:    profile.ImageUrl,
 		},
 	}, nil
+
+}
+
+func (u User) UpdateUser(ctx context.Context, payload *goa.UpdateUserPayload) (res *goa.UpdateUserResult, err error) {
+	q := sqlcgen.New(u.rdb)
+
+	userID := myctx.MustGetRequestUserID(ctx)
+	now := mytime.Now(ctx)
+
+	if err := myrdb.Tx(ctx, u.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+		if payload.Email != nil {
+			if err := q.UpdateUserEmail(ctx, sqlcgen.UpdateUserEmailParams{
+				UserID:    userID,
+				UpdatedAt: now,
+				Email:     *payload.Email,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{
+				UserID:    userID,
+				Email:     *payload.Email,
+				CreatedAt: now,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+		}
+
+		if payload.Password != nil {
+			passwordHash, err := user.GenPasswordHash([]byte(*payload.Password))
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			if err := q.UpdateUserAuthPasswordHash(ctx, sqlcgen.UpdateUserAuthPasswordHashParams{
+				UserID:       userID,
+				UpdatedAt:    now,
+				PasswordHash: string(passwordHash),
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+		}
+
+		if payload.Username != nil || payload.Bio != nil || payload.Image != nil {
+			current, err := q.GetUserProfileByUserID(ctx, userID)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			param := sqlcgen.UpdateUserProfileParams{
+				UserID:    userID,
+				UpdatedAt: now,
+				Username:  current.Username,
+				Bio:       current.Bio,
+				ImageUrl:  current.ImageUrl,
+			}
+
+			if payload.Username != nil {
+				param.Username = *payload.Username
+			}
+			if payload.Bio != nil {
+				param.Bio = *payload.Bio
+			}
+			if payload.Image != nil {
+				param.ImageUrl = *payload.Image
+			}
+
+			if err := q.UpdateUserProfile(ctx, param); err != nil {
+				return errors.WithStack(err)
+			}
+			if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
+				CreatedAt: now,
+				UserID:    userID,
+				Username:  param.Username,
+				Bio:       param.Bio,
+				ImageUrl:  param.ImageUrl,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+		}
+
+		return nil
+	}); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return nil, nil
 }

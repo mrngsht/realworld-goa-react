@@ -22,6 +22,7 @@ type Server struct {
 	Login          http.Handler
 	Register       http.Handler
 	GetCurrentUser http.Handler
+	UpdateUser     http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -51,13 +52,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Login", "POST", "/api/users/login"},
-			{"Register", "POST", "/api/users"},
-			{"GetCurrentUser", "GET", "/api/user"},
+			{"Login", "POST", "/api/user/login"},
+			{"Register", "POST", "/api/user/register"},
+			{"GetCurrentUser", "GET", "/api/user/current"},
+			{"UpdateUser", "POST", "/api/user/update"},
 		},
 		Login:          NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
 		Register:       NewRegisterHandler(e.Register, mux, decoder, encoder, errhandler, formatter),
 		GetCurrentUser: NewGetCurrentUserHandler(e.GetCurrentUser, mux, decoder, encoder, errhandler, formatter),
+		UpdateUser:     NewUpdateUserHandler(e.UpdateUser, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -69,6 +72,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Login = m(s.Login)
 	s.Register = m(s.Register)
 	s.GetCurrentUser = m(s.GetCurrentUser)
+	s.UpdateUser = m(s.UpdateUser)
 }
 
 // MethodNames returns the methods served.
@@ -79,6 +83,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountLoginHandler(mux, h.Login)
 	MountRegisterHandler(mux, h.Register)
 	MountGetCurrentUserHandler(mux, h.GetCurrentUser)
+	MountUpdateUserHandler(mux, h.UpdateUser)
 }
 
 // Mount configures the mux to serve the user endpoints.
@@ -95,7 +100,7 @@ func MountLoginHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/users/login", f)
+	mux.Handle("POST", "/api/user/login", f)
 }
 
 // NewLoginHandler creates a HTTP handler which loads the HTTP request and
@@ -146,7 +151,7 @@ func MountRegisterHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/users", f)
+	mux.Handle("POST", "/api/user/register", f)
 }
 
 // NewRegisterHandler creates a HTTP handler which loads the HTTP request and
@@ -197,7 +202,7 @@ func MountGetCurrentUserHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/api/user", f)
+	mux.Handle("GET", "/api/user/current", f)
 }
 
 // NewGetCurrentUserHandler creates a HTTP handler which loads the HTTP request
@@ -220,6 +225,57 @@ func NewGetCurrentUserHandler(
 		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
 		var err error
 		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUpdateUserHandler configures the mux to serve the "user" service
+// "updateUser" endpoint.
+func MountUpdateUserHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/user/update", f)
+}
+
+// NewUpdateUserHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "updateUser" endpoint.
+func NewUpdateUserHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateUserRequest(mux, decoder)
+		encodeResponse = EncodeUpdateUserResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "updateUser")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

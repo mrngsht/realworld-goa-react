@@ -14,7 +14,7 @@ produces:
     - application/xml
     - application/gob
 paths:
-    /api/user:
+    /api/user/current:
         get:
             tags:
                 - user
@@ -29,7 +29,35 @@ paths:
                             - user
             schemes:
                 - http
-    /api/users:
+    /api/user/login:
+        post:
+            tags:
+                - user
+            summary: login user
+            operationId: user#login
+            parameters:
+                - name: LoginRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UserLoginRequestBody'
+                    required:
+                        - email
+                        - password
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/UserLoginResponseBody'
+                        required:
+                            - user
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/UserLoginPasswordIsIncorrectResponseBody'
+            schemes:
+                - http
+    /api/user/register:
         post:
             tags:
                 - user
@@ -58,32 +86,25 @@ paths:
                         $ref: '#/definitions/UserRegisterEmailAlreadyUsedResponseBody'
             schemes:
                 - http
-    /api/users/login:
+    /api/user/update:
         post:
             tags:
                 - user
-            summary: login user
-            operationId: user#login
+            summary: updateUser user
+            operationId: user#updateUser
             parameters:
-                - name: LoginRequestBody
+                - name: UpdateUserRequestBody
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/UserLoginRequestBody'
-                    required:
-                        - email
-                        - password
+                    $ref: '#/definitions/UserUpdateUserRequestBody'
             responses:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/UserLoginResponseBody'
+                        $ref: '#/definitions/UserUpdateUserResponseBody'
                         required:
                             - user
-                "400":
-                    description: Bad Request response.
-                    schema:
-                        $ref: '#/definitions/UserLoginPasswordIsIncorrectResponseBody'
             schemes:
                 - http
 definitions:
@@ -93,25 +114,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Non nihil.
+                example: Dolore praesentium dicta vel facilis reprehenderit.
             email:
                 type: string
-                example: Sit quis.
+                example: Ea laborum qui laudantium vero voluptas molestiae.
             image:
                 type: string
-                example: A harum et.
+                example: Sed quasi.
             token:
                 type: string
-                example: Reprehenderit fugit eum voluptas voluptas et laboriosam.
+                example: Quae voluptatem quasi dignissimos quod exercitationem.
             username:
                 type: string
-                example: Autem sed ipsa est.
+                example: Animi dolorem aut perferendis nesciunt aliquid.
         example:
-            bio: Sapiente dolorum velit accusamus laborum.
-            email: Qui modi temporibus dolorem.
-            image: Velit omnis ut dolorem aperiam ducimus.
-            token: Dolores esse et non voluptas aut.
-            username: Sed ut et enim sunt sint.
+            bio: Quia neque.
+            email: Ullam ut ex minus.
+            image: Quos omnis magni iste explicabo.
+            token: Nam ipsam reiciendis sit autem.
+            username: Nisi consequatur quo.
         required:
             - email
             - token
@@ -126,11 +147,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Quos ea minima labore.
-                email: Eveniet repudiandae velit et.
-                image: Corporis sit facilis ut ut sunt.
-                token: Eos dolorum incidunt quia corporis doloribus provident.
-                username: Sit aliquam rerum voluptatem rerum.
+                bio: Placeat perspiciatis molestiae.
+                email: Aut aliquid corrupti quae.
+                image: Ut ipsum.
+                token: Voluptates consequatur ab sint sit repellendus.
+                username: Officia ut necessitatibus aut et maiores.
         required:
             - user
     UserLoginEmailNotFoundResponseBody:
@@ -140,7 +161,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -156,18 +177,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: login_EmailNotFound_response_body result type (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: false
         required:
             - name
@@ -206,11 +227,11 @@ definitions:
                 example: false
         description: login_PasswordIsIncorrect_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -225,16 +246,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: aniyah_king@bosco.biz
+                example: emilie.haag@collier.name
                 format: email
             password:
                 type: string
-                example: ty7
+                example: 9r9
                 minLength: 6
                 maxLength: 128
         example:
-            email: vern_jacobson@thiel.org
-            password: f2a
+            email: zena.nitzsche@jacobi.name
+            password: "593"
         required:
             - email
             - password
@@ -246,11 +267,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Quos ea minima labore.
-                email: Eveniet repudiandae velit et.
-                image: Corporis sit facilis ut ut sunt.
-                token: Eos dolorum incidunt quia corporis doloribus provident.
-                username: Sit aliquam rerum voluptatem rerum.
+                bio: Placeat perspiciatis molestiae.
+                email: Aut aliquid corrupti quae.
+                image: Ut ipsum.
+                token: Voluptates consequatur ab sint sit repellendus.
+                username: Officia ut necessitatibus aut et maiores.
         required:
             - user
     UserRegisterEmailAlreadyUsedResponseBody:
@@ -276,7 +297,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -287,8 +308,8 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -302,21 +323,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: gaetano_lindgren@steuber.info
+                example: manley@oconnelllangosh.biz
                 format: email
             password:
                 type: string
-                example: 9wx
+                example: "726"
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: OmWfz
+                example: N7C
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: verlie@kuhnwehner.biz
-            password: 1ux
-            username: 0jB
+            email: dwight_carter@hegmannosinski.net
+            password: 2fn
+            username: FTa
         required:
             - username
             - email
@@ -329,11 +350,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Quos ea minima labore.
-                email: Eveniet repudiandae velit et.
-                image: Corporis sit facilis ut ut sunt.
-                token: Eos dolorum incidunt quia corporis doloribus provident.
-                username: Sit aliquam rerum voluptatem rerum.
+                bio: Placeat perspiciatis molestiae.
+                email: Aut aliquid corrupti quae.
+                image: Ut ipsum.
+                token: Voluptates consequatur ab sint sit repellendus.
+                username: Officia ut necessitatibus aut et maiores.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -343,7 +364,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -379,3 +400,49 @@ definitions:
             - temporary
             - timeout
             - fault
+    UserUpdateUserRequestBody:
+        title: UserUpdateUserRequestBody
+        type: object
+        properties:
+            bio:
+                type: string
+                example: krr
+                maxLength: 4096
+            email:
+                type: string
+                example: cedrick@skiles.name
+                format: email
+            image:
+                type: string
+                example: http://ym
+                pattern: ^http://.+$
+            password:
+                type: string
+                example: bds
+                minLength: 6
+                maxLength: 128
+            username:
+                type: string
+                example: 0ZN
+                pattern: ^[a-zA-Z0-9_]{3,32}$
+        example:
+            bio: f09
+            email: tre.nicolas@deckowfisher.name
+            image: http://a
+            password: spo
+            username: _P3z
+    UserUpdateUserResponseBody:
+        title: UserUpdateUserResponseBody
+        type: object
+        properties:
+            user:
+                $ref: '#/definitions/User'
+        example:
+            user:
+                bio: Placeat perspiciatis molestiae.
+                email: Aut aliquid corrupti quae.
+                image: Ut ipsum.
+                token: Voluptates consequatur ab sint sit repellendus.
+                username: Officia ut necessitatibus aut et maiores.
+        required:
+            - user

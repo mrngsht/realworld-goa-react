@@ -190,3 +190,62 @@ func (q *Queries) InsertUserProfileMutation(ctx context.Context, arg InsertUserP
 	)
 	return err
 }
+
+const updateUserAuthPasswordHash = `-- name: UpdateUserAuthPasswordHash :exec
+UPDATE user_auth_password_
+SET updated_at_ = $2, password_hash_ = $3
+WHERE user_id_ = $1
+`
+
+type UpdateUserAuthPasswordHashParams struct {
+	UserID       uuid.UUID
+	UpdatedAt    time.Time
+	PasswordHash string
+}
+
+func (q *Queries) UpdateUserAuthPasswordHash(ctx context.Context, arg UpdateUserAuthPasswordHashParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserAuthPasswordHash, arg.UserID, arg.UpdatedAt, arg.PasswordHash)
+	return err
+}
+
+const updateUserEmail = `-- name: UpdateUserEmail :exec
+UPDATE user_email_
+SET updated_at_ = $2, email_ = $3
+WHERE user_id_ = $1
+`
+
+type UpdateUserEmailParams struct {
+	UserID    uuid.UUID
+	UpdatedAt time.Time
+	Email     string
+}
+
+func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserEmail, arg.UserID, arg.UpdatedAt, arg.Email)
+	return err
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :exec
+UPDATE user_profile_
+SET updated_at_ = $2, username_ = $3, bio_ = $4, image_url_ = $5 
+WHERE user_id_ = $1
+`
+
+type UpdateUserProfileParams struct {
+	UserID    uuid.UUID
+	UpdatedAt time.Time
+	Username  string
+	Bio       string
+	ImageUrl  string
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserProfile,
+		arg.UserID,
+		arg.UpdatedAt,
+		arg.Username,
+		arg.Bio,
+		arg.ImageUrl,
+	)
+	return err
+}

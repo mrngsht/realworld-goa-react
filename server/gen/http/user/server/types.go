@@ -29,6 +29,16 @@ type RegisterRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// UpdateUserRequestBody is the type of the "user" service "updateUser"
+// endpoint HTTP request body.
+type UpdateUserRequestBody struct {
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	Image    *string `form:"image,omitempty" json:"image,omitempty" xml:"image,omitempty"`
+	Bio      *string `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+}
+
 // LoginResponseBody is the type of the "user" service "login" endpoint HTTP
 // response body.
 type LoginResponseBody struct {
@@ -44,6 +54,12 @@ type RegisterResponseBody struct {
 // GetCurrentUserResponseBody is the type of the "user" service
 // "getCurrentUser" endpoint HTTP response body.
 type GetCurrentUserResponseBody struct {
+	User *UserResponseBody `form:"user" json:"user" xml:"user"`
+}
+
+// UpdateUserResponseBody is the type of the "user" service "updateUser"
+// endpoint HTTP response body.
+type UpdateUserResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
@@ -158,6 +174,16 @@ func NewGetCurrentUserResponseBody(res *user.GetCurrentUserResult) *GetCurrentUs
 	return body
 }
 
+// NewUpdateUserResponseBody builds the HTTP response body from the result of
+// the "updateUser" endpoint of the "user" service.
+func NewUpdateUserResponseBody(res *user.UpdateUserResult) *UpdateUserResponseBody {
+	body := &UpdateUserResponseBody{}
+	if res.User != nil {
+		body.User = marshalUserUserToUserResponseBody(res.User)
+	}
+	return body
+}
+
 // NewLoginEmailNotFoundResponseBody builds the HTTP response body from the
 // result of the "login" endpoint of the "user" service.
 func NewLoginEmailNotFoundResponseBody(res *goa.ServiceError) *LoginEmailNotFoundResponseBody {
@@ -235,6 +261,19 @@ func NewRegisterPayload(body *RegisterRequestBody) *user.RegisterPayload {
 	return v
 }
 
+// NewUpdateUserPayload builds a user service updateUser endpoint payload.
+func NewUpdateUserPayload(body *UpdateUserRequestBody) *user.UpdateUserPayload {
+	v := &user.UpdateUserPayload{
+		Username: body.Username,
+		Email:    body.Email,
+		Password: body.Password,
+		Image:    body.Image,
+		Bio:      body.Bio,
+	}
+
+	return v
+}
+
 // ValidateLoginRequestBody runs the validations defined on LoginRequestBody
 func ValidateLoginRequestBody(body *LoginRequestBody) (err error) {
 	if body.Email == nil {
@@ -285,6 +324,36 @@ func ValidateRegisterRequestBody(body *RegisterRequestBody) (err error) {
 	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) > 128 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 128, false))
+		}
+	}
+	return
+}
+
+// ValidateUpdateUserRequestBody runs the validations defined on
+// UpdateUserRequestBody
+func ValidateUpdateUserRequestBody(body *UpdateUserRequestBody) (err error) {
+	if body.Username != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", *body.Username, "^[a-zA-Z0-9_]{3,32}$"))
+	}
+	if body.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) < 6 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 6, true))
+		}
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) > 128 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 128, false))
+		}
+	}
+	if body.Image != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.image", *body.Image, "^http://.+$"))
+	}
+	if body.Bio != nil {
+		if utf8.RuneCountInString(*body.Bio) > 4096 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.bio", *body.Bio, utf8.RuneCountInString(*body.Bio), 4096, false))
 		}
 	}
 	return

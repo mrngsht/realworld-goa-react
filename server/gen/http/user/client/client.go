@@ -28,6 +28,10 @@ type Client struct {
 	// getCurrentUser endpoint.
 	GetCurrentUserDoer goahttp.Doer
 
+	// UpdateUser Doer is the HTTP client used to make requests to the updateUser
+	// endpoint.
+	UpdateUserDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -51,6 +55,7 @@ func NewClient(
 		LoginDoer:           doer,
 		RegisterDoer:        doer,
 		GetCurrentUserDoer:  doer,
+		UpdateUserDoer:      doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -121,6 +126,30 @@ func (c *Client) GetCurrentUser() goa.Endpoint {
 		resp, err := c.GetCurrentUserDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "getCurrentUser", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UpdateUser returns an endpoint that makes HTTP requests to the user service
+// updateUser server.
+func (c *Client) UpdateUser() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateUserRequest(c.encoder)
+		decodeResponse = DecodeUpdateUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUpdateUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "updateUser", err)
 		}
 		return decodeResponse(resp)
 	}

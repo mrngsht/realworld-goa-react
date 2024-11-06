@@ -9,15 +9,20 @@ package client
 
 // LoginUserPath returns the URL path to the user service login HTTP endpoint.
 func LoginUserPath() string {
-	return "/api/users/login"
+	return "/api/user/login"
 }
 
 // RegisterUserPath returns the URL path to the user service register HTTP endpoint.
 func RegisterUserPath() string {
-	return "/api/users"
+	return "/api/user/register"
 }
 
 // GetCurrentUserUserPath returns the URL path to the user service getCurrentUser HTTP endpoint.
 func GetCurrentUserUserPath() string {
-	return "/api/user"
+	return "/api/user/current"
+}
+
+// UpdateUserUserPath returns the URL path to the user service updateUser HTTP endpoint.
+func UpdateUserUserPath() string {
+	return "/api/user/update"
 }

@@ -24,7 +24,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"ottilie_parker@bartolettidamore.info\",\n      \"password\": \"cm1\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"jaylen.kuhic@ledner.net\",\n      \"password\": \"yj4\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 		if utf8.RuneCountInString(body.Password) < 6 {
@@ -53,7 +53,7 @@ func BuildRegisterPayload(userRegisterBody string) (*user.RegisterPayload, error
 	{
 		err = json.Unmarshal([]byte(userRegisterBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"terence@lubowitz.org\",\n      \"password\": \"qfb\",\n      \"username\": \"L8P\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"preston.powlowski@mosciskiparisian.com\",\n      \"password\": \"hhp\",\n      \"username\": \"Lonx\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
@@ -71,6 +71,28 @@ func BuildRegisterPayload(userRegisterBody string) (*user.RegisterPayload, error
 		Username: body.Username,
 		Email:    body.Email,
 		Password: body.Password,
+	}
+
+	return v, nil
+}
+
+// BuildUpdateUserPayload builds the payload for the user updateUser endpoint
+// from CLI flags.
+func BuildUpdateUserPayload(userUpdateUserBody string) (*user.UpdateUserPayload, error) {
+	var err error
+	var body UpdateUserRequestBody
+	{
+		err = json.Unmarshal([]byte(userUpdateUserBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bio\": \"6ge\",\n      \"email\": \"bud_olson@rempelstracke.info\",\n      \"image\": \"http://ru\",\n      \"password\": \"eax\",\n      \"username\": \"6fd\"\n   }'")
+		}
+	}
+	v := &user.UpdateUserPayload{
+		Username: body.Username,
+		Email:    body.Email,
+		Password: body.Password,
+		Image:    body.Image,
+		Bio:      body.Bio,
 	}
 
 	return v, nil

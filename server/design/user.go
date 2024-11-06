@@ -12,7 +12,7 @@ var _ = Service("user", func() {
 
 	Method("login", func() {
 		HTTP(func() {
-			POST("users/login")
+			POST("user/login")
 			Response(StatusOK)
 			Response(ErrorUser_EmailNotFound, StatusBadRequest)
 			Response(ErrorUser_PasswordIsIncorrect, StatusBadRequest)
@@ -34,7 +34,7 @@ var _ = Service("user", func() {
 
 	Method("register", func() {
 		HTTP(func() {
-			POST("users")
+			POST("user/register")
 			Response(StatusOK)
 			Response(ErrorUser_UsernameAlreadyUsed, StatusBadRequest)
 			Response(ErrorUser_EmailAlreadyUsed, StatusBadRequest)
@@ -57,8 +57,29 @@ var _ = Service("user", func() {
 
 	Method("getCurrentUser", func() {
 		HTTP(func() {
-			GET("user")
+			GET("user/current")
 			Response(StatusOK)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("user", Type_User),
+			)
+		})
+	})
+
+	Method("updateUser", func() {
+		HTTP(func() {
+			POST("user/update")
+			Response(StatusOK)
+		})
+
+		Payload(func() {
+			AttributeWithName("username", String, DefUser_RequestUsername)
+			AttributeWithName("email", String, DefUser_RequestEmail)
+			AttributeWithName("password", String, DefUser_RequestPassword)
+			AttributeWithName("image", String, DefUser_RequestImage)
+			AttributeWithName("bio", String, DefUser_RequestBio)
 		})
 
 		Result(func() {
@@ -87,6 +108,12 @@ var (
 	DefUser_RequestPassword = func() {
 		MinLength(6)
 		MaxLength(128)
+	}
+	DefUser_RequestImage = func() {
+		Pattern(`^http://.+$`)
+	}
+	DefUser_RequestBio = func() {
+		MaxLength(4096)
 	}
 )
 

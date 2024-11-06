@@ -18,6 +18,7 @@ type Endpoints struct {
 	Login          goa.Endpoint
 	Register       goa.Endpoint
 	GetCurrentUser goa.Endpoint
+	UpdateUser     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "user" service with endpoints.
@@ -26,6 +27,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Login:          NewLoginEndpoint(s),
 		Register:       NewRegisterEndpoint(s),
 		GetCurrentUser: NewGetCurrentUserEndpoint(s),
+		UpdateUser:     NewUpdateUserEndpoint(s),
 	}
 }
 
@@ -34,6 +36,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Login = m(e.Login)
 	e.Register = m(e.Register)
 	e.GetCurrentUser = m(e.GetCurrentUser)
+	e.UpdateUser = m(e.UpdateUser)
 }
 
 // NewLoginEndpoint returns an endpoint function that calls the method "login"
@@ -59,5 +62,14 @@ func NewRegisterEndpoint(s Service) goa.Endpoint {
 func NewGetCurrentUserEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		return s.GetCurrentUser(ctx)
+	}
+}
+
+// NewUpdateUserEndpoint returns an endpoint function that calls the method
+// "updateUser" of service "user".
+func NewUpdateUserEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UpdateUserPayload)
+		return s.UpdateUser(ctx, p)
 	}
 }
