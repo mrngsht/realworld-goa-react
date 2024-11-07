@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/guregu/null"
 	"github.com/mrngsht/realworld-goa-react/design"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
@@ -207,10 +208,9 @@ func TestUser_GetCurrentUser(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		p, err := qt.GetUserProfileByUsername(ctx, registerPayload.Username)
-		require.NoError(t, err)
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		res, err := svc.GetCurrentUser(servicetest.SetRequestUser(ctx, p.UserID)) // Act
+		res, err := svc.GetCurrent(ctx) // Act
 		require.NoError(t, err)
 
 		assert.Equal(t, registerPayload.Email, res.User.Email)
@@ -218,5 +218,232 @@ func TestUser_GetCurrentUser(t *testing.T) {
 		assert.Equal(t, "", res.User.Bio)
 		assert.Equal(t, "", res.User.Image)
 		assert.NotEmpty(t, res.User.Token)
+	})
+}
+
+func TestUser_Update(t *testing.T) {
+	ctx := servicetest.NewContext()
+	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+
+	svc := service.NewUser(rdb)
+
+	t.Run("update all", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "all",
+			Email:    "all@example.com",
+			Password: "all",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+
+		updatePayload := &user.UpdatePayload{
+			Username: null.StringFrom("update_all").Ptr(),
+			Email:    null.StringFrom("update_all@example.com").Ptr(),
+			Password: null.StringFrom("update_all").Ptr(),
+			Image:    null.StringFrom("http://example.com/file/update_all.png").Ptr(),
+			Bio:      null.StringFrom("update_all").Ptr(),
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, *updatePayload.Username, res.User.Username)
+		assert.Equal(t, *updatePayload.Email, res.User.Email)
+		assert.Equal(t, *updatePayload.Image, res.User.Image)
+		assert.Equal(t, *updatePayload.Bio, res.User.Bio)
+
+		curr, err := svc.GetCurrent(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, *curr.User, *res.User)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    *updatePayload.Email,
+			Password: *updatePayload.Password,
+		})
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		assert.Error(t, err)
+	})
+
+	t.Run("update email only", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "emailonly",
+			Email:    "emailonly@example.com",
+			Password: "emailonly",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+
+		updatePayload := &user.UpdatePayload{
+			Username: nil,
+			Email:    null.StringFrom("update_emailonly@example.com").Ptr(),
+			Password: nil,
+			Image:    nil,
+			Bio:      nil,
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, *updatePayload.Email, res.User.Email)
+		assert.Equal(t, "", res.User.Image)
+		assert.Equal(t, "", res.User.Bio)
+
+		curr, err := svc.GetCurrent(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, *curr.User, *res.User)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    *updatePayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("update password only", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "passwordonly",
+			Email:    "passwordonly@example.com",
+			Password: "passwordonly",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+
+		updatePayload := &user.UpdatePayload{
+			Username: nil,
+			Email:    nil,
+			Password: null.StringFrom("update_passwordonly").Ptr(),
+			Image:    nil,
+			Bio:      nil,
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, registerPayload.Email, res.User.Email)
+		assert.Equal(t, "", res.User.Image)
+		assert.Equal(t, "", res.User.Bio)
+
+		curr, err := svc.GetCurrent(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, *curr.User, *res.User)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: *updatePayload.Password,
+		})
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		assert.Error(t, err)
+	})
+
+	t.Run("update bio only", func(t *testing.T) { // on behalf of user_profile_
+		registerPayload := &user.RegisterPayload{
+			Username: "bioonly",
+			Email:    "bioonly@example.com",
+			Password: "bioonly",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+
+		updatePayload := &user.UpdatePayload{
+			Username: nil,
+			Email:    nil,
+			Password: nil,
+			Image:    nil,
+			Bio:      null.StringFrom("update_bioonly").Ptr(),
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, registerPayload.Email, res.User.Email)
+		assert.Equal(t, "", res.User.Image)
+		assert.Equal(t, *updatePayload.Bio, res.User.Bio)
+
+		curr, err := svc.GetCurrent(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, *curr.User, *res.User)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("update nothing", func(t *testing.T) {
+		registerPayload := &user.RegisterPayload{
+			Username: "nothing",
+			Email:    "nothing@example.com",
+			Password: "nothing",
+		}
+		_, err := svc.Register(ctx, registerPayload)
+		require.NoError(t, err)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
+
+		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+
+		res, err := svc.Update(ctx, &user.UpdatePayload{}) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, registerPayload.Username, res.User.Username)
+		assert.Equal(t, registerPayload.Email, res.User.Email)
+		assert.Equal(t, "", res.User.Image)
+		assert.Equal(t, "", res.User.Bio)
+
+		curr, err := svc.GetCurrent(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, *curr.User, *res.User)
+
+		_, err = svc.Login(ctx, &user.LoginPayload{
+			Email:    registerPayload.Email,
+			Password: registerPayload.Password,
+		})
+		require.NoError(t, err)
 	})
 }

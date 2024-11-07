@@ -238,13 +238,13 @@ func DecodeRegisterResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
-// BuildGetCurrentUserRequest instantiates a HTTP request object with method
-// and path set to call the "user" service "getCurrentUser" endpoint
-func (c *Client) BuildGetCurrentUserRequest(ctx context.Context, v any) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetCurrentUserUserPath()}
+// BuildGetCurrentRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "getCurrent" endpoint
+func (c *Client) BuildGetCurrentRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetCurrentUserPath()}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("user", "getCurrentUser", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("user", "getCurrent", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -253,10 +253,10 @@ func (c *Client) BuildGetCurrentUserRequest(ctx context.Context, v any) (*http.R
 	return req, nil
 }
 
-// DecodeGetCurrentUserResponse returns a decoder for responses returned by the
-// user getCurrentUser endpoint. restoreBody controls whether the response body
+// DecodeGetCurrentResponse returns a decoder for responses returned by the
+// user getCurrent endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
-func DecodeGetCurrentUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+func DecodeGetCurrentResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -273,33 +273,33 @@ func DecodeGetCurrentUserResponse(decoder func(*http.Response) goahttp.Decoder, 
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body GetCurrentUserResponseBody
+				body GetCurrentResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("user", "getCurrentUser", err)
+				return nil, goahttp.ErrDecodingError("user", "getCurrent", err)
 			}
-			err = ValidateGetCurrentUserResponseBody(&body)
+			err = ValidateGetCurrentResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("user", "getCurrentUser", err)
+				return nil, goahttp.ErrValidationError("user", "getCurrent", err)
 			}
-			res := NewGetCurrentUserResultOK(&body)
+			res := NewGetCurrentResultOK(&body)
 			return res, nil
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("user", "getCurrentUser", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("user", "getCurrent", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// BuildUpdateUserRequest instantiates a HTTP request object with method and
-// path set to call the "user" service "updateUser" endpoint
-func (c *Client) BuildUpdateUserRequest(ctx context.Context, v any) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateUserUserPath()}
+// BuildUpdateRequest instantiates a HTTP request object with method and path
+// set to call the "user" service "update" endpoint
+func (c *Client) BuildUpdateRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateUserPath()}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("user", "updateUser", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("user", "update", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -308,26 +308,26 @@ func (c *Client) BuildUpdateUserRequest(ctx context.Context, v any) (*http.Reque
 	return req, nil
 }
 
-// EncodeUpdateUserRequest returns an encoder for requests sent to the user
-// updateUser server.
-func EncodeUpdateUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+// EncodeUpdateRequest returns an encoder for requests sent to the user update
+// server.
+func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		p, ok := v.(*user.UpdateUserPayload)
+		p, ok := v.(*user.UpdatePayload)
 		if !ok {
-			return goahttp.ErrInvalidType("user", "updateUser", "*user.UpdateUserPayload", v)
+			return goahttp.ErrInvalidType("user", "update", "*user.UpdatePayload", v)
 		}
-		body := NewUpdateUserRequestBody(p)
+		body := NewUpdateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("user", "updateUser", err)
+			return goahttp.ErrEncodingError("user", "update", err)
 		}
 		return nil
 	}
 }
 
-// DecodeUpdateUserResponse returns a decoder for responses returned by the
-// user updateUser endpoint. restoreBody controls whether the response body
-// should be restored after having been read.
-func DecodeUpdateUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+// DecodeUpdateResponse returns a decoder for responses returned by the user
+// update endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -344,22 +344,22 @@ func DecodeUpdateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body UpdateUserResponseBody
+				body UpdateResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("user", "updateUser", err)
+				return nil, goahttp.ErrDecodingError("user", "update", err)
 			}
-			err = ValidateUpdateUserResponseBody(&body)
+			err = ValidateUpdateResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("user", "updateUser", err)
+				return nil, goahttp.ErrValidationError("user", "update", err)
 			}
-			res := NewUpdateUserResultOK(&body)
+			res := NewUpdateResultOK(&body)
 			return res, nil
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("user", "updateUser", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("user", "update", resp.StatusCode, string(body))
 		}
 	}
 }

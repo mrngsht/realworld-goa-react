@@ -19,10 +19,10 @@ type Service interface {
 	Login(context.Context, *LoginPayload) (res *LoginResult, err error)
 	// Register implements register.
 	Register(context.Context, *RegisterPayload) (res *RegisterResult, err error)
-	// GetCurrentUser implements getCurrentUser.
-	GetCurrentUser(context.Context) (res *GetCurrentUserResult, err error)
-	// UpdateUser implements updateUser.
-	UpdateUser(context.Context, *UpdateUserPayload) (res *UpdateUserResult, err error)
+	// GetCurrent implements getCurrent.
+	GetCurrent(context.Context) (res *GetCurrentResult, err error)
+	// Update implements update.
+	Update(context.Context, *UpdatePayload) (res *UpdateResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -39,11 +39,10 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"login", "register", "getCurrentUser", "updateUser"}
+var MethodNames = [4]string{"login", "register", "getCurrent", "update"}
 
-// GetCurrentUserResult is the result type of the user service getCurrentUser
-// method.
-type GetCurrentUserResult struct {
+// GetCurrentResult is the result type of the user service getCurrent method.
+type GetCurrentResult struct {
 	User *User
 }
 
@@ -70,8 +69,8 @@ type RegisterResult struct {
 	User *User
 }
 
-// UpdateUserPayload is the payload type of the user service updateUser method.
-type UpdateUserPayload struct {
+// UpdatePayload is the payload type of the user service update method.
+type UpdatePayload struct {
 	Username *string
 	Email    *string
 	Password *string
@@ -79,8 +78,8 @@ type UpdateUserPayload struct {
 	Bio      *string
 }
 
-// UpdateUserResult is the result type of the user service updateUser method.
-type UpdateUserResult struct {
+// UpdateResult is the result type of the user service update method.
+type UpdateResult struct {
 	User *User
 }
 

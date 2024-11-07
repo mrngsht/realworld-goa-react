@@ -15,19 +15,19 @@ import (
 
 // Endpoints wraps the "user" service endpoints.
 type Endpoints struct {
-	Login          goa.Endpoint
-	Register       goa.Endpoint
-	GetCurrentUser goa.Endpoint
-	UpdateUser     goa.Endpoint
+	Login      goa.Endpoint
+	Register   goa.Endpoint
+	GetCurrent goa.Endpoint
+	Update     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "user" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Login:          NewLoginEndpoint(s),
-		Register:       NewRegisterEndpoint(s),
-		GetCurrentUser: NewGetCurrentUserEndpoint(s),
-		UpdateUser:     NewUpdateUserEndpoint(s),
+		Login:      NewLoginEndpoint(s),
+		Register:   NewRegisterEndpoint(s),
+		GetCurrent: NewGetCurrentEndpoint(s),
+		Update:     NewUpdateEndpoint(s),
 	}
 }
 
@@ -35,8 +35,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Login = m(e.Login)
 	e.Register = m(e.Register)
-	e.GetCurrentUser = m(e.GetCurrentUser)
-	e.UpdateUser = m(e.UpdateUser)
+	e.GetCurrent = m(e.GetCurrent)
+	e.Update = m(e.Update)
 }
 
 // NewLoginEndpoint returns an endpoint function that calls the method "login"
@@ -57,19 +57,19 @@ func NewRegisterEndpoint(s Service) goa.Endpoint {
 	}
 }
 
-// NewGetCurrentUserEndpoint returns an endpoint function that calls the method
-// "getCurrentUser" of service "user".
-func NewGetCurrentUserEndpoint(s Service) goa.Endpoint {
+// NewGetCurrentEndpoint returns an endpoint function that calls the method
+// "getCurrent" of service "user".
+func NewGetCurrentEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		return s.GetCurrentUser(ctx)
+		return s.GetCurrent(ctx)
 	}
 }
 
-// NewUpdateUserEndpoint returns an endpoint function that calls the method
-// "updateUser" of service "user".
-func NewUpdateUserEndpoint(s Service) goa.Endpoint {
+// NewUpdateEndpoint returns an endpoint function that calls the method
+// "update" of service "user".
+func NewUpdateEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		p := req.(*UpdateUserPayload)
-		return s.UpdateUser(ctx, p)
+		p := req.(*UpdatePayload)
+		return s.Update(ctx, p)
 	}
 }

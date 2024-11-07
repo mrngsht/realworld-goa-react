@@ -18,13 +18,13 @@ paths:
         get:
             tags:
                 - user
-            summary: getCurrentUser user
-            operationId: user#getCurrentUser
+            summary: getCurrent user
+            operationId: user#getCurrent
             responses:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/UserGetCurrentUserResponseBody'
+                        $ref: '#/definitions/UserGetCurrentResponseBody'
                         required:
                             - user
             schemes:
@@ -90,19 +90,19 @@ paths:
         post:
             tags:
                 - user
-            summary: updateUser user
-            operationId: user#updateUser
+            summary: update user
+            operationId: user#update
             parameters:
-                - name: UpdateUserRequestBody
+                - name: UpdateRequestBody
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/UserUpdateUserRequestBody'
+                    $ref: '#/definitions/UserUpdateRequestBody'
             responses:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/UserUpdateUserResponseBody'
+                        $ref: '#/definitions/UserUpdateResponseBody'
                         required:
                             - user
             schemes:
@@ -114,44 +114,44 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Dolore praesentium dicta vel facilis reprehenderit.
+                example: Nesciunt aliquid et dolore praesentium.
             email:
                 type: string
-                example: Ea laborum qui laudantium vero voluptas molestiae.
+                example: Nemo esse sed sed ea laborum qui.
             image:
                 type: string
-                example: Sed quasi.
+                example: Vel facilis.
             token:
                 type: string
-                example: Quae voluptatem quasi dignissimos quod exercitationem.
+                example: Vero voluptas molestiae eos quae voluptatem.
             username:
                 type: string
-                example: Animi dolorem aut perferendis nesciunt aliquid.
+                example: Dignissimos quod exercitationem quaerat animi dolorem aut.
         example:
-            bio: Quia neque.
-            email: Ullam ut ex minus.
-            image: Quos omnis magni iste explicabo.
-            token: Nam ipsam reiciendis sit autem.
-            username: Nisi consequatur quo.
+            bio: Quo incidunt quia neque et.
+            email: Aspernatur sed quasi quisquam ullam ut.
+            image: Omnis magni iste explicabo.
+            token: Minus culpa nam.
+            username: Reiciendis sit autem officiis nisi.
         required:
             - email
             - token
             - username
             - bio
             - image
-    UserGetCurrentUserResponseBody:
-        title: UserGetCurrentUserResponseBody
+    UserGetCurrentResponseBody:
+        title: UserGetCurrentResponseBody
         type: object
         properties:
             user:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Placeat perspiciatis molestiae.
-                email: Aut aliquid corrupti quae.
-                image: Ut ipsum.
-                token: Voluptates consequatur ab sint sit repellendus.
-                username: Officia ut necessitatibus aut et maiores.
+                bio: Necessitatibus aut et maiores officiis placeat.
+                email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                image: Molestiae incidunt.
+                token: Sint sit.
+                username: Sed officia.
         required:
             - user
     UserLoginEmailNotFoundResponseBody:
@@ -267,11 +267,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Placeat perspiciatis molestiae.
-                email: Aut aliquid corrupti quae.
-                image: Ut ipsum.
-                token: Voluptates consequatur ab sint sit repellendus.
-                username: Officia ut necessitatibus aut et maiores.
+                bio: Necessitatibus aut et maiores officiis placeat.
+                email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                image: Molestiae incidunt.
+                token: Sint sit.
+                username: Sed officia.
         required:
             - user
     UserRegisterEmailAlreadyUsedResponseBody:
@@ -350,11 +350,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Placeat perspiciatis molestiae.
-                email: Aut aliquid corrupti quae.
-                image: Ut ipsum.
-                token: Voluptates consequatur ab sint sit repellendus.
-                username: Officia ut necessitatibus aut et maiores.
+                bio: Necessitatibus aut et maiores officiis placeat.
+                email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                image: Molestiae incidunt.
+                token: Sint sit.
+                username: Sed officia.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -400,8 +400,8 @@ definitions:
             - temporary
             - timeout
             - fault
-    UserUpdateUserRequestBody:
-        title: UserUpdateUserRequestBody
+    UserUpdateRequestBody:
+        title: UserUpdateRequestBody
         type: object
         properties:
             bio:
@@ -414,8 +414,8 @@ definitions:
                 format: email
             image:
                 type: string
-                example: http://ym
-                pattern: ^http://.+$
+                example: http://m
+                pattern: ^https?://.+$
             password:
                 type: string
                 example: bds
@@ -426,23 +426,23 @@ definitions:
                 example: 0ZN
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: f09
+            bio: 09a
             email: tre.nicolas@deckowfisher.name
-            image: http://a
+            image: https://d
             password: spo
             username: _P3z
-    UserUpdateUserResponseBody:
-        title: UserUpdateUserResponseBody
+    UserUpdateResponseBody:
+        title: UserUpdateResponseBody
         type: object
         properties:
             user:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Placeat perspiciatis molestiae.
-                email: Aut aliquid corrupti quae.
-                image: Ut ipsum.
-                token: Voluptates consequatur ab sint sit repellendus.
-                username: Officia ut necessitatibus aut et maiores.
+                bio: Necessitatibus aut et maiores officiis placeat.
+                email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                image: Molestiae incidunt.
+                token: Sint sit.
+                username: Sed officia.
         required:
             - user

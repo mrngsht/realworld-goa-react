@@ -188,41 +188,20 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 	}, nil
 }
 
-func (u User) GetCurrentUser(ctx context.Context) (*goa.GetCurrentUserResult, error) {
+func (u User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 	q := sqlcgen.New(u.rdb)
 
 	userID := myctx.MustGetRequestUserID(ctx)
 
-	email, err := q.GetUserEmailByUserID(ctx, userID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	profile, err := q.GetUserProfileByUserID(ctx, userID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	token, err := user.IssueToken(userID, mytime.Now(ctx))
+	user, err := u.getUserByUserID(ctx, q, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return &goa.GetCurrentUserResult{
-		User: &goa.User{
-			Email:    email,
-			Token:    token,
-			Username: profile.Username,
-			Bio:      profile.Bio,
-			Image:    profile.ImageUrl,
-		},
-	}, nil
-
+	return &goa.GetCurrentResult{User: user}, nil
 }
 
-func (u User) UpdateUser(ctx context.Context, payload *goa.UpdateUserPayload) (res *goa.UpdateUserResult, err error) {
+func (u User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
 	q := sqlcgen.New(u.rdb)
 
 	userID := myctx.MustGetRequestUserID(ctx)
@@ -304,5 +283,37 @@ func (u User) UpdateUser(ctx context.Context, payload *goa.UpdateUserPayload) (r
 		return nil, errors.WithStack(err)
 	}
 
-	return nil, nil
+	user, err := u.getUserByUserID(ctx, q, userID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &goa.UpdateResult{User: user}, nil
+}
+
+func (u User) getUserByUserID(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID) (*goa.User, error) {
+	email, err := q.GetUserEmailByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	profile, err := q.GetUserProfileByUserID(ctx, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	token, err := user.IssueToken(userID, mytime.Now(ctx))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &goa.User{
+		Email:    email,
+		Token:    token,
+		Username: profile.Username,
+		Bio:      profile.Bio,
+		Image:    profile.ImageUrl,
+	}, nil
 }

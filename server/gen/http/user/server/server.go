@@ -18,11 +18,11 @@ import (
 
 // Server lists the user service endpoint HTTP handlers.
 type Server struct {
-	Mounts         []*MountPoint
-	Login          http.Handler
-	Register       http.Handler
-	GetCurrentUser http.Handler
-	UpdateUser     http.Handler
+	Mounts     []*MountPoint
+	Login      http.Handler
+	Register   http.Handler
+	GetCurrent http.Handler
+	Update     http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -54,13 +54,13 @@ func New(
 		Mounts: []*MountPoint{
 			{"Login", "POST", "/api/user/login"},
 			{"Register", "POST", "/api/user/register"},
-			{"GetCurrentUser", "GET", "/api/user/current"},
-			{"UpdateUser", "POST", "/api/user/update"},
+			{"GetCurrent", "GET", "/api/user/current"},
+			{"Update", "POST", "/api/user/update"},
 		},
-		Login:          NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
-		Register:       NewRegisterHandler(e.Register, mux, decoder, encoder, errhandler, formatter),
-		GetCurrentUser: NewGetCurrentUserHandler(e.GetCurrentUser, mux, decoder, encoder, errhandler, formatter),
-		UpdateUser:     NewUpdateUserHandler(e.UpdateUser, mux, decoder, encoder, errhandler, formatter),
+		Login:      NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
+		Register:   NewRegisterHandler(e.Register, mux, decoder, encoder, errhandler, formatter),
+		GetCurrent: NewGetCurrentHandler(e.GetCurrent, mux, decoder, encoder, errhandler, formatter),
+		Update:     NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -71,8 +71,8 @@ func (s *Server) Service() string { return "user" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Login = m(s.Login)
 	s.Register = m(s.Register)
-	s.GetCurrentUser = m(s.GetCurrentUser)
-	s.UpdateUser = m(s.UpdateUser)
+	s.GetCurrent = m(s.GetCurrent)
+	s.Update = m(s.Update)
 }
 
 // MethodNames returns the methods served.
@@ -82,8 +82,8 @@ func (s *Server) MethodNames() []string { return user.MethodNames[:] }
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountLoginHandler(mux, h.Login)
 	MountRegisterHandler(mux, h.Register)
-	MountGetCurrentUserHandler(mux, h.GetCurrentUser)
-	MountUpdateUserHandler(mux, h.UpdateUser)
+	MountGetCurrentHandler(mux, h.GetCurrent)
+	MountUpdateHandler(mux, h.Update)
 }
 
 // Mount configures the mux to serve the user endpoints.
@@ -193,9 +193,9 @@ func NewRegisterHandler(
 	})
 }
 
-// MountGetCurrentUserHandler configures the mux to serve the "user" service
-// "getCurrentUser" endpoint.
-func MountGetCurrentUserHandler(mux goahttp.Muxer, h http.Handler) {
+// MountGetCurrentHandler configures the mux to serve the "user" service
+// "getCurrent" endpoint.
+func MountGetCurrentHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -205,9 +205,9 @@ func MountGetCurrentUserHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/api/user/current", f)
 }
 
-// NewGetCurrentUserHandler creates a HTTP handler which loads the HTTP request
-// and calls the "user" service "getCurrentUser" endpoint.
-func NewGetCurrentUserHandler(
+// NewGetCurrentHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "getCurrent" endpoint.
+func NewGetCurrentHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -216,12 +216,12 @@ func NewGetCurrentUserHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		encodeResponse = EncodeGetCurrentUserResponse(encoder)
+		encodeResponse = EncodeGetCurrentResponse(encoder)
 		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "getCurrentUser")
+		ctx = context.WithValue(ctx, goa.MethodKey, "getCurrent")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
 		var err error
 		res, err := endpoint(ctx, nil)
@@ -237,9 +237,9 @@ func NewGetCurrentUserHandler(
 	})
 }
 
-// MountUpdateUserHandler configures the mux to serve the "user" service
-// "updateUser" endpoint.
-func MountUpdateUserHandler(mux goahttp.Muxer, h http.Handler) {
+// MountUpdateHandler configures the mux to serve the "user" service "update"
+// endpoint.
+func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -249,9 +249,9 @@ func MountUpdateUserHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/api/user/update", f)
 }
 
-// NewUpdateUserHandler creates a HTTP handler which loads the HTTP request and
-// calls the "user" service "updateUser" endpoint.
-func NewUpdateUserHandler(
+// NewUpdateHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "update" endpoint.
+func NewUpdateHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -260,13 +260,13 @@ func NewUpdateUserHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeUpdateUserRequest(mux, decoder)
-		encodeResponse = EncodeUpdateUserResponse(encoder)
+		decodeRequest  = DecodeUpdateRequest(mux, decoder)
+		encodeResponse = EncodeUpdateResponse(encoder)
 		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "updateUser")
+		ctx = context.WithValue(ctx, goa.MethodKey, "update")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
 		payload, err := decodeRequest(r)
 		if err != nil {

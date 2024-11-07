@@ -3,9 +3,11 @@ package servicetest
 import (
 	"context"
 	"errors"
+	"testing"
 
-	"github.com/google/uuid"
 	"github.com/mrngsht/realworld-goa-react/myctx"
+	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
+	"github.com/stretchr/testify/require"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -20,6 +22,9 @@ func GoaServiceErrorName(err error) string {
 	return "NOT_GOA_SERVICE_ERROR"
 }
 
-func SetRequestUser(ctx context.Context, userID uuid.UUID) context.Context {
-	return myctx.SetRequestUserID(ctx, userID)
+func SetRequestUser(t *testing.T, ctx context.Context, qt *sqlctest.Queries, username string) context.Context {
+	t.Helper()
+	p, err := qt.GetUserProfileByUsername(ctx, username)
+	require.NoError(t, err)
+	return myctx.SetRequestUserID(ctx, p.UserID)
 }

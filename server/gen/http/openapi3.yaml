@@ -10,8 +10,8 @@ paths:
         get:
             tags:
                 - user
-            summary: getCurrentUser user
-            operationId: user#getCurrentUser
+            summary: getCurrent user
+            operationId: user#getCurrent
             responses:
                 "200":
                     description: OK response.
@@ -21,11 +21,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Placeat perspiciatis molestiae.
-                                    email: Aut aliquid corrupti quae.
-                                    image: Ut ipsum.
-                                    token: Voluptates consequatur ab sint sit repellendus.
-                                    username: Officia ut necessitatibus aut et maiores.
+                                    bio: Necessitatibus aut et maiores officiis placeat.
+                                    email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                                    image: Molestiae incidunt.
+                                    token: Sint sit.
+                                    username: Sed officia.
     /api/user/login:
         post:
             tags:
@@ -39,8 +39,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: jaylen.kuhic@ledner.net
-                            password: yj4
+                            email: jaylen@lueilwitz.info
+                            password: j4i
             responses:
                 "200":
                     description: OK response.
@@ -50,11 +50,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Placeat perspiciatis molestiae.
-                                    email: Aut aliquid corrupti quae.
-                                    image: Ut ipsum.
-                                    token: Voluptates consequatur ab sint sit repellendus.
-                                    username: Officia ut necessitatibus aut et maiores.
+                                    bio: Necessitatibus aut et maiores officiis placeat.
+                                    email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                                    image: Molestiae incidunt.
+                                    token: Sint sit.
+                                    username: Sed officia.
                 "400":
                     description: 'PasswordIsIncorrect: Bad Request response.'
                     content:
@@ -74,9 +74,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/RegisterRequestBody'
                         example:
-                            email: preston.powlowski@mosciskiparisian.com
-                            password: hhp
-                            username: Lonx
+                            email: shana@rolfsonpowlowski.biz
+                            password: q8f
+                            username: ObL
             responses:
                 "200":
                     description: OK response.
@@ -86,11 +86,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Placeat perspiciatis molestiae.
-                                    email: Aut aliquid corrupti quae.
-                                    image: Ut ipsum.
-                                    token: Voluptates consequatur ab sint sit repellendus.
-                                    username: Officia ut necessitatibus aut et maiores.
+                                    bio: Necessitatibus aut et maiores officiis placeat.
+                                    email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                                    image: Molestiae incidunt.
+                                    token: Sint sit.
+                                    username: Sed officia.
                 "400":
                     description: 'EmailAlreadyUsed: Bad Request response.'
                     content:
@@ -101,20 +101,20 @@ paths:
         post:
             tags:
                 - user
-            summary: updateUser user
-            operationId: user#updateUser
+            summary: update user
+            operationId: user#update
             requestBody:
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/UpdateUserRequestBody'
+                            $ref: '#/components/schemas/UpdateRequestBody'
                         example:
-                            bio: 6ge
-                            email: bud_olson@rempelstracke.info
-                            image: http://ru
-                            password: eax
-                            username: 6fd
+                            bio: lru
+                            email: aniyah_king@bosco.biz
+                            image: http://ea
+                            password: ty7
+                            username: DCt
             responses:
                 "200":
                     description: OK response.
@@ -124,11 +124,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Placeat perspiciatis molestiae.
-                                    email: Aut aliquid corrupti quae.
-                                    image: Ut ipsum.
-                                    token: Voluptates consequatur ab sint sit repellendus.
-                                    username: Officia ut necessitatibus aut et maiores.
+                                    bio: Necessitatibus aut et maiores officiis placeat.
+                                    email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                                    image: Molestiae incidunt.
+                                    token: Sint sit.
+                                    username: Sed officia.
 components:
     schemas:
         Error:
@@ -137,7 +137,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: false
+                    example: true
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -157,7 +157,7 @@ components:
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: true
+                    example: false
             example:
                 fault: false
                 id: 123abc
@@ -177,16 +177,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: erna_mcdermott@starkschultz.biz
+                    example: kacie_keebler@lebsack.org
                     format: email
                 password:
                     type: string
-                    example: 0ix
+                    example: 2he
                     minLength: 6
                     maxLength: 128
             example:
-                email: jennyfer@west.net
-                password: rye
+                email: seamus@kertzmannpfannerstill.com
+                password: rah
             required:
                 - email
                 - password
@@ -197,11 +197,11 @@ components:
                     $ref: '#/components/schemas/User'
             example:
                 user:
-                    bio: Placeat perspiciatis molestiae.
-                    email: Aut aliquid corrupti quae.
-                    image: Ut ipsum.
-                    token: Voluptates consequatur ab sint sit repellendus.
-                    username: Officia ut necessitatibus aut et maiores.
+                    bio: Necessitatibus aut et maiores officiis placeat.
+                    email: Aliquid corrupti quae reprehenderit voluptates consequatur.
+                    image: Molestiae incidunt.
+                    token: Sint sit.
+                    username: Sed officia.
             required:
                 - user
         RegisterRequestBody:
@@ -209,40 +209,40 @@ components:
             properties:
                 email:
                     type: string
-                    example: napoleon.jenkins@hauck.biz
+                    example: vaughn@bode.com
                     format: email
                 password:
                     type: string
-                    example: o24
+                    example: "515"
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: JH7UEk
+                    example: QW_n
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                email: ryley@hyatt.net
-                password: u0l
-                username: 4TT
+                email: alessia@kohler.com
+                password: 2a7
+                username: 2hIk
             required:
                 - username
                 - email
                 - password
-        UpdateUserRequestBody:
+        UpdateRequestBody:
             type: object
             properties:
                 bio:
                     type: string
-                    example: wvq
+                    example: vql
                     maxLength: 4096
                 email:
                     type: string
-                    example: elva@huelshettinger.name
+                    example: elva_reinger@waelchi.name
                     format: email
                 image:
                     type: string
-                    example: http://7l
-                    pattern: ^http://.+$
+                    example: http://li
+                    pattern: ^https?://.+$
                 password:
                     type: string
                     example: 8gh
@@ -250,38 +250,38 @@ components:
                     maxLength: 128
                 username:
                     type: string
-                    example: LP5
+                    example: xvyo7ulP
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                bio: 5ws
-                email: therese@stehr.com
-                image: http://zu
-                password: c57
-                username: 35i4GwR
+                bio: 57n
+                email: alayna_o'keefe@kling.info
+                image: http://rf
+                password: ioy
+                username: 5iI
         User:
             type: object
             properties:
                 bio:
                     type: string
-                    example: Et fugiat laudantium et pariatur inventore.
+                    example: Ipsam laborum expedita.
                 email:
                     type: string
-                    example: Repellendus nihil amet consectetur pariatur reprehenderit.
+                    example: Nihil amet.
                 image:
                     type: string
-                    example: Alias eius facere corrupti est.
+                    example: Iste fugit eos et fugiat laudantium.
                 token:
                     type: string
-                    example: Ad aspernatur aut enim nihil.
+                    example: Pariatur reprehenderit rerum ad.
                 username:
                     type: string
-                    example: Laborum expedita ipsa iste fugit.
+                    example: Aut enim.
             example:
-                bio: Aliquid voluptatem adipisci magnam placeat.
-                email: Qui est blanditiis reprehenderit.
-                image: Itaque maiores atque ea.
-                token: Quis officiis.
-                username: Quia illo porro itaque odit ex velit.
+                bio: Quis officiis.
+                email: Pariatur inventore earum.
+                image: Quia illo porro itaque odit ex velit.
+                token: Eius facere corrupti est maxime.
+                username: Est blanditiis reprehenderit.
             required:
                 - email
                 - token

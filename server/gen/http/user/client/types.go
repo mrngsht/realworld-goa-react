@@ -27,9 +27,9 @@ type RegisterRequestBody struct {
 	Password string `form:"password" json:"password" xml:"password"`
 }
 
-// UpdateUserRequestBody is the type of the "user" service "updateUser"
-// endpoint HTTP request body.
-type UpdateUserRequestBody struct {
+// UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
+// request body.
+type UpdateRequestBody struct {
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
@@ -49,15 +49,15 @@ type RegisterResponseBody struct {
 	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
-// GetCurrentUserResponseBody is the type of the "user" service
-// "getCurrentUser" endpoint HTTP response body.
-type GetCurrentUserResponseBody struct {
+// GetCurrentResponseBody is the type of the "user" service "getCurrent"
+// endpoint HTTP response body.
+type GetCurrentResponseBody struct {
 	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
-// UpdateUserResponseBody is the type of the "user" service "updateUser"
-// endpoint HTTP response body.
-type UpdateUserResponseBody struct {
+// UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
+// response body.
+type UpdateResponseBody struct {
 	User *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 }
 
@@ -163,10 +163,10 @@ func NewRegisterRequestBody(p *user.RegisterPayload) *RegisterRequestBody {
 	return body
 }
 
-// NewUpdateUserRequestBody builds the HTTP request body from the payload of
-// the "updateUser" endpoint of the "user" service.
-func NewUpdateUserRequestBody(p *user.UpdateUserPayload) *UpdateUserRequestBody {
-	body := &UpdateUserRequestBody{
+// NewUpdateRequestBody builds the HTTP request body from the payload of the
+// "update" endpoint of the "user" service.
+func NewUpdateRequestBody(p *user.UpdatePayload) *UpdateRequestBody {
+	body := &UpdateRequestBody{
 		Username: p.Username,
 		Email:    p.Email,
 		Password: p.Password,
@@ -254,19 +254,19 @@ func NewRegisterEmailAlreadyUsed(body *RegisterEmailAlreadyUsedResponseBody) *go
 	return v
 }
 
-// NewGetCurrentUserResultOK builds a "user" service "getCurrentUser" endpoint
-// result from a HTTP "OK" response.
-func NewGetCurrentUserResultOK(body *GetCurrentUserResponseBody) *user.GetCurrentUserResult {
-	v := &user.GetCurrentUserResult{}
+// NewGetCurrentResultOK builds a "user" service "getCurrent" endpoint result
+// from a HTTP "OK" response.
+func NewGetCurrentResultOK(body *GetCurrentResponseBody) *user.GetCurrentResult {
+	v := &user.GetCurrentResult{}
 	v.User = unmarshalUserResponseBodyToUserUser(body.User)
 
 	return v
 }
 
-// NewUpdateUserResultOK builds a "user" service "updateUser" endpoint result
-// from a HTTP "OK" response.
-func NewUpdateUserResultOK(body *UpdateUserResponseBody) *user.UpdateUserResult {
-	v := &user.UpdateUserResult{}
+// NewUpdateResultOK builds a "user" service "update" endpoint result from a
+// HTTP "OK" response.
+func NewUpdateResultOK(body *UpdateResponseBody) *user.UpdateResult {
+	v := &user.UpdateResult{}
 	v.User = unmarshalUserResponseBodyToUserUser(body.User)
 
 	return v
@@ -299,9 +299,9 @@ func ValidateRegisterResponseBody(body *RegisterResponseBody) (err error) {
 	return
 }
 
-// ValidateGetCurrentUserResponseBody runs the validations defined on
-// GetCurrentUserResponseBody
-func ValidateGetCurrentUserResponseBody(body *GetCurrentUserResponseBody) (err error) {
+// ValidateGetCurrentResponseBody runs the validations defined on
+// GetCurrentResponseBody
+func ValidateGetCurrentResponseBody(body *GetCurrentResponseBody) (err error) {
 	if body.User == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}
@@ -313,9 +313,8 @@ func ValidateGetCurrentUserResponseBody(body *GetCurrentUserResponseBody) (err e
 	return
 }
 
-// ValidateUpdateUserResponseBody runs the validations defined on
-// UpdateUserResponseBody
-func ValidateUpdateUserResponseBody(body *UpdateUserResponseBody) (err error) {
+// ValidateUpdateResponseBody runs the validations defined on UpdateResponseBody
+func ValidateUpdateResponseBody(body *UpdateResponseBody) (err error) {
 	if body.User == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
 	}

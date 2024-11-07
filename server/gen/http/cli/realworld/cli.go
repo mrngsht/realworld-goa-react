@@ -22,15 +22,15 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `user (login|register|get-current-user|update-user)
+	return `user (login|register|get-current|update)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` user login --body '{
-      "email": "jaylen.kuhic@ledner.net",
-      "password": "yj4"
+      "email": "jaylen@lueilwitz.info",
+      "password": "j4i"
    }'` + "\n" +
 		""
 }
@@ -53,16 +53,16 @@ func ParseEndpoint(
 		userRegisterFlags    = flag.NewFlagSet("register", flag.ExitOnError)
 		userRegisterBodyFlag = userRegisterFlags.String("body", "REQUIRED", "")
 
-		userGetCurrentUserFlags = flag.NewFlagSet("get-current-user", flag.ExitOnError)
+		userGetCurrentFlags = flag.NewFlagSet("get-current", flag.ExitOnError)
 
-		userUpdateUserFlags    = flag.NewFlagSet("update-user", flag.ExitOnError)
-		userUpdateUserBodyFlag = userUpdateUserFlags.String("body", "REQUIRED", "")
+		userUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
+		userUpdateBodyFlag = userUpdateFlags.String("body", "REQUIRED", "")
 	)
 	userFlags.Usage = userUsage
 	userLoginFlags.Usage = userLoginUsage
 	userRegisterFlags.Usage = userRegisterUsage
-	userGetCurrentUserFlags.Usage = userGetCurrentUserUsage
-	userUpdateUserFlags.Usage = userUpdateUserUsage
+	userGetCurrentFlags.Usage = userGetCurrentUsage
+	userUpdateFlags.Usage = userUpdateUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -104,11 +104,11 @@ func ParseEndpoint(
 			case "register":
 				epf = userRegisterFlags
 
-			case "get-current-user":
-				epf = userGetCurrentUserFlags
+			case "get-current":
+				epf = userGetCurrentFlags
 
-			case "update-user":
-				epf = userUpdateUserFlags
+			case "update":
+				epf = userUpdateFlags
 
 			}
 
@@ -141,11 +141,11 @@ func ParseEndpoint(
 			case "register":
 				endpoint = c.Register()
 				data, err = userc.BuildRegisterPayload(*userRegisterBodyFlag)
-			case "get-current-user":
-				endpoint = c.GetCurrentUser()
-			case "update-user":
-				endpoint = c.UpdateUser()
-				data, err = userc.BuildUpdateUserPayload(*userUpdateUserBodyFlag)
+			case "get-current":
+				endpoint = c.GetCurrent()
+			case "update":
+				endpoint = c.Update()
+				data, err = userc.BuildUpdatePayload(*userUpdateBodyFlag)
 			}
 		}
 	}
@@ -165,8 +165,8 @@ Usage:
 COMMAND:
     login: Login implements login.
     register: Register implements register.
-    get-current-user: GetCurrentUser implements getCurrentUser.
-    update-user: UpdateUser implements updateUser.
+    get-current: GetCurrent implements getCurrent.
+    update: Update implements update.
 
 Additional help:
     %[1]s user COMMAND --help
@@ -180,8 +180,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "jaylen.kuhic@ledner.net",
-      "password": "yj4"
+      "email": "jaylen@lueilwitz.info",
+      "password": "j4i"
    }'
 `, os.Args[0])
 }
@@ -194,36 +194,36 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "preston.powlowski@mosciskiparisian.com",
-      "password": "hhp",
-      "username": "Lonx"
+      "email": "shana@rolfsonpowlowski.biz",
+      "password": "q8f",
+      "username": "ObL"
    }'
 `, os.Args[0])
 }
 
-func userGetCurrentUserUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user get-current-user
+func userGetCurrentUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user get-current
 
-GetCurrentUser implements getCurrentUser.
+GetCurrent implements getCurrent.
 
 Example:
-    %[1]s user get-current-user
+    %[1]s user get-current
 `, os.Args[0])
 }
 
-func userUpdateUserUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user update-user -body JSON
+func userUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user update -body JSON
 
-UpdateUser implements updateUser.
+Update implements update.
     -body JSON: 
 
 Example:
-    %[1]s user update-user --body '{
-      "bio": "6ge",
-      "email": "bud_olson@rempelstracke.info",
-      "image": "http://ru",
-      "password": "eax",
-      "username": "6fd"
+    %[1]s user update --body '{
+      "bio": "lru",
+      "email": "aniyah_king@bosco.biz",
+      "image": "http://ea",
+      "password": "ty7",
+      "username": "DCt"
    }'
 `, os.Args[0])
 }

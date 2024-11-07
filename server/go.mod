@@ -6,6 +6,7 @@ require (
 	github.com/cockroachdb/errors v1.11.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
+	github.com/guregu/null v4.0.0+incompatible
 	github.com/lib/pq v1.10.9
 	github.com/magefile/mage v1.15.0
 	github.com/stretchr/testify v1.9.0

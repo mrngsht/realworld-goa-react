@@ -29,9 +29,9 @@ type RegisterRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
-// UpdateUserRequestBody is the type of the "user" service "updateUser"
-// endpoint HTTP request body.
-type UpdateUserRequestBody struct {
+// UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
+// request body.
+type UpdateRequestBody struct {
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
@@ -51,15 +51,15 @@ type RegisterResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
-// GetCurrentUserResponseBody is the type of the "user" service
-// "getCurrentUser" endpoint HTTP response body.
-type GetCurrentUserResponseBody struct {
+// GetCurrentResponseBody is the type of the "user" service "getCurrent"
+// endpoint HTTP response body.
+type GetCurrentResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
-// UpdateUserResponseBody is the type of the "user" service "updateUser"
-// endpoint HTTP response body.
-type UpdateUserResponseBody struct {
+// UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
+// response body.
+type UpdateResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
@@ -164,20 +164,20 @@ func NewRegisterResponseBody(res *user.RegisterResult) *RegisterResponseBody {
 	return body
 }
 
-// NewGetCurrentUserResponseBody builds the HTTP response body from the result
-// of the "getCurrentUser" endpoint of the "user" service.
-func NewGetCurrentUserResponseBody(res *user.GetCurrentUserResult) *GetCurrentUserResponseBody {
-	body := &GetCurrentUserResponseBody{}
+// NewGetCurrentResponseBody builds the HTTP response body from the result of
+// the "getCurrent" endpoint of the "user" service.
+func NewGetCurrentResponseBody(res *user.GetCurrentResult) *GetCurrentResponseBody {
+	body := &GetCurrentResponseBody{}
 	if res.User != nil {
 		body.User = marshalUserUserToUserResponseBody(res.User)
 	}
 	return body
 }
 
-// NewUpdateUserResponseBody builds the HTTP response body from the result of
-// the "updateUser" endpoint of the "user" service.
-func NewUpdateUserResponseBody(res *user.UpdateUserResult) *UpdateUserResponseBody {
-	body := &UpdateUserResponseBody{}
+// NewUpdateResponseBody builds the HTTP response body from the result of the
+// "update" endpoint of the "user" service.
+func NewUpdateResponseBody(res *user.UpdateResult) *UpdateResponseBody {
+	body := &UpdateResponseBody{}
 	if res.User != nil {
 		body.User = marshalUserUserToUserResponseBody(res.User)
 	}
@@ -261,9 +261,9 @@ func NewRegisterPayload(body *RegisterRequestBody) *user.RegisterPayload {
 	return v
 }
 
-// NewUpdateUserPayload builds a user service updateUser endpoint payload.
-func NewUpdateUserPayload(body *UpdateUserRequestBody) *user.UpdateUserPayload {
-	v := &user.UpdateUserPayload{
+// NewUpdatePayload builds a user service update endpoint payload.
+func NewUpdatePayload(body *UpdateRequestBody) *user.UpdatePayload {
+	v := &user.UpdatePayload{
 		Username: body.Username,
 		Email:    body.Email,
 		Password: body.Password,
@@ -329,9 +329,8 @@ func ValidateRegisterRequestBody(body *RegisterRequestBody) (err error) {
 	return
 }
 
-// ValidateUpdateUserRequestBody runs the validations defined on
-// UpdateUserRequestBody
-func ValidateUpdateUserRequestBody(body *UpdateUserRequestBody) (err error) {
+// ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
+func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	if body.Username != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", *body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 	}
@@ -349,7 +348,7 @@ func ValidateUpdateUserRequestBody(body *UpdateUserRequestBody) (err error) {
 		}
 	}
 	if body.Image != nil {
-		err = goa.MergeErrors(err, goa.ValidatePattern("body.image", *body.Image, "^http://.+$"))
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.image", *body.Image, "^https?://.+$"))
 	}
 	if body.Bio != nil {
 		if utf8.RuneCountInString(*body.Bio) > 4096 {

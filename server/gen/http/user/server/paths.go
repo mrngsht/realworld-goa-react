@@ -17,12 +17,12 @@ func RegisterUserPath() string {
 	return "/api/user/register"
 }
 
-// GetCurrentUserUserPath returns the URL path to the user service getCurrentUser HTTP endpoint.
-func GetCurrentUserUserPath() string {
+// GetCurrentUserPath returns the URL path to the user service getCurrent HTTP endpoint.
+func GetCurrentUserPath() string {
 	return "/api/user/current"
 }
 
-// UpdateUserUserPath returns the URL path to the user service updateUser HTTP endpoint.
-func UpdateUserUserPath() string {
+// UpdateUserPath returns the URL path to the user service update HTTP endpoint.
+func UpdateUserPath() string {
 	return "/api/user/update"
 }

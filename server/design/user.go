@@ -55,7 +55,7 @@ var _ = Service("user", func() {
 		})
 	})
 
-	Method("getCurrentUser", func() {
+	Method("getCurrent", func() {
 		HTTP(func() {
 			GET("user/current")
 			Response(StatusOK)
@@ -68,7 +68,7 @@ var _ = Service("user", func() {
 		})
 	})
 
-	Method("updateUser", func() {
+	Method("update", func() {
 		HTTP(func() {
 			POST("user/update")
 			Response(StatusOK)
@@ -110,7 +110,7 @@ var (
 		MaxLength(128)
 	}
 	DefUser_RequestImage = func() {
-		Pattern(`^http://.+$`)
+		Pattern(`^https?://.+$`)
 	}
 	DefUser_RequestBio = func() {
 		MaxLength(4096)

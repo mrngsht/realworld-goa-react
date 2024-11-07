@@ -24,13 +24,12 @@ type Client struct {
 	// endpoint.
 	RegisterDoer goahttp.Doer
 
-	// GetCurrentUser Doer is the HTTP client used to make requests to the
-	// getCurrentUser endpoint.
-	GetCurrentUserDoer goahttp.Doer
-
-	// UpdateUser Doer is the HTTP client used to make requests to the updateUser
+	// GetCurrent Doer is the HTTP client used to make requests to the getCurrent
 	// endpoint.
-	UpdateUserDoer goahttp.Doer
+	GetCurrentDoer goahttp.Doer
+
+	// Update Doer is the HTTP client used to make requests to the update endpoint.
+	UpdateDoer goahttp.Doer
 
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
@@ -54,8 +53,8 @@ func NewClient(
 	return &Client{
 		LoginDoer:           doer,
 		RegisterDoer:        doer,
-		GetCurrentUserDoer:  doer,
-		UpdateUserDoer:      doer,
+		GetCurrentDoer:      doer,
+		UpdateDoer:          doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -112,34 +111,34 @@ func (c *Client) Register() goa.Endpoint {
 	}
 }
 
-// GetCurrentUser returns an endpoint that makes HTTP requests to the user
-// service getCurrentUser server.
-func (c *Client) GetCurrentUser() goa.Endpoint {
+// GetCurrent returns an endpoint that makes HTTP requests to the user service
+// getCurrent server.
+func (c *Client) GetCurrent() goa.Endpoint {
 	var (
-		decodeResponse = DecodeGetCurrentUserResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeGetCurrentResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildGetCurrentUserRequest(ctx, v)
+		req, err := c.BuildGetCurrentRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.GetCurrentUserDoer.Do(req)
+		resp, err := c.GetCurrentDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("user", "getCurrentUser", err)
+			return nil, goahttp.ErrRequestError("user", "getCurrent", err)
 		}
 		return decodeResponse(resp)
 	}
 }
 
-// UpdateUser returns an endpoint that makes HTTP requests to the user service
-// updateUser server.
-func (c *Client) UpdateUser() goa.Endpoint {
+// Update returns an endpoint that makes HTTP requests to the user service
+// update server.
+func (c *Client) Update() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeUpdateUserRequest(c.encoder)
-		decodeResponse = DecodeUpdateUserResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeUpdateRequest(c.encoder)
+		decodeResponse = DecodeUpdateResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildUpdateUserRequest(ctx, v)
+		req, err := c.BuildUpdateRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -147,9 +146,9 @@ func (c *Client) UpdateUser() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.UpdateUserDoer.Do(req)
+		resp, err := c.UpdateDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("user", "updateUser", err)
+			return nil, goahttp.ErrRequestError("user", "update", err)
 		}
 		return decodeResponse(resp)
 	}

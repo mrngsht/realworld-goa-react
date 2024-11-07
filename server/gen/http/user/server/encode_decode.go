@@ -184,36 +184,36 @@ func EncodeRegisterError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
-// EncodeGetCurrentUserResponse returns an encoder for responses returned by
-// the user getCurrentUser endpoint.
-func EncodeGetCurrentUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeGetCurrentResponse returns an encoder for responses returned by the
+// user getCurrent endpoint.
+func EncodeGetCurrentResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*user.GetCurrentUserResult)
+		res, _ := v.(*user.GetCurrentResult)
 		enc := encoder(ctx, w)
-		body := NewGetCurrentUserResponseBody(res)
+		body := NewGetCurrentResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// EncodeUpdateUserResponse returns an encoder for responses returned by the
-// user updateUser endpoint.
-func EncodeUpdateUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeUpdateResponse returns an encoder for responses returned by the user
+// update endpoint.
+func EncodeUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*user.UpdateUserResult)
+		res, _ := v.(*user.UpdateResult)
 		enc := encoder(ctx, w)
-		body := NewUpdateUserResponseBody(res)
+		body := NewUpdateResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeUpdateUserRequest returns a decoder for requests sent to the user
-// updateUser endpoint.
-func DecodeUpdateUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+// DecodeUpdateRequest returns a decoder for requests sent to the user update
+// endpoint.
+func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			body UpdateUserRequestBody
+			body UpdateRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -227,11 +227,11 @@ func DecodeUpdateUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateUpdateUserRequestBody(&body)
+		err = ValidateUpdateRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUpdateUserPayload(&body)
+		payload := NewUpdatePayload(&body)
 
 		return payload, nil
 	}

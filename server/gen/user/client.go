@@ -15,19 +15,19 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	LoginEndpoint          goa.Endpoint
-	RegisterEndpoint       goa.Endpoint
-	GetCurrentUserEndpoint goa.Endpoint
-	UpdateUserEndpoint     goa.Endpoint
+	LoginEndpoint      goa.Endpoint
+	RegisterEndpoint   goa.Endpoint
+	GetCurrentEndpoint goa.Endpoint
+	UpdateEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(login, register, getCurrentUser, updateUser goa.Endpoint) *Client {
+func NewClient(login, register, getCurrent, update goa.Endpoint) *Client {
 	return &Client{
-		LoginEndpoint:          login,
-		RegisterEndpoint:       register,
-		GetCurrentUserEndpoint: getCurrentUser,
-		UpdateUserEndpoint:     updateUser,
+		LoginEndpoint:      login,
+		RegisterEndpoint:   register,
+		GetCurrentEndpoint: getCurrent,
+		UpdateEndpoint:     update,
 	}
 }
 
@@ -63,34 +63,34 @@ func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *Registe
 	return ires.(*RegisterResult), nil
 }
 
-// GetCurrentUser calls the "getCurrentUser" endpoint of the "user" service.
-// GetCurrentUser may return the following errors:
+// GetCurrent calls the "getCurrent" endpoint of the "user" service.
+// GetCurrent may return the following errors:
 //   - "UsernameAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailNotFound" (type *goa.ServiceError)
 //   - "PasswordIsIncorrect" (type *goa.ServiceError)
 //   - error: internal error
-func (c *Client) GetCurrentUser(ctx context.Context) (res *GetCurrentUserResult, err error) {
+func (c *Client) GetCurrent(ctx context.Context) (res *GetCurrentResult, err error) {
 	var ires any
-	ires, err = c.GetCurrentUserEndpoint(ctx, nil)
+	ires, err = c.GetCurrentEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}
-	return ires.(*GetCurrentUserResult), nil
+	return ires.(*GetCurrentResult), nil
 }
 
-// UpdateUser calls the "updateUser" endpoint of the "user" service.
-// UpdateUser may return the following errors:
+// Update calls the "update" endpoint of the "user" service.
+// Update may return the following errors:
 //   - "UsernameAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailAlreadyUsed" (type *goa.ServiceError)
 //   - "EmailNotFound" (type *goa.ServiceError)
 //   - "PasswordIsIncorrect" (type *goa.ServiceError)
 //   - error: internal error
-func (c *Client) UpdateUser(ctx context.Context, p *UpdateUserPayload) (res *UpdateUserResult, err error) {
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *UpdateResult, err error) {
 	var ires any
-	ires, err = c.UpdateUserEndpoint(ctx, p)
+	ires, err = c.UpdateEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*UpdateUserResult), nil
+	return ires.(*UpdateResult), nil
 }
