@@ -72,6 +72,7 @@ func (Migration) Schema() error {
     -e '/^[[:space:]]*$/d' \
     -e '/^SELECT pg_catalog./d' \
     -e '/^ALTER TABLE .* OWNER TO "postgres";/d' \
+    -e '/^ALTER TYPE .* OWNER TO "postgres";/d' \
     -e 's/"public"\.//'`
 
 	out, err := sh.Output("docker", "compose", "exec", "-T", "db", "sh", "-c", pgdump)

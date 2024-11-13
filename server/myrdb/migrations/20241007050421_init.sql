@@ -52,12 +52,38 @@ CREATE TABLE IF NOT EXISTS user_auth_password_ (
   CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_)
 );
 
+CREATE TABLE IF NOT EXISTS user_follow_ (
+  created_at_ TIMESTAMPTZ NOT NULL,
+  user_id_ UUID NOT NULL,
+  followed_user_id_ UUID NOT NULL,
+  PRIMARY KEY (user_id_, followed_user_id_),
+  CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_),
+  CONSTRAINT fk_followed_user_id_ FOREIGN KEY (followed_user_id_) REFERENCES user_ (id_)
+);
+
+CREATE TYPE user_follow_mutation_type_ AS ENUM ('follow', 'unfollow');
+
+CREATE TABLE IF NOT EXISTS user_follow_mutation_ (
+  created_at_ TIMESTAMPTZ NOT NULL,
+  user_id_ UUID NOT NULL,
+  followed_user_id_ UUID NOT NULL,
+  type_ user_follow_mutation_type_ NOT NULL,
+  CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_),
+  CONSTRAINT fk_followed_user_id_ FOREIGN KEY (followed_user_id_) REFERENCES user_ (id_)
+);
+
+
 -- +goose Down
 -- +goose StatementBegin
+DROP TABLE IF EXISTS user_follow_mutation_;
+DROP TABLE IF EXISTS user_follow_;
+DROP TABLE IF EXISTS user_follow_;
 DROP TABLE IF EXISTS user_auth_password_;
 DROP TABLE IF EXISTS user_email_mutation_;
 DROP TABLE IF EXISTS user_email_;
 DROP TABLE IF EXISTS user_profile_mutation_;
 DROP TABLE IF EXISTS user_profile_;
 DROP TABLE IF EXISTS user_;
+
+DROP TYPE user_follow_mutation_type_;
 -- +goose StatementEnd
