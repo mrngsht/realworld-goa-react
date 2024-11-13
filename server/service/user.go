@@ -19,13 +19,13 @@ type User struct {
 	rdb myrdb.RDB
 }
 
-func NewUser(rdb myrdb.RDB) User {
-	return User{rdb: rdb}
+func NewUser(rdb myrdb.RDB) *User {
+	return &User{rdb: rdb}
 }
 
-var _ goa.Service = User{}
+var _ goa.Service = &User{}
 
-func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
+func (u *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
 	defer func() {
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
@@ -84,7 +84,7 @@ func (u User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.Lo
 	}, nil
 }
 
-func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *goa.RegisterResult, err error) {
+func (u *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *goa.RegisterResult, err error) {
 	defer func() {
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
@@ -188,7 +188,7 @@ func (u User) Register(ctx context.Context, payload *goa.RegisterPayload) (res *
 	}, nil
 }
 
-func (u User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
+func (u *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 	q := sqlcgen.New(u.rdb)
 
 	userID := myctx.MustGetRequestUserID(ctx)
@@ -201,7 +201,7 @@ func (u User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 	return &goa.GetCurrentResult{User: user}, nil
 }
 
-func (u User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
+func (u *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
 	q := sqlcgen.New(u.rdb)
 
 	userID := myctx.MustGetRequestUserID(ctx)
@@ -291,7 +291,7 @@ func (u User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.
 	return &goa.UpdateResult{User: user}, nil
 }
 
-func (u User) getUserByUserID(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID) (*goa.User, error) {
+func (u *User) getUserByUserID(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID) (*goa.User, error) {
 	email, err := q.GetUserEmailByUserID(ctx, userID)
 	if err != nil {
 		// handle ErrNoRows as internal server error
