@@ -47,6 +47,15 @@ FROM user_profile_
 WHERE user_id_ = $1
 LIMIT 1;
 
+-- name: GetUserProfileByUsername :one
+SELECT 
+  user_id_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE username_ = $1
+LIMIT 1;
+
 -- name: GetUserEmailByUserID :one
 SELECT email_ FROM user_email_ 
 WHERE user_id_ = $1
@@ -67,4 +76,16 @@ UPDATE user_profile_
 SET updated_at_ = $2, username_ = $3, bio_ = $4, image_url_ = $5 
 WHERE user_id_ = $1;
 
+-- name: InsertUserFollow :exec
+INSERT INTO user_follow_
+(created_at_, user_id_, followed_user_id_) 
+VALUES ($1, $2, $3);
 
+-- name: InsertUserFollowMutation :exec
+INSERT INTO user_follow_mutation_
+(created_at_, user_id_, followed_user_id_, type_) 
+VALUES ($1, $2, $3, $4);
+
+-- name: DeleteUserFollow :execrows
+DELETE FROM user_follow_
+WHERE user_id_ = $1 AND followed_user_id_ = $2; 

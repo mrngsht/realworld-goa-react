@@ -5,10 +5,54 @@
 package sqlcgen
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type UserFollowMutationType string
+
+const (
+	UserFollowMutationTypeFollow   UserFollowMutationType = "follow"
+	UserFollowMutationTypeUnfollow UserFollowMutationType = "unfollow"
+)
+
+func (e *UserFollowMutationType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UserFollowMutationType(s)
+	case string:
+		*e = UserFollowMutationType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UserFollowMutationType: %T", src)
+	}
+	return nil
+}
+
+type NullUserFollowMutationType struct {
+	UserFollowMutationType UserFollowMutationType
+	Valid                  bool // Valid is true if UserFollowMutationType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUserFollowMutationType) Scan(value interface{}) error {
+	if value == nil {
+		ns.UserFollowMutationType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UserFollowMutationType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUserFollowMutationType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UserFollowMutationType), nil
+}
 
 type User struct {
 	CreatedAt time.Time
@@ -33,6 +77,19 @@ type UserEmailMutation struct {
 	CreatedAt time.Time
 	UserID    uuid.UUID
 	Email     string
+}
+
+type UserFollow struct {
+	CreatedAt      time.Time
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+}
+
+type UserFollowMutation struct {
+	CreatedAt      time.Time
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+	Type           UserFollowMutationType
 }
 
 type UserProfile struct {

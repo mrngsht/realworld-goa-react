@@ -12,6 +12,24 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteUserFollow = `-- name: DeleteUserFollow :execrows
+DELETE FROM user_follow_
+WHERE user_id_ = $1 AND followed_user_id_ = $2
+`
+
+type DeleteUserFollowParams struct {
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+}
+
+func (q *Queries) DeleteUserFollow(ctx context.Context, arg DeleteUserFollowParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteUserFollow, arg.UserID, arg.FollowedUserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const getPasswordHashByUserID = `-- name: GetPasswordHashByUserID :one
 SELECT password_hash_ FROM user_auth_password_ 
 WHERE user_id_ = $1
@@ -71,6 +89,29 @@ func (q *Queries) GetUserProfileByUserID(ctx context.Context, userID uuid.UUID) 
 	row := q.db.QueryRowContext(ctx, getUserProfileByUserID, userID)
 	var i GetUserProfileByUserIDRow
 	err := row.Scan(&i.Username, &i.Bio, &i.ImageUrl)
+	return i, err
+}
+
+const getUserProfileByUsername = `-- name: GetUserProfileByUsername :one
+SELECT 
+  user_id_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE username_ = $1
+LIMIT 1
+`
+
+type GetUserProfileByUsernameRow struct {
+	UserID   uuid.UUID
+	Bio      string
+	ImageUrl string
+}
+
+func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string) (GetUserProfileByUsernameRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileByUsername, username)
+	var i GetUserProfileByUsernameRow
+	err := row.Scan(&i.UserID, &i.Bio, &i.ImageUrl)
 	return i, err
 }
 
@@ -138,6 +179,46 @@ type InsertUserEmailMutationParams struct {
 
 func (q *Queries) InsertUserEmailMutation(ctx context.Context, arg InsertUserEmailMutationParams) error {
 	_, err := q.db.ExecContext(ctx, insertUserEmailMutation, arg.CreatedAt, arg.UserID, arg.Email)
+	return err
+}
+
+const insertUserFollow = `-- name: InsertUserFollow :exec
+INSERT INTO user_follow_
+(created_at_, user_id_, followed_user_id_) 
+VALUES ($1, $2, $3)
+`
+
+type InsertUserFollowParams struct {
+	CreatedAt      time.Time
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+}
+
+func (q *Queries) InsertUserFollow(ctx context.Context, arg InsertUserFollowParams) error {
+	_, err := q.db.ExecContext(ctx, insertUserFollow, arg.CreatedAt, arg.UserID, arg.FollowedUserID)
+	return err
+}
+
+const insertUserFollowMutation = `-- name: InsertUserFollowMutation :exec
+INSERT INTO user_follow_mutation_
+(created_at_, user_id_, followed_user_id_, type_) 
+VALUES ($1, $2, $3, $4)
+`
+
+type InsertUserFollowMutationParams struct {
+	CreatedAt      time.Time
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+	Type           UserFollowMutationType
+}
+
+func (q *Queries) InsertUserFollowMutation(ctx context.Context, arg InsertUserFollowMutationParams) error {
+	_, err := q.db.ExecContext(ctx, insertUserFollowMutation,
+		arg.CreatedAt,
+		arg.UserID,
+		arg.FollowedUserID,
+		arg.Type,
+	)
 	return err
 }
 
