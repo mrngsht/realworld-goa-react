@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/mrngsht/realworld-goa-react/gen/profile"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/service"
@@ -8,12 +9,14 @@ import (
 )
 
 type endpoints struct {
-	User *user.Endpoints
+	User    *user.Endpoints
+	Profile *profile.Endpoints
 }
 
 func setupEndpoints(rdb myrdb.RDB) *endpoints {
 	return &endpoints{
-		User: setupEndpoint(user.NewEndpoints(service.NewUser(rdb))),
+		User:    setupEndpoint(user.NewEndpoints(service.NewUser(rdb))),
+		Profile: setupEndpoint(profile.NewEndpoints(service.NewProfile(rdb))),
 	}
 }
 

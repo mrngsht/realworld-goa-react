@@ -25,7 +25,7 @@ func NewUser(rdb myrdb.RDB) *User {
 
 var _ goa.Service = &User{}
 
-func (u *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
+func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.LoginResult, err error) {
 	defer func() {
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
@@ -37,7 +37,7 @@ func (u *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 		}
 	}()
 
-	q := sqlcgen.New(u.rdb)
+	q := sqlcgen.New(s.rdb)
 
 	userID, err := q.GetUserIDByEmail(ctx, payload.Email)
 	if err != nil {

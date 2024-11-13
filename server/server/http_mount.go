@@ -3,7 +3,9 @@ package server
 import (
 	"net/http"
 
+	profile "github.com/mrngsht/realworld-goa-react/gen/http/profile/server"
 	user "github.com/mrngsht/realworld-goa-react/gen/http/user/server"
+
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -11,6 +13,7 @@ func setupHttpServers(endpoints *endpoints) goahttp.ResolverMuxer {
 	mux, dec, enc := goahttp.NewMuxer(), goahttp.RequestDecoder, goahttp.ResponseEncoder
 
 	setupHttpServer(user.New(endpoints.User, mux, dec, enc, nil, nil), mux)
+	setupHttpServer(profile.New(endpoints.Profile, mux, dec, enc, nil, nil), mux)
 
 	return mux
 }
