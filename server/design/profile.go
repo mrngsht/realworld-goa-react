@@ -5,6 +5,7 @@ import . "goa.design/goa/v3/dsl"
 var _ = Service("profile", func() {
 	Description("profile")
 
+	Error(ErrorProfile_UserNotFound)
 	Error(ErrorProfile_UserAlreadyFollowing)
 	Error(ErrorProfile_UserNotFollowing)
 
@@ -12,6 +13,7 @@ var _ = Service("profile", func() {
 		HTTP(func() {
 			POST("profile/follow_user")
 			Response(StatusOK)
+			Response(ErrorProfile_UserNotFound, StatusBadRequest)
 			Response(ErrorProfile_UserAlreadyFollowing, StatusBadRequest)
 		})
 
@@ -32,6 +34,7 @@ var _ = Service("profile", func() {
 		HTTP(func() {
 			POST("profile/unfollow_user")
 			Response(StatusOK)
+			Response(ErrorProfile_UserNotFound, StatusBadRequest)
 			Response(ErrorProfile_UserNotFollowing, StatusBadRequest)
 		})
 
@@ -51,6 +54,7 @@ var _ = Service("profile", func() {
 })
 
 const (
+	ErrorProfile_UserNotFound         = "UserNotFound"
 	ErrorProfile_UserAlreadyFollowing = "UserAlreadyFollowing"
 	ErrorProfile_UserNotFollowing     = "UserNotFollowing"
 )

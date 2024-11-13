@@ -36,10 +36,46 @@ type UnfollowUserResponseBody struct {
 	Profile *ProfileResponseBody `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
 }
 
+// FollowUserUserNotFoundResponseBody is the type of the "profile" service
+// "followUser" endpoint HTTP response body for the "UserNotFound" error.
+type FollowUserUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // FollowUserUserAlreadyFollowingResponseBody is the type of the "profile"
 // service "followUser" endpoint HTTP response body for the
 // "UserAlreadyFollowing" error.
 type FollowUserUserAlreadyFollowingResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UnfollowUserUserNotFoundResponseBody is the type of the "profile" service
+// "unfollowUser" endpoint HTTP response body for the "UserNotFound" error.
+type UnfollowUserUserNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -109,6 +145,21 @@ func NewFollowUserResultOK(body *FollowUserResponseBody) *profile.FollowUserResu
 	return v
 }
 
+// NewFollowUserUserNotFound builds a profile service followUser endpoint
+// UserNotFound error.
+func NewFollowUserUserNotFound(body *FollowUserUserNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewFollowUserUserAlreadyFollowing builds a profile service followUser
 // endpoint UserAlreadyFollowing error.
 func NewFollowUserUserAlreadyFollowing(body *FollowUserUserAlreadyFollowingResponseBody) *goa.ServiceError {
@@ -129,6 +180,21 @@ func NewFollowUserUserAlreadyFollowing(body *FollowUserUserAlreadyFollowingRespo
 func NewUnfollowUserResultOK(body *UnfollowUserResponseBody) *profile.UnfollowUserResult {
 	v := &profile.UnfollowUserResult{}
 	v.Profile = unmarshalProfileResponseBodyToProfileProfile(body.Profile)
+
+	return v
+}
+
+// NewUnfollowUserUserNotFound builds a profile service unfollowUser endpoint
+// UserNotFound error.
+func NewUnfollowUserUserNotFound(body *UnfollowUserUserNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -176,9 +242,57 @@ func ValidateUnfollowUserResponseBody(body *UnfollowUserResponseBody) (err error
 	return
 }
 
+// ValidateFollowUserUserNotFoundResponseBody runs the validations defined on
+// followUser_UserNotFound_response_body
+func ValidateFollowUserUserNotFoundResponseBody(body *FollowUserUserNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateFollowUserUserAlreadyFollowingResponseBody runs the validations
 // defined on followUser_UserAlreadyFollowing_response_body
 func ValidateFollowUserUserAlreadyFollowingResponseBody(body *FollowUserUserAlreadyFollowingResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUnfollowUserUserNotFoundResponseBody runs the validations defined on
+// unfollowUser_UserNotFound_response_body
+func ValidateUnfollowUserUserNotFoundResponseBody(body *UnfollowUserUserNotFoundResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

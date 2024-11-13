@@ -34,8 +34,8 @@ func UsageExamples() string {
       "username": "zn5"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "kari_blick@raynormccullough.name",
-      "password": "bh9"
+      "email": "ophelia@stehr.biz",
+      "password": "sm4"
    }'` + "\n" +
 		""
 }
@@ -230,7 +230,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "6B82V"
+      "username": "C2PiK"
    }'
 `, os.Args[0])
 }
@@ -259,8 +259,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "kari_blick@raynormccullough.name",
-      "password": "bh9"
+      "email": "ophelia@stehr.biz",
+      "password": "sm4"
    }'
 `, os.Args[0])
 }
@@ -273,9 +273,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "madaline@hauckrenner.info",
-      "password": "wxm",
-      "username": "bnVB"
+      "email": "raymond@roobschimmel.biz",
+      "password": "uip",
+      "username": "q4I"
    }'
 `, os.Args[0])
 }
@@ -298,11 +298,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "91p",
-      "email": "felicity_cummerata@schoenwehner.com",
-      "image": "http://rv",
-      "password": "l1v",
-      "username": "CD4"
+      "bio": "w3n",
+      "email": "eleonore@reichel.biz",
+      "image": "https://o1",
+      "password": "1po",
+      "username": "05i1T"
    }'
 `, os.Args[0])
 }

@@ -168,21 +168,21 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Et consequatur sapiente minima.
+                example: Amet tempora consequuntur.
             following:
                 type: boolean
                 example: false
             image:
                 type: string
-                example: Corporis tempore id soluta.
+                example: Eius perspiciatis provident tenetur quis.
             username:
                 type: string
-                example: Ex voluptatem aut distinctio.
+                example: Dolor corporis tempore id soluta.
         example:
-            bio: Perspiciatis provident.
-            following: true
-            image: Quis necessitatibus.
-            username: Tempora consequuntur et.
+            bio: Dolore dicta.
+            following: false
+            image: Ut facere reprehenderit.
+            username: Aut sit est cum dolorum aut praesentium.
         required:
             - username
             - bio
@@ -194,10 +194,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: h9e
+                example: XoX5RH
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: BCx
+            username: jrj
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -221,7 +221,119 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
                 example: false
+        description: followUser_UserAlreadyFollowing_response_body result type (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    ProfileFollowUserUserNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: followUser_UserNotFound_response_body result type (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    ProfileUnfollowUserRequestBody:
+        title: ProfileUnfollowUserRequestBody
+        type: object
+        properties:
+            username:
+                type: string
+                example: Wd6p
+                pattern: ^[a-zA-Z0-9_]{3,32}$
+        example:
+            username: hC9E
+        required:
+            - username
+    ProfileUnfollowUserResponseBody:
+        title: ProfileUnfollowUserResponseBody
+        type: object
+        properties:
+            profile:
+                $ref: '#/definitions/Profile'
+        example:
+            profile:
+                bio: Beatae et.
+                following: true
+                image: Amet pariatur sit omnis aut aliquid corrupti.
+                username: Enim ab commodi odio voluptate.
+        required:
+            - profile
+    ProfileUnfollowUserUserNotFollowingResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -242,14 +354,14 @@ definitions:
                 type: boolean
                 description: Is the error a timeout?
                 example: true
-        description: followUser_UserAlreadyFollowing_response_body result type (default view)
+        description: unfollowUser_UserNotFollowing_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: true
+            temporary: false
+            timeout: false
         required:
             - name
             - id
@@ -257,33 +369,7 @@ definitions:
             - temporary
             - timeout
             - fault
-    ProfileUnfollowUserRequestBody:
-        title: ProfileUnfollowUserRequestBody
-        type: object
-        properties:
-            username:
-                type: string
-                example: jBED
-                pattern: ^[a-zA-Z0-9_]{3,32}$
-        example:
-            username: EXo
-        required:
-            - username
-    ProfileUnfollowUserResponseBody:
-        title: ProfileUnfollowUserResponseBody
-        type: object
-        properties:
-            profile:
-                $ref: '#/definitions/Profile'
-        example:
-            profile:
-                bio: Beatae et.
-                following: true
-                image: Amet pariatur sit omnis aut aliquid corrupti.
-                username: Enim ab commodi odio voluptate.
-        required:
-            - profile
-    ProfileUnfollowUserUserNotFollowingResponseBody:
+    ProfileUnfollowUserUserNotFoundResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
         properties:
@@ -310,15 +396,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
-        description: unfollowUser_UserNotFollowing_response_body result type (default view)
+                example: true
+        description: unfollowUser_UserNotFound_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: false
+            temporary: false
+            timeout: true
         required:
             - name
             - id
@@ -332,25 +418,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Numquam odio.
+                example: Debitis vero explicabo quod occaecati veritatis.
             email:
                 type: string
-                example: Voluptatem sunt.
+                example: Eveniet consequatur non laborum nesciunt exercitationem voluptas.
             image:
                 type: string
-                example: Occaecati sit amet optio autem.
+                example: Possimus deleniti quas ad aliquam.
             token:
                 type: string
-                example: Nam sed et.
+                example: Eveniet consequuntur non voluptas quo debitis quia.
             username:
                 type: string
-                example: Porro consequuntur dolore recusandae aut aut.
+                example: Pariatur et minima minima dolorem aut.
         example:
-            bio: Eveniet consequuntur non voluptas quo debitis quia.
-            email: Voluptas temporibus illum dicta illum.
-            image: Pariatur et minima minima dolorem aut.
-            token: Cupiditate qui consequuntur error laboriosam.
-            username: Eveniet consequatur non laborum nesciunt exercitationem voluptas.
+            bio: Numquam excepturi aut numquam.
+            email: Officiis vero voluptatum.
+            image: Quia quam rerum officia ut laudantium molestiae.
+            token: Quam aut aliquam consequatur vel nostrum qui.
+            username: Vel voluptatem deserunt.
         required:
             - email
             - token
@@ -365,11 +451,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Et corrupti voluptatum enim aut.
-                email: Velit accusamus laborum.
-                image: Autem repellendus tenetur maiores est et.
-                token: Velit omnis ut dolorem aperiam ducimus.
-                username: Est vel autem sequi est.
+                bio: Autem repellendus tenetur maiores est et.
+                email: Omnis ut dolorem aperiam ducimus.
+                image: Esse eligendi voluptas placeat nisi.
+                token: Est vel autem sequi est.
+                username: Et corrupti voluptatum enim aut.
         required:
             - user
     UserLoginEmailNotFoundResponseBody:
@@ -399,14 +485,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: login_EmailNotFound_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -422,7 +508,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -445,11 +531,11 @@ definitions:
                 example: false
         description: login_PasswordIsIncorrect_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -464,16 +550,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: buck_langosh@okon.net
+                example: kariane@bogan.biz
                 format: email
             password:
                 type: string
-                example: bat
+                example: 1uw
                 minLength: 6
                 maxLength: 128
         example:
-            email: dwight_carter@hegmannosinski.net
-            password: fn9
+            email: cruz@ratkeauer.org
+            password: 5ye
         required:
             - email
             - password
@@ -485,11 +571,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Et corrupti voluptatum enim aut.
-                email: Velit accusamus laborum.
-                image: Autem repellendus tenetur maiores est et.
-                token: Velit omnis ut dolorem aperiam ducimus.
-                username: Est vel autem sequi est.
+                bio: Autem repellendus tenetur maiores est et.
+                email: Omnis ut dolorem aperiam ducimus.
+                image: Esse eligendi voluptas placeat nisi.
+                token: Est vel autem sequi est.
+                username: Et corrupti voluptatum enim aut.
         required:
             - user
     UserRegisterEmailAlreadyUsedResponseBody:
@@ -526,7 +612,7 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -541,21 +627,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: dion@rowejast.info
+                example: eleanora.johnson@will.info
                 format: email
             password:
                 type: string
-                example: q8d
+                example: 1we
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: ojZ
+                example: Uelr
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: lemuel@osinski.name
-            password: aei
-            username: yvT3qF
+            email: kaleigh@roberts.name
+            password: t7o
+            username: QGt
         required:
             - username
             - email
@@ -568,11 +654,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Et corrupti voluptatum enim aut.
-                email: Velit accusamus laborum.
-                image: Autem repellendus tenetur maiores est et.
-                token: Velit omnis ut dolorem aperiam ducimus.
-                username: Est vel autem sequi est.
+                bio: Autem repellendus tenetur maiores est et.
+                email: Omnis ut dolorem aperiam ducimus.
+                image: Esse eligendi voluptas placeat nisi.
+                token: Est vel autem sequi est.
+                username: Et corrupti voluptatum enim aut.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -624,31 +710,31 @@ definitions:
         properties:
             bio:
                 type: string
-                example: m2w
+                example: qf0
                 maxLength: 4096
             email:
                 type: string
-                example: jennings.kihn@pagaceichmann.biz
+                example: reyes@spinka.org
                 format: email
             image:
                 type: string
-                example: https://4
+                example: http://st
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: tt9
+                example: hes
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: Iiw
+                example: FL4
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: a4s
-            email: loyce@flatley.biz
-            image: http://ub
-            password: ufp
-            username: lM7
+            bio: c3e
+            email: hilbert@kassulkekris.net
+            image: http://18
+            password: 4xh
+            username: ioA
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -657,10 +743,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Et corrupti voluptatum enim aut.
-                email: Velit accusamus laborum.
-                image: Autem repellendus tenetur maiores est et.
-                token: Velit omnis ut dolorem aperiam ducimus.
-                username: Est vel autem sequi est.
+                bio: Autem repellendus tenetur maiores est et.
+                email: Omnis ut dolorem aperiam ducimus.
+                image: Esse eligendi voluptas placeat nisi.
+                token: Est vel autem sequi est.
+                username: Et corrupti voluptatum enim aut.
         required:
             - user

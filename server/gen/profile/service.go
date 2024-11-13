@@ -67,6 +67,11 @@ type UnfollowUserResult struct {
 	Profile *Profile
 }
 
+// MakeUserNotFound builds a goa.ServiceError from an error.
+func MakeUserNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "UserNotFound", false, false, false)
+}
+
 // MakeUserAlreadyFollowing builds a goa.ServiceError from an error.
 func MakeUserAlreadyFollowing(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "UserAlreadyFollowing", false, false, false)
