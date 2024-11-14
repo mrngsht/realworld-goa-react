@@ -30,3 +30,11 @@ LIMIT 1;
 -- name: ListUserEmailMutationByUserID :many
 SELECT * FROM user_email_mutation_
 WHERE user_id_ = $1;
+
+-- name: ListUserFollowByUserID :many
+SELECT * FROM user_follow_
+WHERE user_id_ = $1;
+
+-- name: ListUserFollowMutationByUserID :many
+SELECT * FROM user_follow_mutation_
+WHERE user_id_ = $1;

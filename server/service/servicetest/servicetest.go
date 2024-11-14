@@ -5,8 +5,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+	"github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myctx"
+	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
+	"github.com/mrngsht/realworld-goa-react/service"
 	"github.com/stretchr/testify/require"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -27,4 +31,33 @@ func SetRequestUser(t *testing.T, ctx context.Context, qt *sqlctest.Queries, use
 	p, err := qt.GetUserProfileByUsername(ctx, username)
 	require.NoError(t, err)
 	return myctx.SetRequestUserID(ctx, p.UserID)
+}
+
+type CreateUserResult struct {
+	UserID   uuid.UUID
+	Username string
+	Bio      string
+	ImageUrl string
+}
+
+func CreateUser(t *testing.T, ctx context.Context, rdb myrdb.RDB) CreateUserResult {
+	t.Helper()
+
+	username := uuid.New().String()
+	_, err := service.NewUser(rdb).Register(ctx, &user.RegisterPayload{
+		Username: username,
+		Email:    username + "@example.com",
+		Password: "password",
+	})
+	require.NoError(t, err)
+
+	p, err := sqlctest.New(rdb).GetUserProfileByUsername(ctx, username)
+	require.NoError(t, err)
+
+	return CreateUserResult{
+		UserID:   p.UserID,
+		Username: p.Username,
+		Bio:      p.Bio,
+		ImageUrl: p.ImageUrl,
+	}
 }

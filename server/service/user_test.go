@@ -6,7 +6,7 @@ import (
 
 	"github.com/guregu/null"
 	"github.com/mrngsht/realworld-goa-react/design"
-	"github.com/mrngsht/realworld-goa-react/gen/user"
+	goa "github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest"
 	"github.com/mrngsht/realworld-goa-react/mytime/mytimetest"
@@ -23,7 +23,7 @@ func TestUser_Login(t *testing.T) {
 	svc := service.NewUser(rdb)
 
 	t.Run("succeed", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "succeed",
 			Email:    "succeed@example.com",
 			Password: "password",
@@ -31,7 +31,7 @@ func TestUser_Login(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+		res, err := svc.Login(ctx, &goa.LoginPayload{ // Act
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -45,7 +45,7 @@ func TestUser_Login(t *testing.T) {
 	})
 
 	t.Run("email not found", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "emailnotfound",
 			Email:    "emailnotfound@example.com",
 			Password: "password",
@@ -53,7 +53,7 @@ func TestUser_Login(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+		res, err := svc.Login(ctx, &goa.LoginPayload{ // Act
 			Email:    "WRONG_EMAIL_ADDRESS@example.com",
 			Password: registerPayload.Password,
 		})
@@ -64,7 +64,7 @@ func TestUser_Login(t *testing.T) {
 	})
 
 	t.Run("password is incorrect", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "incorrectpass",
 			Email:    "incorrectpass@example.com",
 			Password: "password",
@@ -72,7 +72,7 @@ func TestUser_Login(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		res, err := svc.Login(ctx, &user.LoginPayload{ // Act
+		res, err := svc.Login(ctx, &goa.LoginPayload{ // Act
 			Email:    registerPayload.Email,
 			Password: "INCORRECT_PASSWORD",
 		})
@@ -92,7 +92,7 @@ func TestUser_Register(t *testing.T) {
 	t.Run("succeed", func(t *testing.T) {
 		executedAt := mytimetest.AdjustTimeForTest(time.Now())
 		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
-		payload := &user.RegisterPayload{
+		payload := &goa.RegisterPayload{
 			Username: "succeed",
 			Email:    "succeed@example.com",
 			Password: "password",
@@ -140,7 +140,7 @@ func TestUser_Register(t *testing.T) {
 
 	t.Run("username already used", func(t *testing.T) {
 		{ // 1st: expect to succeed
-			payload := &user.RegisterPayload{
+			payload := &goa.RegisterPayload{
 				Username: "dup_username",
 				Email:    "dup_username@example.com",
 				Password: "password",
@@ -150,7 +150,7 @@ func TestUser_Register(t *testing.T) {
 		}
 
 		{ // 2nd: expect to fail
-			payload := &user.RegisterPayload{
+			payload := &goa.RegisterPayload{
 				Username: "dup_username",
 				Email:    "dup_username_different_email@example.com",
 				Password: "password",
@@ -167,7 +167,7 @@ func TestUser_Register(t *testing.T) {
 
 	t.Run("email already used", func(t *testing.T) {
 		{ // 1st: expect to succeed
-			payload := &user.RegisterPayload{
+			payload := &goa.RegisterPayload{
 				Username: "dup_email",
 				Email:    "dup_email@example.com",
 				Password: "password",
@@ -177,7 +177,7 @@ func TestUser_Register(t *testing.T) {
 		}
 
 		{ // 2nd: expect to fail
-			payload := &user.RegisterPayload{
+			payload := &goa.RegisterPayload{
 				Username: "dup_email_different_username",
 				Email:    "dup_email@example.com",
 				Password: "password",
@@ -200,7 +200,7 @@ func TestUser_GetCurrentUser(t *testing.T) {
 	svc := service.NewUser(rdb)
 
 	t.Run("succeed", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "succeed",
 			Email:    "succeed@example.com",
 			Password: "password",
@@ -228,7 +228,7 @@ func TestUser_Update(t *testing.T) {
 	svc := service.NewUser(rdb)
 
 	t.Run("update all", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "all",
 			Email:    "all@example.com",
 			Password: "all",
@@ -236,7 +236,7 @@ func TestUser_Update(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -244,7 +244,7 @@ func TestUser_Update(t *testing.T) {
 
 		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		updatePayload := &user.UpdatePayload{
+		updatePayload := &goa.UpdatePayload{
 			Username: null.StringFrom("update_all").Ptr(),
 			Email:    null.StringFrom("update_all@example.com").Ptr(),
 			Password: null.StringFrom("update_all").Ptr(),
@@ -263,13 +263,13 @@ func TestUser_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *curr.User, *res.User)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    *updatePayload.Email,
 			Password: *updatePayload.Password,
 		})
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -277,7 +277,7 @@ func TestUser_Update(t *testing.T) {
 	})
 
 	t.Run("update email only", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "emailonly",
 			Email:    "emailonly@example.com",
 			Password: "emailonly",
@@ -285,7 +285,7 @@ func TestUser_Update(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -293,7 +293,7 @@ func TestUser_Update(t *testing.T) {
 
 		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		updatePayload := &user.UpdatePayload{
+		updatePayload := &goa.UpdatePayload{
 			Username: nil,
 			Email:    null.StringFrom("update_emailonly@example.com").Ptr(),
 			Password: nil,
@@ -312,7 +312,7 @@ func TestUser_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *curr.User, *res.User)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    *updatePayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -320,7 +320,7 @@ func TestUser_Update(t *testing.T) {
 	})
 
 	t.Run("update password only", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "passwordonly",
 			Email:    "passwordonly@example.com",
 			Password: "passwordonly",
@@ -328,7 +328,7 @@ func TestUser_Update(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -336,7 +336,7 @@ func TestUser_Update(t *testing.T) {
 
 		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		updatePayload := &user.UpdatePayload{
+		updatePayload := &goa.UpdatePayload{
 			Username: nil,
 			Email:    nil,
 			Password: null.StringFrom("update_passwordonly").Ptr(),
@@ -355,13 +355,13 @@ func TestUser_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *curr.User, *res.User)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: *updatePayload.Password,
 		})
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -369,7 +369,7 @@ func TestUser_Update(t *testing.T) {
 	})
 
 	t.Run("update bio only", func(t *testing.T) { // on behalf of user_profile_
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "bioonly",
 			Email:    "bioonly@example.com",
 			Password: "bioonly",
@@ -377,7 +377,7 @@ func TestUser_Update(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -385,7 +385,7 @@ func TestUser_Update(t *testing.T) {
 
 		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		updatePayload := &user.UpdatePayload{
+		updatePayload := &goa.UpdatePayload{
 			Username: nil,
 			Email:    nil,
 			Password: nil,
@@ -404,7 +404,7 @@ func TestUser_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *curr.User, *res.User)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -412,7 +412,7 @@ func TestUser_Update(t *testing.T) {
 	})
 
 	t.Run("update nothing", func(t *testing.T) {
-		registerPayload := &user.RegisterPayload{
+		registerPayload := &goa.RegisterPayload{
 			Username: "nothing",
 			Email:    "nothing@example.com",
 			Password: "nothing",
@@ -420,7 +420,7 @@ func TestUser_Update(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})
@@ -428,7 +428,7 @@ func TestUser_Update(t *testing.T) {
 
 		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
 
-		res, err := svc.Update(ctx, &user.UpdatePayload{}) // Act
+		res, err := svc.Update(ctx, &goa.UpdatePayload{}) // Act
 		require.NoError(t, err)
 
 		assert.Equal(t, registerPayload.Username, res.User.Username)
@@ -440,7 +440,7 @@ func TestUser_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, *curr.User, *res.User)
 
-		_, err = svc.Login(ctx, &user.LoginPayload{
+		_, err = svc.Login(ctx, &goa.LoginPayload{
 			Email:    registerPayload.Email,
 			Password: registerPayload.Password,
 		})

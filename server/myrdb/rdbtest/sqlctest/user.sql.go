@@ -126,6 +126,67 @@ func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid
 	return items, nil
 }
 
+const listUserFollowByUserID = `-- name: ListUserFollowByUserID :many
+SELECT created_at_, user_id_, followed_user_id_ FROM user_follow_
+WHERE user_id_ = $1
+`
+
+func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollow, error) {
+	rows, err := q.db.QueryContext(ctx, listUserFollowByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserFollow
+	for rows.Next() {
+		var i UserFollow
+		if err := rows.Scan(&i.CreatedAt, &i.UserID, &i.FollowedUserID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUserFollowMutationByUserID = `-- name: ListUserFollowMutationByUserID :many
+SELECT created_at_, user_id_, followed_user_id_, type_ FROM user_follow_mutation_
+WHERE user_id_ = $1
+`
+
+func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollowMutation, error) {
+	rows, err := q.db.QueryContext(ctx, listUserFollowMutationByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserFollowMutation
+	for rows.Next() {
+		var i UserFollowMutation
+		if err := rows.Scan(
+			&i.CreatedAt,
+			&i.UserID,
+			&i.FollowedUserID,
+			&i.Type,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUserProfileMutationByUserID = `-- name: ListUserProfileMutationByUserID :many
 SELECT created_at_, user_id_, username_, bio_, image_url_ FROM user_profile_mutation_
 WHERE user_id_ = $1
