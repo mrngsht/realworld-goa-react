@@ -101,6 +101,7 @@ func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string)
 const listUserEmailMutationByUserID = `-- name: ListUserEmailMutationByUserID :many
 SELECT created_at_, user_id_, email_ FROM user_email_mutation_
 WHERE user_id_ = $1
+ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserEmailMutation, error) {
@@ -129,6 +130,7 @@ func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid
 const listUserFollowByUserID = `-- name: ListUserFollowByUserID :many
 SELECT created_at_, user_id_, followed_user_id_ FROM user_follow_
 WHERE user_id_ = $1
+ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollow, error) {
@@ -157,6 +159,7 @@ func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) 
 const listUserFollowMutationByUserID = `-- name: ListUserFollowMutationByUserID :many
 SELECT created_at_, user_id_, followed_user_id_, type_ FROM user_follow_mutation_
 WHERE user_id_ = $1
+ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollowMutation, error) {
@@ -190,6 +193,7 @@ func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uui
 const listUserProfileMutationByUserID = `-- name: ListUserProfileMutationByUserID :many
 SELECT created_at_, user_id_, username_, bio_, image_url_ FROM user_profile_mutation_
 WHERE user_id_ = $1
+ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserProfileMutation, error) {
