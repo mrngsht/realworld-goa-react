@@ -101,22 +101,20 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 		return nil, errors.WithStack(err)
 	}
 
-	var userID = uuid.Nil
+	userID := uuid.New()
 	if err := myrdb.Tx(ctx, s.db, func(ctx context.Context, txdb myrdb.TxDB) error {
 		db := txdb
 
 		now := mytime.Now(ctx)
-		newUserID := uuid.New()
-
 		if err := sqlcgen.Q.InsertUser(ctx, db, sqlcgen.InsertUserParams{
 			CreatedAt: now,
-			ID:        newUserID,
+			ID:        userID,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
 		if err := sqlcgen.Q.InsertUserProfile(ctx, db, sqlcgen.InsertUserProfileParams{
-			UserID:    newUserID,
+			UserID:    userID,
 			Username:  payload.Username,
 			Bio:       "",
 			ImageUrl:  "",
@@ -128,7 +126,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			return errors.WithStack(err)
 		}
 		if err := sqlcgen.Q.InsertUserProfileMutation(ctx, db, sqlcgen.InsertUserProfileMutationParams{
-			UserID:    newUserID,
+			UserID:    userID,
 			Username:  payload.Username,
 			Bio:       "",
 			ImageUrl:  "",
@@ -138,7 +136,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 		}
 
 		if err := sqlcgen.Q.InsertUserEmail(ctx, db, sqlcgen.InsertUserEmailParams{
-			UserID:    newUserID,
+			UserID:    userID,
 			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
@@ -148,7 +146,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			return errors.WithStack(err)
 		}
 		if err := sqlcgen.Q.InsertUserEmailMutation(ctx, db, sqlcgen.InsertUserEmailMutationParams{
-			UserID:    newUserID,
+			UserID:    userID,
 			Email:     payload.Email,
 			CreatedAt: now,
 		}); err != nil {
@@ -156,14 +154,12 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 		}
 
 		if err := sqlcgen.Q.InsertUserAuthPassword(ctx, db, sqlcgen.InsertUserAuthPasswordParams{
-			UserID:       newUserID,
+			UserID:       userID,
 			PasswordHash: string(passwordHash),
 			CreatedAt:    now,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
-
-		userID = newUserID
 
 		return nil
 	}); err != nil {
