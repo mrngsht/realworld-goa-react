@@ -64,6 +64,12 @@ CREATE TABLE "article_favorite_mutation_" (
     "user_id_" "uuid" NOT NULL,
     "type_" "article_favorite_mutation_type_" NOT NULL
 );
+CREATE TABLE "article_stats_" (
+    "created_at_" timestamp with time zone NOT NULL,
+    "updated_at_" timestamp with time zone NOT NULL,
+    "article_id_" "uuid" NOT NULL,
+    "favorites_count_" bigint
+);
 CREATE TABLE "article_tag_" (
     "created_at_" timestamp with time zone NOT NULL,
     "article_id_" "uuid" NOT NULL,
@@ -134,6 +140,8 @@ ALTER TABLE ONLY "article_deleted_"
     ADD CONSTRAINT "article_deleted__pkey" PRIMARY KEY ("article_id_");
 ALTER TABLE ONLY "article_favorite_"
     ADD CONSTRAINT "article_favorite__pkey" PRIMARY KEY ("article_id_", "user_id_");
+ALTER TABLE ONLY "article_stats_"
+    ADD CONSTRAINT "article_stats__pkey" PRIMARY KEY ("article_id_");
 ALTER TABLE ONLY "article_tag_"
     ADD CONSTRAINT "article_tag__pkey" PRIMARY KEY ("article_id_", "tag_");
 ALTER TABLE ONLY "enum_article_tag_"
@@ -173,6 +181,8 @@ ALTER TABLE ONLY "article_comment_content_mutation_"
 ALTER TABLE ONLY "article_favorite_"
     ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
 ALTER TABLE ONLY "article_favorite_mutation_"
+    ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
+ALTER TABLE ONLY "article_stats_"
     ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
 ALTER TABLE ONLY "article_content_"
     ADD CONSTRAINT "fk_author_user_id_" FOREIGN KEY ("author_user_id_") REFERENCES "user_"("id_");

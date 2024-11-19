@@ -179,8 +179,17 @@ CREATE TABLE IF NOT EXISTS article_favorite_mutation_ (
   CONSTRAINT fk_user_id_ FOREIGN KEY (user_id_) REFERENCES user_ (id_)
 );
 
+CREATE TABLE IF NOT EXISTS article_stats_ (
+  created_at_ TIMESTAMPTZ NOT NULL,
+  updated_at_ TIMESTAMPTZ NOT NULL,
+  article_id_ UUID NOT NULL,
+  favorites_count_ BIGINT NULL,
+  PRIMARY KEY (article_id_),
+  CONSTRAINT fk_article_id_ FOREIGN KEY (article_id_) REFERENCES article_ (id_)
+);
 -- +goose Down
 -- +goose StatementBegin
+DROP TABLE IF EXISTS article_stats;
 DROP TABLE IF EXISTS article_favorite_mutation_;
 DROP TABLE IF EXISTS article_favorite_;
 DROP TABLE IF EXISTS article_comment_deleted_;

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/cockroachdb/errors"
+
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 )
@@ -17,6 +19,12 @@ func NewArticle(rdb myrdb.RDB) *Article {
 
 var _ goa.Service = &Article{}
 
-func (s *Article) Create(context.Context, *goa.CreatePayload) (res *goa.CreateResult, err error) {
+func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
+	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+
+		return nil
+	}); err != nil {
+		return nil, errors.WithStack(err)
+	}
 	return nil, nil
 }
