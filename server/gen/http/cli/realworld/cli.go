@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 
+	articlec "github.com/mrngsht/realworld-goa-react/gen/http/article/client"
 	profilec "github.com/mrngsht/realworld-goa-react/gen/http/profile/client"
 	userc "github.com/mrngsht/realworld-goa-react/gen/http/user/client"
 	goahttp "goa.design/goa/v3/http"
@@ -23,19 +24,31 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `profile (follow-user|unfollow-user)
+	return `article create
+profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` profile follow-user --body '{
-      "username": "zn5"
+	return os.Args[0] + ` article create --body '{
+      "body": "Autem officiis nisi.",
+      "description": "Ut ex minus culpa nam ipsam reiciendis.",
+      "tagList": [
+         "Incidunt quia neque.",
+         "Quos omnis magni iste explicabo.",
+         "Optio vitae facilis cumque consequatur sapiente.",
+         "Voluptatem sunt est non odit rerum sapiente."
+      ],
+      "title": "6nr"
+   }'` + "\n" +
+		os.Args[0] + ` profile follow-user --body '{
+      "username": "IB8q"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "ophelia@stehr.biz",
-      "password": "sm4"
+      "email": "cortney_jerde@auer.org",
+      "password": "5ye"
    }'` + "\n" +
 		""
 }
@@ -50,6 +63,11 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, any, error) {
 	var (
+		articleFlags = flag.NewFlagSet("article", flag.ContinueOnError)
+
+		articleCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
+		articleCreateBodyFlag = articleCreateFlags.String("body", "REQUIRED", "")
+
 		profileFlags = flag.NewFlagSet("profile", flag.ContinueOnError)
 
 		profileFollowUserFlags    = flag.NewFlagSet("follow-user", flag.ExitOnError)
@@ -71,6 +89,9 @@ func ParseEndpoint(
 		userUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
 		userUpdateBodyFlag = userUpdateFlags.String("body", "REQUIRED", "")
 	)
+	articleFlags.Usage = articleUsage
+	articleCreateFlags.Usage = articleCreateUsage
+
 	profileFlags.Usage = profileUsage
 	profileFollowUserFlags.Usage = profileFollowUserUsage
 	profileUnfollowUserFlags.Usage = profileUnfollowUserUsage
@@ -96,6 +117,8 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
+		case "article":
+			svcf = articleFlags
 		case "profile":
 			svcf = profileFlags
 		case "user":
@@ -115,6 +138,13 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
+		case "article":
+			switch epn {
+			case "create":
+				epf = articleCreateFlags
+
+			}
+
 		case "profile":
 			switch epn {
 			case "follow-user":
@@ -161,6 +191,13 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
+		case "article":
+			c := articlec.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "create":
+				endpoint = c.Create()
+				data, err = articlec.BuildCreatePayload(*articleCreateBodyFlag)
+			}
 		case "profile":
 			c := profilec.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -195,6 +232,40 @@ func ParseEndpoint(
 	return endpoint, data, nil
 }
 
+// articleUsage displays the usage of the article command and its subcommands.
+func articleUsage() {
+	fmt.Fprintf(os.Stderr, `article
+Usage:
+    %[1]s [globalflags] article COMMAND [flags]
+
+COMMAND:
+    create: Create implements create.
+
+Additional help:
+    %[1]s article COMMAND --help
+`, os.Args[0])
+}
+func articleCreateUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article create -body JSON
+
+Create implements create.
+    -body JSON: 
+
+Example:
+    %[1]s article create --body '{
+      "body": "Autem officiis nisi.",
+      "description": "Ut ex minus culpa nam ipsam reiciendis.",
+      "tagList": [
+         "Incidunt quia neque.",
+         "Quos omnis magni iste explicabo.",
+         "Optio vitae facilis cumque consequatur sapiente.",
+         "Voluptatem sunt est non odit rerum sapiente."
+      ],
+      "title": "6nr"
+   }'
+`, os.Args[0])
+}
+
 // profileUsage displays the usage of the profile command and its subcommands.
 func profileUsage() {
 	fmt.Fprintf(os.Stderr, `profile
@@ -217,7 +288,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "zn5"
+      "username": "IB8q"
    }'
 `, os.Args[0])
 }
@@ -230,7 +301,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "C2PiK"
+      "username": "38g"
    }'
 `, os.Args[0])
 }
@@ -259,8 +330,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "ophelia@stehr.biz",
-      "password": "sm4"
+      "email": "cortney_jerde@auer.org",
+      "password": "5ye"
    }'
 `, os.Args[0])
 }
@@ -273,9 +344,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "raymond@roobschimmel.biz",
-      "password": "uip",
-      "username": "q4I"
+      "email": "tre.nicolas@deckowfisher.name",
+      "password": "poe",
+      "username": "3Hz"
    }'
 `, os.Args[0])
 }
@@ -298,11 +369,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "w3n",
-      "email": "eleonore@reichel.biz",
-      "image": "https://o1",
-      "password": "1po",
-      "username": "05i1T"
+      "bio": "um2",
+      "email": "jennings.kihn@pagaceichmann.biz",
+      "image": "http://k",
+      "password": "qtt",
+      "username": "N9Iw"
    }'
 `, os.Args[0])
 }
