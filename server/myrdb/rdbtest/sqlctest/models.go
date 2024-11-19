@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type ArticleFavoriteMutationType string
@@ -169,7 +168,7 @@ type ArticleStats struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	ArticleID      uuid.UUID
-	FavoritesCount pgtype.Int8
+	FavoritesCount *int64
 }
 
 type ArticleTag struct {

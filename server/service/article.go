@@ -5,7 +5,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/guregu/null"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
 	"github.com/mrngsht/realworld-goa-react/myctx"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
@@ -64,7 +64,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 		if err := q.InsertArticleStats(ctx, sqlcgen.InsertArticleStatsParams{
 			CreatedAt:      now,
 			ArticleID:      newArticleID,
-			FavoritesCount: pgtype.Int8{Int64: 0, Valid: true},
+			FavoritesCount: null.IntFrom(0).Ptr(),
 		}); err != nil {
 			return errors.WithStack(err)
 		}
@@ -75,5 +75,10 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 	}); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return nil, nil
+
+	return &goa.CreateResult{
+		Article: &goa.ArticleDetail{
+			ID: articleID.String(),
+		},
+	}, nil
 }

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const insertArticle = `-- name: InsertArticle :exec
@@ -91,7 +90,7 @@ VALUES ($3, $3, $1, $2)
 
 type InsertArticleStatsParams struct {
 	ArticleID      uuid.UUID
-	FavoritesCount pgtype.Int8
+	FavoritesCount *int64
 	CreatedAt      time.Time
 }
 
