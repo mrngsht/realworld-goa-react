@@ -23,11 +23,11 @@ type DeleteUserFollowParams struct {
 }
 
 func (q *Queries) DeleteUserFollow(ctx context.Context, arg DeleteUserFollowParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, deleteUserFollow, arg.UserID, arg.FollowedUserID)
+	result, err := q.db.Exec(ctx, deleteUserFollow, arg.UserID, arg.FollowedUserID)
 	if err != nil {
 		return 0, err
 	}
-	return result.RowsAffected()
+	return result.RowsAffected(), nil
 }
 
 const getPasswordHashByUserID = `-- name: GetPasswordHashByUserID :one
@@ -37,7 +37,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetPasswordHashByUserID(ctx context.Context, userID uuid.UUID) (string, error) {
-	row := q.db.QueryRowContext(ctx, getPasswordHashByUserID, userID)
+	row := q.db.QueryRow(ctx, getPasswordHashByUserID, userID)
 	var password_hash_ string
 	err := row.Scan(&password_hash_)
 	return password_hash_, err
@@ -50,7 +50,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserEmailByUserID(ctx context.Context, userID uuid.UUID) (string, error) {
-	row := q.db.QueryRowContext(ctx, getUserEmailByUserID, userID)
+	row := q.db.QueryRow(ctx, getUserEmailByUserID, userID)
 	var email_ string
 	err := row.Scan(&email_)
 	return email_, err
@@ -63,7 +63,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID, error) {
-	row := q.db.QueryRowContext(ctx, getUserIDByEmail, email)
+	row := q.db.QueryRow(ctx, getUserIDByEmail, email)
 	var user_id_ uuid.UUID
 	err := row.Scan(&user_id_)
 	return user_id_, err
@@ -86,7 +86,7 @@ type GetUserProfileByUserIDRow struct {
 }
 
 func (q *Queries) GetUserProfileByUserID(ctx context.Context, userID uuid.UUID) (GetUserProfileByUserIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileByUserID, userID)
+	row := q.db.QueryRow(ctx, getUserProfileByUserID, userID)
 	var i GetUserProfileByUserIDRow
 	err := row.Scan(&i.Username, &i.Bio, &i.ImageUrl)
 	return i, err
@@ -109,7 +109,7 @@ type GetUserProfileByUsernameRow struct {
 }
 
 func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string) (GetUserProfileByUsernameRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileByUsername, username)
+	row := q.db.QueryRow(ctx, getUserProfileByUsername, username)
 	var i GetUserProfileByUsernameRow
 	err := row.Scan(&i.UserID, &i.Bio, &i.ImageUrl)
 	return i, err
@@ -127,7 +127,7 @@ type InsertUserParams struct {
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.db.ExecContext(ctx, insertUser, arg.CreatedAt, arg.ID)
+	_, err := q.db.Exec(ctx, insertUser, arg.CreatedAt, arg.ID)
 	return err
 }
 
@@ -144,7 +144,7 @@ type InsertUserAuthPasswordParams struct {
 }
 
 func (q *Queries) InsertUserAuthPassword(ctx context.Context, arg InsertUserAuthPasswordParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserAuthPassword, arg.UserID, arg.PasswordHash, arg.CreatedAt)
+	_, err := q.db.Exec(ctx, insertUserAuthPassword, arg.UserID, arg.PasswordHash, arg.CreatedAt)
 	return err
 }
 
@@ -161,7 +161,7 @@ type InsertUserEmailParams struct {
 }
 
 func (q *Queries) InsertUserEmail(ctx context.Context, arg InsertUserEmailParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserEmail, arg.UserID, arg.Email, arg.CreatedAt)
+	_, err := q.db.Exec(ctx, insertUserEmail, arg.UserID, arg.Email, arg.CreatedAt)
 	return err
 }
 
@@ -178,7 +178,7 @@ type InsertUserEmailMutationParams struct {
 }
 
 func (q *Queries) InsertUserEmailMutation(ctx context.Context, arg InsertUserEmailMutationParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserEmailMutation, arg.CreatedAt, arg.UserID, arg.Email)
+	_, err := q.db.Exec(ctx, insertUserEmailMutation, arg.CreatedAt, arg.UserID, arg.Email)
 	return err
 }
 
@@ -195,7 +195,7 @@ type InsertUserFollowParams struct {
 }
 
 func (q *Queries) InsertUserFollow(ctx context.Context, arg InsertUserFollowParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserFollow, arg.CreatedAt, arg.UserID, arg.FollowedUserID)
+	_, err := q.db.Exec(ctx, insertUserFollow, arg.CreatedAt, arg.UserID, arg.FollowedUserID)
 	return err
 }
 
@@ -213,7 +213,7 @@ type InsertUserFollowMutationParams struct {
 }
 
 func (q *Queries) InsertUserFollowMutation(ctx context.Context, arg InsertUserFollowMutationParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserFollowMutation,
+	_, err := q.db.Exec(ctx, insertUserFollowMutation,
 		arg.CreatedAt,
 		arg.UserID,
 		arg.FollowedUserID,
@@ -237,7 +237,7 @@ type InsertUserProfileParams struct {
 }
 
 func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfileParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserProfile,
+	_, err := q.db.Exec(ctx, insertUserProfile,
 		arg.UserID,
 		arg.Username,
 		arg.Bio,
@@ -262,7 +262,7 @@ type InsertUserProfileMutationParams struct {
 }
 
 func (q *Queries) InsertUserProfileMutation(ctx context.Context, arg InsertUserProfileMutationParams) error {
-	_, err := q.db.ExecContext(ctx, insertUserProfileMutation,
+	_, err := q.db.Exec(ctx, insertUserProfileMutation,
 		arg.CreatedAt,
 		arg.UserID,
 		arg.Username,
@@ -285,7 +285,7 @@ type UpdateUserAuthPasswordHashParams struct {
 }
 
 func (q *Queries) UpdateUserAuthPasswordHash(ctx context.Context, arg UpdateUserAuthPasswordHashParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserAuthPasswordHash, arg.UserID, arg.UpdatedAt, arg.PasswordHash)
+	_, err := q.db.Exec(ctx, updateUserAuthPasswordHash, arg.UserID, arg.UpdatedAt, arg.PasswordHash)
 	return err
 }
 
@@ -302,7 +302,7 @@ type UpdateUserEmailParams struct {
 }
 
 func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserEmail, arg.UserID, arg.UpdatedAt, arg.Email)
+	_, err := q.db.Exec(ctx, updateUserEmail, arg.UserID, arg.UpdatedAt, arg.Email)
 	return err
 }
 
@@ -321,7 +321,7 @@ type UpdateUserProfileParams struct {
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserProfile,
+	_, err := q.db.Exec(ctx, updateUserProfile,
 		arg.UserID,
 		arg.UpdatedAt,
 		arg.Username,

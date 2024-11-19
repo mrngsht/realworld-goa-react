@@ -14,10 +14,10 @@ import (
 )
 
 type Profile struct {
-	rdb myrdb.RDB
+	rdb myrdb.Conn
 }
 
-func NewProfile(rdb myrdb.RDB) *Profile {
+func NewProfile(rdb myrdb.Conn) *Profile {
 	return &Profile{rdb: rdb}
 }
 
@@ -46,7 +46,7 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 		return nil, errors.WithStack(err)
 	}
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
 		q = sqlcgen.New(tx)
 		now := mytime.Now(ctx)
 
@@ -108,7 +108,7 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 		return nil, errors.WithStack(err)
 	}
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
 		q = sqlcgen.New(tx)
 		now := mytime.Now(ctx)
 

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/cockroachdb/errors"
@@ -8,11 +9,13 @@ import (
 )
 
 func Run() error {
-	rdb, err := myrdb.OpenLocalRDB()
+	ctx := context.Background()
+
+	rdb, err := myrdb.OpenLocalRDB(ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer rdb.Close()
+	defer rdb.Close(ctx)
 
 	endpoints := setupEndpoints(rdb)
 	mux := setupHttpServers(endpoints)

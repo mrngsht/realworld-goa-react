@@ -18,7 +18,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserAuthPasswordByUserID(ctx context.Context, userID uuid.UUID) (UserAuthPassword, error) {
-	row := q.db.QueryRowContext(ctx, getUserAuthPasswordByUserID, userID)
+	row := q.db.QueryRow(ctx, getUserAuthPasswordByUserID, userID)
 	var i UserAuthPassword
 	err := row.Scan(
 		&i.CreatedAt,
@@ -36,7 +36,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(&i.CreatedAt, &i.ID)
 	return i, err
@@ -49,7 +49,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserEmailByEmail(ctx context.Context, email string) (UserEmail, error) {
-	row := q.db.QueryRowContext(ctx, getUserEmailByEmail, email)
+	row := q.db.QueryRow(ctx, getUserEmailByEmail, email)
 	var i UserEmail
 	err := row.Scan(
 		&i.CreatedAt,
@@ -67,7 +67,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserEmailByID(ctx context.Context, userID uuid.UUID) (UserEmail, error) {
-	row := q.db.QueryRowContext(ctx, getUserEmailByID, userID)
+	row := q.db.QueryRow(ctx, getUserEmailByID, userID)
 	var i UserEmail
 	err := row.Scan(
 		&i.CreatedAt,
@@ -85,7 +85,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string) (UserProfile, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileByUsername, username)
+	row := q.db.QueryRow(ctx, getUserProfileByUsername, username)
 	var i UserProfile
 	err := row.Scan(
 		&i.CreatedAt,
@@ -105,7 +105,7 @@ ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserEmailMutation, error) {
-	rows, err := q.db.QueryContext(ctx, listUserEmailMutationByUserID, userID)
+	rows, err := q.db.Query(ctx, listUserEmailMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,9 +117,6 @@ func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -134,7 +131,7 @@ ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollow, error) {
-	rows, err := q.db.QueryContext(ctx, listUserFollowByUserID, userID)
+	rows, err := q.db.Query(ctx, listUserFollowByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -146,9 +143,6 @@ func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) 
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -163,7 +157,7 @@ ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollowMutation, error) {
-	rows, err := q.db.QueryContext(ctx, listUserFollowMutationByUserID, userID)
+	rows, err := q.db.Query(ctx, listUserFollowMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -181,9 +175,6 @@ func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uui
 		}
 		items = append(items, i)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -197,7 +188,7 @@ ORDER BY created_at_ ASC
 `
 
 func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserProfileMutation, error) {
-	rows, err := q.db.QueryContext(ctx, listUserProfileMutationByUserID, userID)
+	rows, err := q.db.Query(ctx, listUserProfileMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -215,9 +206,6 @@ func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, userID uu
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

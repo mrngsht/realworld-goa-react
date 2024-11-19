@@ -16,10 +16,10 @@ import (
 )
 
 type User struct {
-	rdb myrdb.RDB
+	rdb myrdb.Conn
 }
 
-func NewUser(rdb myrdb.RDB) *User {
+func NewUser(rdb myrdb.Conn) *User {
 	return &User{rdb: rdb}
 }
 
@@ -102,7 +102,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 	}
 
 	var userID = uuid.Nil
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
 		q := sqlcgen.New(tx)
 
 		now := mytime.Now(ctx)
@@ -205,7 +205,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 	userID := myctx.MustGetRequestUserID(ctx)
 	now := mytime.Now(ctx)
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
 		q := sqlcgen.New(tx)
 
 		if payload.Email != nil {

@@ -2,7 +2,9 @@ package myrdb
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/cockroachdb/errors"
 	"github.com/mrngsht/realworld-goa-react/config"
@@ -11,37 +13,41 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func OpenLocalRDB() (*rdb, error) {
-	sqldb, err := sql.Open("postgres", config.C.RDBConnectionString)
+func OpenLocalRDB(ctx context.Context) (conn, error) {
+	cfg, err := pgxpool.ParseConfig(config.C.RDBConnectionString)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return conn{}, errors.WithStack(err)
 	}
-	return &rdb{sqldb}, nil
+	pool, err := pgxpool.NewWithConfig(ctx, cfg)
+	if err != nil {
+		return conn{}, errors.WithStack(err)
+	}
+	return conn{pool}, nil
 }
 
-type rdb struct {
-	*sql.DB
+type conn struct {
+	*pgxpool.Pool // use pool as connection because we don't need the queries to run on the same connection except the transaction.
 }
 
-var _ RDB = (*rdb)(nil)
+var _ Conn = (*conn)(nil)
 
-func (r rdb) BeginTx(ctx context.Context, opts *sql.TxOptions) (TxDB, error) {
-	return r.DB.BeginTx(ctx, opts)
+func (r conn) BeginTx(ctx context.Context, opts pgx.TxOptions) (TxConn, error) {
+	return r.Pool.BeginTx(ctx, opts)
 }
 
-type RDB interface {
+type Conn interface {
 	sqlcgen.DBTX
-	BeginTx(context.Context, *sql.TxOptions) (TxDB, error)
+	BeginTx(context.Context, pgx.TxOptions) (TxConn, error)
 }
 
-type TxDB interface {
+type TxConn interface {
 	sqlcgen.DBTX
-	Rollback() error
-	Commit() error
+	Rollback(context.Context) error
+	Commit(context.Context) error
 }
 
-func Tx(ctx context.Context, db RDB, txFunc func(context.Context, TxDB) error) (err error) {
-	tx, err := db.BeginTx(ctx, nil)
+func Tx(ctx context.Context, db Conn, txFunc func(context.Context, TxConn) error) (err error) {
+	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -52,11 +58,11 @@ func Tx(ctx context.Context, db RDB, txFunc func(context.Context, TxDB) error) (
 		}
 
 		if err != nil {
-			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
 				err = errors.Join(err, rollbackErr)
 			}
 		} else {
-			if err := tx.Commit(); err != nil {
+			if err := tx.Commit(ctx); err != nil {
 				err = errors.WithStack(err)
 			}
 		}

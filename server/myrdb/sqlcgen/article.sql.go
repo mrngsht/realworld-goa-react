@@ -7,11 +7,10 @@ package sqlcgen
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const insertArticle = `-- name: InsertArticle :exec
@@ -26,7 +25,7 @@ type InsertArticleParams struct {
 }
 
 func (q *Queries) InsertArticle(ctx context.Context, arg InsertArticleParams) error {
-	_, err := q.db.ExecContext(ctx, insertArticle, arg.CreatedAt, arg.ID)
+	_, err := q.db.Exec(ctx, insertArticle, arg.CreatedAt, arg.ID)
 	return err
 }
 
@@ -46,7 +45,7 @@ type InsertArticleContentParams struct {
 }
 
 func (q *Queries) InsertArticleContent(ctx context.Context, arg InsertArticleContentParams) error {
-	_, err := q.db.ExecContext(ctx, insertArticleContent,
+	_, err := q.db.Exec(ctx, insertArticleContent,
 		arg.ArticleID,
 		arg.Title,
 		arg.Description,
@@ -73,7 +72,7 @@ type InsertArticleContentMutationParams struct {
 }
 
 func (q *Queries) InsertArticleContentMutation(ctx context.Context, arg InsertArticleContentMutationParams) error {
-	_, err := q.db.ExecContext(ctx, insertArticleContentMutation,
+	_, err := q.db.Exec(ctx, insertArticleContentMutation,
 		arg.CreatedAt,
 		arg.ArticleID,
 		arg.Title,
@@ -92,12 +91,12 @@ VALUES ($3, $3, $1, $2)
 
 type InsertArticleStatsParams struct {
 	ArticleID      uuid.UUID
-	FavoritesCount sql.NullInt64
+	FavoritesCount pgtype.Int8
 	CreatedAt      time.Time
 }
 
 func (q *Queries) InsertArticleStats(ctx context.Context, arg InsertArticleStatsParams) error {
-	_, err := q.db.ExecContext(ctx, insertArticleStats, arg.ArticleID, arg.FavoritesCount, arg.CreatedAt)
+	_, err := q.db.Exec(ctx, insertArticleStats, arg.ArticleID, arg.FavoritesCount, arg.CreatedAt)
 	return err
 }
 
@@ -110,10 +109,10 @@ VALUES ($1, $2, $3)
 type InsertArticleTagMutationParams struct {
 	CreatedAt time.Time
 	ArticleID uuid.UUID
-	Tags      json.RawMessage
+	Tags      []byte
 }
 
 func (q *Queries) InsertArticleTagMutation(ctx context.Context, arg InsertArticleTagMutationParams) error {
-	_, err := q.db.ExecContext(ctx, insertArticleTagMutation, arg.CreatedAt, arg.ArticleID, arg.Tags)
+	_, err := q.db.Exec(ctx, insertArticleTagMutation, arg.CreatedAt, arg.ArticleID, arg.Tags)
 	return err
 }

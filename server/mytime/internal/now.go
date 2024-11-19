@@ -8,5 +8,5 @@ import (
 var Now = DefaultNow
 
 func DefaultNow(_ context.Context) time.Time {
-	return time.Now().UTC()
+	return time.Now().Local()
 }

@@ -1,21 +1,16 @@
 package myrdb
 
 import (
-	"database/sql"
-
 	"github.com/cockroachdb/errors"
-
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func IsErrNoRows(err error) bool {
-	return errors.Is(err, sql.ErrNoRows)
+	return errors.Is(err, pgx.ErrNoRows)
 }
 
-const pqUniqueViolationCode = pq.ErrorCode("23505")
-
 func IsErrUniqueViolation(err error) bool {
-	// ref: https://github.com/go-gorm/gorm/issues/4135#issuecomment-790584782
-	var pqErr *pq.Error
-	return errors.As(err, &pqErr) && pqErr.Code == pqUniqueViolationCode
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505" // https://www.postgresql.jp/document/8.0/html/errcodes-appendix.html
 }

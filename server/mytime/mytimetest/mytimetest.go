@@ -30,5 +30,5 @@ func WithFixedNow(t *testing.T, ctx context.Context, tm time.Time) context.Conte
 }
 
 func AdjustTimeForTest(tm time.Time) time.Time {
-	return tm.Truncate(time.Microsecond).UTC()
+	return tm.Truncate(time.Microsecond).Local()
 }

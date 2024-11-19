@@ -40,7 +40,7 @@ type CreateUserResult struct {
 	ImageUrl string
 }
 
-func CreateUser(t *testing.T, ctx context.Context, rdb myrdb.RDB) CreateUserResult {
+func CreateUser(t *testing.T, ctx context.Context, rdb myrdb.Conn) CreateUserResult {
 	t.Helper()
 
 	username := uuid.New().String()
