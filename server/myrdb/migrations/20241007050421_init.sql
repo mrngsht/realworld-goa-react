@@ -127,12 +127,6 @@ CREATE TABLE IF NOT EXISTS article_tag_mutation_ (
 );
 COMMENT ON COLUMN article_tag_mutation_.tags_ IS 'json array of tag(string)';
 
-CREATE TABLE IF NOT EXISTS enum_article_tag_ (
-  created_at_ TIMESTAMPTZ NOT NULL,
-  tag_ TEXT NOT NULL,
-  PRIMARY KEY (tag_)
-);
-
 CREATE TABLE IF NOT EXISTS article_comment_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   id_ UUID NOT NULL,
@@ -206,7 +200,6 @@ DROP TABLE IF EXISTS article_comment_deleted_;
 DROP TABLE IF EXISTS article_comment_content_mutation_;
 DROP TABLE IF EXISTS article_comment_content_;
 DROP TABLE IF EXISTS article_comment_;
-DROP TABLE IF EXISTS enum_article_tag_;
 DROP TABLE IF EXISTS article_tag_mutation_;
 DROP TABLE IF EXISTS article_tag_;
 DROP TABLE IF EXISTS article_deleted_;

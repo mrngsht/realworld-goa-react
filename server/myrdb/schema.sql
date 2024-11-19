@@ -81,10 +81,6 @@ CREATE TABLE "article_tag_mutation_" (
     "article_id_" "uuid" NOT NULL,
     "tags_" "jsonb" NOT NULL
 );
-CREATE TABLE "enum_article_tag_" (
-    "created_at_" timestamp with time zone NOT NULL,
-    "tag_" "text" NOT NULL
-);
 CREATE TABLE "user_" (
     "created_at_" timestamp with time zone NOT NULL,
     "id_" "uuid" NOT NULL
@@ -152,8 +148,6 @@ ALTER TABLE ONLY "article_tag_"
     ADD CONSTRAINT "article_tag__article_id__tag__key" UNIQUE ("article_id_", "tag_");
 ALTER TABLE ONLY "article_tag_"
     ADD CONSTRAINT "article_tag__pkey" PRIMARY KEY ("article_id_", "seq_no_");
-ALTER TABLE ONLY "enum_article_tag_"
-    ADD CONSTRAINT "enum_article_tag__pkey" PRIMARY KEY ("tag_");
 ALTER TABLE ONLY "user_"
     ADD CONSTRAINT "user__pkey" PRIMARY KEY ("id_");
 ALTER TABLE ONLY "user_auth_password_"
