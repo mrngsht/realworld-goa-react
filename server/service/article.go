@@ -69,10 +69,11 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 
 		if len(payload.TagList) > 0 {
 			tagParams := make([]sqlcgen.InsertArticleTagParams, 0, len(payload.TagList))
-			for _, tag := range payload.TagList {
+			for i, tag := range payload.TagList {
 				tagParams = append(tagParams, sqlcgen.InsertArticleTagParams{
 					CreatedAt: now,
 					ArticleID: articleID,
+					SeqNo:     int32(i + 1),
 					Tag:       tag,
 				})
 			}

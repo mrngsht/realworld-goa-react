@@ -112,8 +112,10 @@ CREATE TABLE IF NOT EXISTS article_deleted_ (
 CREATE TABLE IF NOT EXISTS article_tag_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   article_id_ UUID NOT NULL,
+  seq_no_ INTEGER NOT NULL,
   tag_ TEXT NOT NULL,
-  PRIMARY KEY (article_id_, tag_),
+  PRIMARY KEY (article_id_, seq_no_),
+  UNIQUE (article_id_, tag_),
   CONSTRAINT fk_article_id_ FOREIGN KEY (article_id_) REFERENCES article_ (id_)
 );
 

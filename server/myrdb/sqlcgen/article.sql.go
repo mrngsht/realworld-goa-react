@@ -102,6 +102,7 @@ func (q *Queries) InsertArticleStats(ctx context.Context, db DBTX, arg InsertArt
 type InsertArticleTagParams struct {
 	CreatedAt time.Time
 	ArticleID uuid.UUID
+	SeqNo     int32
 	Tag       string
 }
 

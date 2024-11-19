@@ -31,6 +31,7 @@ func (r iteratorForInsertArticleTag) Values() ([]interface{}, error) {
 	return []interface{}{
 		r.rows[0].CreatedAt,
 		r.rows[0].ArticleID,
+		r.rows[0].SeqNo,
 		r.rows[0].Tag,
 	}, nil
 }
@@ -40,5 +41,5 @@ func (r iteratorForInsertArticleTag) Err() error {
 }
 
 func (q *Queries) InsertArticleTag(ctx context.Context, db DBTX, arg []InsertArticleTagParams) (int64, error) {
-	return db.CopyFrom(ctx, []string{"article_tag_"}, []string{"created_at_", "article_id_", "tag_"}, &iteratorForInsertArticleTag{rows: arg})
+	return db.CopyFrom(ctx, []string{"article_tag_"}, []string{"created_at_", "article_id_", "seq_no_", "tag_"}, &iteratorForInsertArticleTag{rows: arg})
 }

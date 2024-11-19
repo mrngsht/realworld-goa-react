@@ -15,8 +15,8 @@ VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: InsertArticleTag :copyfrom
 INSERT INTO article_tag_
-(created_at_, article_id_, tag_) 
-VALUES ($1, $2, $3);
+(created_at_, article_id_, seq_no_, tag_) 
+VALUES ($1, $2, $3, $4);
 
 -- name: InsertArticleTagMutation :exec
 INSERT INTO article_tag_mutation_

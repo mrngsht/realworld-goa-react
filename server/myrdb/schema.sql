@@ -73,6 +73,7 @@ CREATE TABLE "article_stats_" (
 CREATE TABLE "article_tag_" (
     "created_at_" timestamp with time zone NOT NULL,
     "article_id_" "uuid" NOT NULL,
+    "seq_no_" integer NOT NULL,
     "tag_" "text" NOT NULL
 );
 CREATE TABLE "article_tag_mutation_" (
@@ -148,7 +149,9 @@ ALTER TABLE ONLY "article_favorite_"
 ALTER TABLE ONLY "article_stats_"
     ADD CONSTRAINT "article_stats__pkey" PRIMARY KEY ("article_id_");
 ALTER TABLE ONLY "article_tag_"
-    ADD CONSTRAINT "article_tag__pkey" PRIMARY KEY ("article_id_", "tag_");
+    ADD CONSTRAINT "article_tag__article_id__tag__key" UNIQUE ("article_id_", "tag_");
+ALTER TABLE ONLY "article_tag_"
+    ADD CONSTRAINT "article_tag__pkey" PRIMARY KEY ("article_id_", "seq_no_");
 ALTER TABLE ONLY "enum_article_tag_"
     ADD CONSTRAINT "enum_article_tag__pkey" PRIMARY KEY ("tag_");
 ALTER TABLE ONLY "user_"

@@ -174,6 +174,7 @@ type ArticleStats struct {
 type ArticleTag struct {
 	CreatedAt time.Time
 	ArticleID uuid.UUID
+	SeqNo     int32
 	Tag       string
 }
 
