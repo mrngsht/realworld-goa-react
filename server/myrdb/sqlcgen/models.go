@@ -184,11 +184,6 @@ type ArticleTagMutation struct {
 	Tags      []byte
 }
 
-type EnumArticleTag struct {
-	CreatedAt time.Time
-	Tag       string
-}
-
 type User struct {
 	CreatedAt time.Time
 	ID        uuid.UUID

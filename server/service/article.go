@@ -50,7 +50,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 			CreatedAt:    now,
 			ArticleID:    articleID,
 			Title:        payload.Title,
-			Description:  payload.Title,
+			Description:  payload.Description,
 			Body:         payload.Body,
 			AuthorUserID: userID,
 		}); err != nil {
@@ -60,7 +60,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 			CreatedAt:    now,
 			ArticleID:    articleID,
 			Title:        payload.Title,
-			Description:  payload.Title,
+			Description:  payload.Description,
 			Body:         payload.Body,
 			AuthorUserID: userID,
 		}); err != nil {
