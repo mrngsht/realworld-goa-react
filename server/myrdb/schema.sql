@@ -68,7 +68,7 @@ CREATE TABLE "article_stats_" (
     "created_at_" timestamp with time zone NOT NULL,
     "updated_at_" timestamp with time zone NOT NULL,
     "article_id_" "uuid" NOT NULL,
-    "favorites_count_" bigint
+    "favorites_count_" bigint NOT NULL
 );
 CREATE TABLE "article_tag_" (
     "created_at_" timestamp with time zone NOT NULL,

@@ -168,7 +168,7 @@ type ArticleStats struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	ArticleID      uuid.UUID
-	FavoritesCount *int64
+	FavoritesCount int64
 }
 
 type ArticleTag struct {

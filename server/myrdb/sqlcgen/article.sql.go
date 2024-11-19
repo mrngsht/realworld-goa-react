@@ -90,7 +90,7 @@ VALUES ($3, $3, $1, $2)
 
 type InsertArticleStatsParams struct {
 	ArticleID      uuid.UUID
-	FavoritesCount *int64
+	FavoritesCount int64
 	CreatedAt      time.Time
 }
 

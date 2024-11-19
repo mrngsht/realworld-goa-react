@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS article_stats_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   updated_at_ TIMESTAMPTZ NOT NULL,
   article_id_ UUID NOT NULL,
-  favorites_count_ BIGINT NULL,
+  favorites_count_ BIGINT NOT NULL,
   PRIMARY KEY (article_id_),
   CONSTRAINT fk_article_id_ FOREIGN KEY (article_id_) REFERENCES article_ (id_)
 );
