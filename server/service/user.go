@@ -96,8 +96,6 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 		}
 	}()
 
-	q := sqlcgen.New(s.rdb)
-
 	passwordHash, err := user.GenPasswordHash([]byte(payload.Password))
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -105,7 +103,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 
 	var userID = uuid.Nil
 	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
-		q = sqlcgen.New(tx)
+		q := sqlcgen.New(tx)
 
 		now := mytime.Now(ctx)
 		newUserID := uuid.New()
@@ -208,6 +206,8 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 	now := mytime.Now(ctx)
 
 	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxDB) error {
+		q := sqlcgen.New(tx)
+
 		if payload.Email != nil {
 			if err := q.UpdateUserEmail(ctx, sqlcgen.UpdateUserEmailParams{
 				UserID:    userID,
