@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
@@ -27,23 +28,27 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 	userID := myctx.MustGetRequestUserID(ctx)
 	db := s.db
 
-	var articleID = uuid.Nil
+	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	now := mytime.Now(ctx)
+	articleID := uuid.New()
 	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
 		db := txdb
 
-		now := mytime.Now(ctx)
-		newArticleID := uuid.New()
-
 		if err := sqlcgen.Q.InsertArticle(ctx, db, sqlcgen.InsertArticleParams{
 			CreatedAt: now,
-			ID:        newArticleID,
+			ID:        articleID,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
 		if err := sqlcgen.Q.InsertArticleContent(ctx, db, sqlcgen.InsertArticleContentParams{
 			CreatedAt:    now,
-			ArticleID:    newArticleID,
+			ArticleID:    articleID,
 			Title:        payload.Title,
 			Description:  payload.Title,
 			Body:         payload.Body,
@@ -53,7 +58,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 		}
 		if err := sqlcgen.Q.InsertArticleContentMutation(ctx, db, sqlcgen.InsertArticleContentMutationParams{
 			CreatedAt:    now,
-			ArticleID:    newArticleID,
+			ArticleID:    articleID,
 			Title:        payload.Title,
 			Description:  payload.Title,
 			Body:         payload.Body,
@@ -62,15 +67,41 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 			return errors.WithStack(err)
 		}
 
+		if len(payload.TagList) > 0 {
+			tagParams := make([]sqlcgen.InsertArticleTagParams, 0, len(payload.TagList))
+			for _, tag := range payload.TagList {
+				tagParams = append(tagParams, sqlcgen.InsertArticleTagParams{
+					CreatedAt: now,
+					ArticleID: articleID,
+					Tag:       tag,
+				})
+			}
+
+			if _, err := sqlcgen.Q.InsertArticleTag(ctx, db, tagParams); err != nil {
+				return errors.WithStack(err)
+			}
+
+			tagsJson, err := json.Marshal(payload.TagList)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			if err := sqlcgen.Q.InsertArticleTagMutation(ctx, db, sqlcgen.InsertArticleTagMutationParams{
+				CreatedAt: now,
+				ArticleID: articleID,
+				Tags:      tagsJson,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+		}
+
 		if err := sqlcgen.Q.InsertArticleStats(ctx, db, sqlcgen.InsertArticleStatsParams{
 			CreatedAt:      now,
-			ArticleID:      newArticleID,
+			ArticleID:      articleID,
 			FavoritesCount: null.IntFrom(0).Ptr(),
 		}); err != nil {
 			return errors.WithStack(err)
 		}
-
-		articleID = newArticleID
 
 		return nil
 	}); err != nil {
@@ -79,7 +110,21 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 
 	return &goa.CreateResult{
 		Article: &goa.ArticleDetail{
-			ID: articleID.String(),
+			ID:             articleID.String(),
+			Title:          payload.Title,
+			Description:    payload.Description,
+			Body:           payload.Body,
+			TagList:        payload.TagList,
+			CreatedAt:      now.String(),
+			UpdatedAt:      now.String(),
+			Favorited:      false,
+			FavoritesCount: 0,
+			Author: &goa.Profile{
+				Username:  profile.Username,
+				Bio:       profile.Bio,
+				Image:     profile.Bio,
+				Following: false,
+			},
 		},
 	}, nil
 }
