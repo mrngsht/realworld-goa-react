@@ -13,6 +13,11 @@ INSERT INTO article_content_mutation_
 (created_at_, article_id_, title_, description_, body_, author_user_id_) 
 VALUES ($1, $2, $3, $4, $5, $6);
 
+-- name: InsertArticleTag :copyfrom
+INSERT INTO article_tag_
+(created_at_, article_id_, tag_) 
+VALUES ($1, $2, $3);
+
 -- name: InsertArticleTagMutation :exec
 INSERT INTO article_tag_mutation_
 (created_at_, article_id_, tags_) 

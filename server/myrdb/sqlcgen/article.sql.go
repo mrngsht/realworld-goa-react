@@ -100,6 +100,12 @@ func (q *Queries) InsertArticleStats(ctx context.Context, arg InsertArticleStats
 	return err
 }
 
+type InsertArticleTagParams struct {
+	CreatedAt time.Time
+	ArticleID uuid.UUID
+	Tag       string
+}
+
 const insertArticleTagMutation = `-- name: InsertArticleTagMutation :exec
 INSERT INTO article_tag_mutation_
 (created_at_, article_id_, tags_) 
