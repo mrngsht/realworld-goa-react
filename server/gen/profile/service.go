@@ -81,3 +81,8 @@ func MakeUserAlreadyFollowing(err error) *goa.ServiceError {
 func MakeUserNotFollowing(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "UserNotFollowing", false, false, false)
 }
+
+// MakeCannotFollowYourself builds a goa.ServiceError from an error.
+func MakeCannotFollowYourself(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "CannotFollowYourself", false, false, false)
+}

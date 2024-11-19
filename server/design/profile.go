@@ -8,6 +8,7 @@ var _ = Service("profile", func() {
 	Error(ErrorProfile_UserNotFound)
 	Error(ErrorProfile_UserAlreadyFollowing)
 	Error(ErrorProfile_UserNotFollowing)
+	Error(ErrorProfile_UserCannotFollowYourself)
 
 	Method("followUser", func() {
 		HTTP(func() {
@@ -15,6 +16,7 @@ var _ = Service("profile", func() {
 			Response(StatusOK)
 			Response(ErrorProfile_UserNotFound, StatusBadRequest)
 			Response(ErrorProfile_UserAlreadyFollowing, StatusBadRequest)
+			Response(ErrorProfile_UserCannotFollowYourself, StatusBadRequest)
 		})
 
 		Payload(func() {
@@ -54,9 +56,10 @@ var _ = Service("profile", func() {
 })
 
 const (
-	ErrorProfile_UserNotFound         = "UserNotFound"
-	ErrorProfile_UserAlreadyFollowing = "UserAlreadyFollowing"
-	ErrorProfile_UserNotFollowing     = "UserNotFollowing"
+	ErrorProfile_UserNotFound             = "UserNotFound"
+	ErrorProfile_UserAlreadyFollowing     = "UserAlreadyFollowing"
+	ErrorProfile_UserNotFollowing         = "UserNotFollowing"
+	ErrorProfile_UserCannotFollowYourself = "CannotFollowYourself"
 )
 
 var (

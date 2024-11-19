@@ -80,7 +80,7 @@ paths:
                                     image: Impedit sed non laudantium autem.
                                     username: Dolore corporis quas.
                 "400":
-                    description: 'UserAlreadyFollowing: Bad Request response.'
+                    description: 'CannotFollowYourself: Bad Request response.'
                     content:
                         application/vnd.goa.error:
                             schema:
@@ -98,7 +98,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: 38g
+                            username: aL9
             responses:
                 "200":
                     description: OK response.
@@ -133,11 +133,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Et doloremque eligendi quae excepturi.
-                                    email: Ut autem aut quas.
-                                    image: Rem est reprehenderit.
-                                    token: Ducimus et in quibusdam qui nostrum.
-                                    username: Dicta voluptatem distinctio.
+                                    bio: Rem est reprehenderit.
+                                    email: Aut quas officiis ducimus et.
+                                    image: Veritatis doloribus officiis qui.
+                                    token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
+                                    username: Et doloremque eligendi quae excepturi.
     /api/user/login:
         post:
             tags:
@@ -151,8 +151,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: cortney_jerde@auer.org
-                            password: 5ye
+                            email: dallin.auer@stamm.name
+                            password: eav
             responses:
                 "200":
                     description: OK response.
@@ -162,11 +162,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Et doloremque eligendi quae excepturi.
-                                    email: Ut autem aut quas.
-                                    image: Rem est reprehenderit.
-                                    token: Ducimus et in quibusdam qui nostrum.
-                                    username: Dicta voluptatem distinctio.
+                                    bio: Rem est reprehenderit.
+                                    email: Aut quas officiis ducimus et.
+                                    image: Veritatis doloribus officiis qui.
+                                    token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
+                                    username: Et doloremque eligendi quae excepturi.
                 "400":
                     description: 'PasswordIsIncorrect: Bad Request response.'
                     content:
@@ -186,9 +186,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/RegisterRequestBody'
                         example:
-                            email: tre.nicolas@deckowfisher.name
-                            password: poe
-                            username: 3Hz
+                            email: filiberto_adams@brekke.com
+                            password: aei
+                            username: vTPO
             responses:
                 "200":
                     description: OK response.
@@ -198,11 +198,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Et doloremque eligendi quae excepturi.
-                                    email: Ut autem aut quas.
-                                    image: Rem est reprehenderit.
-                                    token: Ducimus et in quibusdam qui nostrum.
-                                    username: Dicta voluptatem distinctio.
+                                    bio: Rem est reprehenderit.
+                                    email: Aut quas officiis ducimus et.
+                                    image: Veritatis doloribus officiis qui.
+                                    token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
+                                    username: Et doloremque eligendi quae excepturi.
                 "400":
                     description: 'EmailAlreadyUsed: Bad Request response.'
                     content:
@@ -222,11 +222,11 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateRequestBody'
                         example:
-                            bio: um2
-                            email: jennings.kihn@pagaceichmann.biz
-                            image: http://k
-                            password: qtt
-                            username: N9Iw
+                            bio: 5bk
+                            email: kallie@veum.biz
+                            image: https://jn
+                            password: w34
+                            username: MQha
             responses:
                 "200":
                     description: OK response.
@@ -236,11 +236,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Et doloremque eligendi quae excepturi.
-                                    email: Ut autem aut quas.
-                                    image: Rem est reprehenderit.
-                                    token: Ducimus et in quibusdam qui nostrum.
-                                    username: Dicta voluptatem distinctio.
+                                    bio: Rem est reprehenderit.
+                                    email: Aut quas officiis ducimus et.
+                                    image: Veritatis doloribus officiis qui.
+                                    token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
+                                    username: Et doloremque eligendi quae excepturi.
 components:
     schemas:
         ArticleDetail:
@@ -250,41 +250,40 @@ components:
                     $ref: '#/components/schemas/Profile'
                 body:
                     type: string
-                    example: Iste sit harum.
+                    example: Sed quis.
                 createdAt:
                     type: string
-                    example: "1993-06-05T14:22:19Z"
+                    example: "2006-08-07T20:29:18Z"
                     format: date-time
                 description:
                     type: string
-                    example: Voluptatibus quia dolore.
+                    example: Fugiat nostrum quis culpa.
                 favorited:
                     type: boolean
-                    example: true
+                    example: false
                 favoritesCount:
                     type: integer
-                    example: 10202101454038254246
+                    example: 13493329062390294763
                     format: int64
                 id:
                     type: string
-                    example: 106b6139-6ac9-4f1e-b152-0084e6b4d87d
+                    example: 02f28dfa-15e4-4851-b10b-0c77ef354ff5
                     format: uuid
                 tagList:
                     type: array
                     items:
                         type: string
-                        example: Provident rerum deleniti ipsa rem.
+                        example: Laudantium iste.
                     example:
-                        - Repudiandae tempora non eveniet est sapiente.
-                        - Veniam culpa esse ea ut.
-                        - Accusantium aut ut.
-                        - Maiores tempore fugiat.
+                        - Adipisci adipisci ut.
+                        - A aspernatur temporibus sapiente et.
+                        - Neque aut.
                 title:
                     type: string
-                    example: Eligendi asperiores.
+                    example: Qui accusantium aut ut eligendi maiores.
                 updatedAt:
                     type: string
-                    example: "2005-07-24T19:34:53Z"
+                    example: "1970-12-02T19:32:47Z"
                     format: date-time
             example:
                 author:
@@ -292,19 +291,17 @@ components:
                     following: true
                     image: Minima assumenda placeat sint.
                     username: Rerum sed quos ea minima labore qui.
-                body: Ratione quidem ducimus officia quia.
-                createdAt: "1996-04-22T20:03:57Z"
-                description: Nostrum maiores quaerat animi.
-                favorited: true
-                favoritesCount: 8836597987077289925
-                id: 97ac1e2b-38ef-4f06-860b-77d0e854ced5
+                body: Ab totam in placeat repudiandae modi non.
+                createdAt: "2012-02-03T01:47:24Z"
+                description: Blanditiis iste ipsum est.
+                favorited: false
+                favoritesCount: 8453761250145586171
+                id: d017719c-fae5-4cac-b61f-45539448a8eb
                 tagList:
-                    - Est delectus quisquam.
-                    - Odit natus dignissimos porro vero impedit.
-                    - Possimus blanditiis iste ipsum est.
-                    - Ab totam in placeat repudiandae modi non.
-                title: Explicabo dicta.
-                updatedAt: "2003-06-29T16:09:02Z"
+                    - Qui iusto voluptates impedit.
+                    - Nostrum earum voluptatem qui.
+                title: Impedit accusantium.
+                updatedAt: "1976-10-09T11:11:28Z"
             required:
                 - id
                 - title
@@ -321,30 +318,32 @@ components:
             properties:
                 body:
                     type: string
-                    example: Adipisci et officiis.
+                    example: Voluptas quaerat.
                 description:
                     type: string
-                    example: Quidem excepturi rerum perferendis.
+                    example: Sed aliquid eum consequatur alias.
                 tagList:
                     type: array
                     items:
                         type: string
-                        example: Deleniti quis inventore provident et sed.
+                        example: Harum sit totam saepe magnam soluta iste.
                     example:
-                        - Consequatur alias corporis voluptas quaerat explicabo harum.
-                        - Totam saepe magnam soluta iste mollitia.
                         - Et ullam exercitationem at.
+                        - Sit iste sapiente consequuntur facere ipsa voluptatem.
+                        - Enim dolore.
+                        - Minima nostrum omnis ipsam omnis qui.
                 title:
                     type: string
-                    example: "385"
+                    example: 09h
                     maxLength: 128
             example:
-                body: Enim dolore.
-                description: Facere ipsa voluptatem.
+                body: Ab iusto dicta.
+                description: Occaecati incidunt sint.
                 tagList:
-                    - Nostrum omnis ipsam omnis qui.
-                    - Asperiores sequi id consequuntur occaecati.
-                title: 8ua
+                    - Veritatis fugiat voluptatem nobis consequatur.
+                    - Quis minus unde incidunt rerum et neque.
+                    - Sint sed est.
+                title: tfe
             required:
                 - title
                 - description
@@ -401,13 +400,13 @@ components:
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: true
+                    example: false
             example:
                 fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
             required:
                 - name
@@ -421,10 +420,10 @@ components:
             properties:
                 username:
                     type: string
-                    example: Waj
+                    example: rHZot
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                username: 3Oym
+                username: yvU1
             required:
                 - username
         FollowUserResponseBody:
@@ -445,16 +444,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: arthur@cronaschinner.com
+                    example: samir@ohara.org
                     format: email
                 password:
                     type: string
-                    example: 3sr
+                    example: mkh
                     minLength: 6
                     maxLength: 128
             example:
-                email: ettie.stehr@fisher.info
-                password: wyi
+                email: pierce.auer@lockman.name
+                password: t66
             required:
                 - email
                 - password
@@ -465,11 +464,11 @@ components:
                     $ref: '#/components/schemas/User'
             example:
                 user:
-                    bio: Et doloremque eligendi quae excepturi.
-                    email: Ut autem aut quas.
-                    image: Rem est reprehenderit.
-                    token: Ducimus et in quibusdam qui nostrum.
-                    username: Dicta voluptatem distinctio.
+                    bio: Rem est reprehenderit.
+                    email: Aut quas officiis ducimus et.
+                    image: Veritatis doloribus officiis qui.
+                    token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
+                    username: Et doloremque eligendi quae excepturi.
             required:
                 - user
         Profile:
@@ -477,21 +476,21 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Ratione aperiam quam consectetur.
+                    example: Dolor dolor sapiente architecto eveniet dolor.
                 following:
                     type: boolean
                     example: true
                 image:
                     type: string
-                    example: Odit voluptas.
+                    example: Quibusdam illum voluptatibus id.
                 username:
                     type: string
-                    example: Voluptatem neque nostrum nemo porro.
+                    example: Ipsa sunt sit sunt cupiditate.
             example:
-                bio: Consequatur ratione sequi.
-                following: true
-                image: Perspiciatis velit.
-                username: Et exercitationem aut.
+                bio: Nulla iusto.
+                following: false
+                image: Laborum voluptates non accusantium repudiandae.
+                username: Optio mollitia.
             required:
                 - username
                 - bio
@@ -502,21 +501,21 @@ components:
             properties:
                 email:
                     type: string
-                    example: esmeralda@stamm.info
+                    example: ayden_zboncak@reichelwindler.org
                     format: email
                 password:
                     type: string
-                    example: nhx
+                    example: 3ww
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: kVqj
+                    example: 98f9
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                email: kamron@mcclure.name
-                password: qz0
-                username: QICTh
+                email: kavon@roob.com
+                password: fg5
+                username: XPTn
             required:
                 - username
                 - email
@@ -526,55 +525,55 @@ components:
             properties:
                 bio:
                     type: string
-                    example: bmn
+                    example: rfo
                     maxLength: 4096
                 email:
                     type: string
-                    example: barry@okeefegreenfelder.com
+                    example: zaria@maggio.com
                     format: email
                 image:
                     type: string
-                    example: https://2
+                    example: http://vp
                     pattern: ^https?://.+$
                 password:
                     type: string
-                    example: q0f
+                    example: ql0
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: 8238u
+                    example: hooaQ
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                bio: 6ak
-                email: maximo@kshlerin.org
-                image: http://yj
-                password: wev
-                username: aoKM
+                bio: m99
+                email: valentine.corwin@stammmurazik.info
+                image: https://o
+                password: yo1
+                username: zzLcT
         User:
             type: object
             properties:
                 bio:
                     type: string
-                    example: Optio sed qui.
+                    example: Non eius nemo molestiae.
                 email:
                     type: string
-                    example: Eligendi et molestiae beatae quibusdam.
+                    example: Est nam voluptatibus non optio sed.
                 image:
                     type: string
-                    example: Provident a suscipit.
+                    example: Nihil molestias repudiandae esse doloremque numquam sed.
                 token:
                     type: string
-                    example: Id rerum officiis.
+                    example: Mollitia provident a suscipit iure.
                 username:
                     type: string
-                    example: Nam voluptatibus.
+                    example: Culpa laboriosam tempora.
             example:
-                bio: Sed officia exercitationem odio praesentium illum tenetur.
-                email: Est culpa laboriosam tempora ullam.
-                image: Minus sint consequatur incidunt ut eligendi dolores.
-                token: Eius nemo.
-                username: Quasi nihil molestias repudiandae esse doloremque.
+                bio: Sit et quidem excepturi rerum.
+                email: Exercitationem odio praesentium illum tenetur repellat minus.
+                image: Non adipisci et officiis natus.
+                token: Consequatur incidunt ut eligendi.
+                username: Enim ullam.
             required:
                 - email
                 - token

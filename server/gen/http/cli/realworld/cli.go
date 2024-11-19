@@ -47,8 +47,8 @@ func UsageExamples() string {
       "username": "IB8q"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "cortney_jerde@auer.org",
-      "password": "5ye"
+      "email": "dallin.auer@stamm.name",
+      "password": "eav"
    }'` + "\n" +
 		""
 }
@@ -301,7 +301,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "38g"
+      "username": "aL9"
    }'
 `, os.Args[0])
 }
@@ -330,8 +330,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "cortney_jerde@auer.org",
-      "password": "5ye"
+      "email": "dallin.auer@stamm.name",
+      "password": "eav"
    }'
 `, os.Args[0])
 }
@@ -344,9 +344,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "tre.nicolas@deckowfisher.name",
-      "password": "poe",
-      "username": "3Hz"
+      "email": "filiberto_adams@brekke.com",
+      "password": "aei",
+      "username": "vTPO"
    }'
 `, os.Args[0])
 }
@@ -369,11 +369,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "um2",
-      "email": "jennings.kihn@pagaceichmann.biz",
-      "image": "http://k",
-      "password": "qtt",
-      "username": "N9Iw"
+      "bio": "5bk",
+      "email": "kallie@veum.biz",
+      "image": "https://jn",
+      "password": "w34",
+      "username": "MQha"
    }'
 `, os.Args[0])
 }

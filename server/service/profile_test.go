@@ -106,6 +106,17 @@ func TestProfile_FollowUser(t *testing.T) {
 		require.Error(t, err)
 		assert.Equal(t, design.ErrorProfile_UserAlreadyFollowing, servicetest.GoaServiceErrorName(err))
 	})
+
+	t.Run("user cannot follow itself", func(t *testing.T) {
+		u1 := servicetest.CreateUser(t, ctx, db)
+
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
+			Username: u1.Username,
+		})
+		require.Error(t, err)
+		assert.Equal(t, design.ErrorProfile_UserCannotFollowYourself, servicetest.GoaServiceErrorName(err))
+	})
 }
 
 func TestProfile_UnfollowUser(t *testing.T) {

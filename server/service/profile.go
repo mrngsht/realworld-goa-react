@@ -31,6 +31,8 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 				err = goa.MakeUserNotFound(err)
 			case user.ErrUserAlreadyFollowing:
 				err = goa.MakeUserAlreadyFollowing(err)
+			case user.ErrCannotFollowYourself:
+				err = goa.MakeCannotFollowYourself(err)
 			}
 		}
 	}()
@@ -44,6 +46,10 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 			return nil, user.ErrUserNotFound
 		}
 		return nil, errors.WithStack(err)
+	}
+
+	if followingProfile.UserID == requestUserID {
+		return nil, user.ErrCannotFollowYourself
 	}
 
 	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {

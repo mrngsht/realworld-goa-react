@@ -13,4 +13,5 @@ var (
 	ErrUserNotFound         = myerr.NewAppErr("user not found")
 	ErrUserAlreadyFollowing = myerr.NewAppErr("user already following")
 	ErrUserNotFollowing     = myerr.NewAppErr("user not following")
+	ErrCannotFollowYourself = myerr.NewAppErr("cannot follow yourself")
 )
