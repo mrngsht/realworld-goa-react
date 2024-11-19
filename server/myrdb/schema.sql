@@ -75,6 +75,11 @@ CREATE TABLE "article_tag_" (
     "article_id_" "uuid" NOT NULL,
     "tag_" "text" NOT NULL
 );
+CREATE TABLE "article_tag_mutation_" (
+    "created_at_" timestamp with time zone NOT NULL,
+    "article_id_" "uuid" NOT NULL,
+    "tags_" "jsonb" NOT NULL
+);
 CREATE TABLE "enum_article_tag_" (
     "created_at_" timestamp with time zone NOT NULL,
     "tag_" "text" NOT NULL
@@ -173,6 +178,8 @@ ALTER TABLE ONLY "article_content_mutation_"
 ALTER TABLE ONLY "article_deleted_"
     ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
 ALTER TABLE ONLY "article_tag_"
+    ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
+ALTER TABLE ONLY "article_tag_mutation_"
     ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");
 ALTER TABLE ONLY "article_comment_content_"
     ADD CONSTRAINT "fk_article_id_" FOREIGN KEY ("article_id_") REFERENCES "article_"("id_");

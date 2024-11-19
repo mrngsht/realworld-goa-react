@@ -117,6 +117,14 @@ CREATE TABLE IF NOT EXISTS article_tag_ (
   CONSTRAINT fk_article_id_ FOREIGN KEY (article_id_) REFERENCES article_ (id_)
 );
 
+CREATE TABLE IF NOT EXISTS article_tag_mutation_ (
+  created_at_ TIMESTAMPTZ NOT NULL,
+  article_id_ UUID NOT NULL,
+  tags_ JSONB NOT NULL,
+  CONSTRAINT fk_article_id_ FOREIGN KEY (article_id_) REFERENCES article_ (id_)
+);
+COMMENT ON COLUMN article_tag_mutation_.tags_ IS 'json array of tag(string)';
+
 CREATE TABLE IF NOT EXISTS enum_article_tag_ (
   created_at_ TIMESTAMPTZ NOT NULL,
   tag_ TEXT NOT NULL,
@@ -189,7 +197,7 @@ CREATE TABLE IF NOT EXISTS article_stats_ (
 );
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS article_stats;
+DROP TABLE IF EXISTS article_stats_;
 DROP TABLE IF EXISTS article_favorite_mutation_;
 DROP TABLE IF EXISTS article_favorite_;
 DROP TABLE IF EXISTS article_comment_deleted_;
@@ -197,6 +205,7 @@ DROP TABLE IF EXISTS article_comment_content_mutation_;
 DROP TABLE IF EXISTS article_comment_content_;
 DROP TABLE IF EXISTS article_comment_;
 DROP TABLE IF EXISTS enum_article_tag_;
+DROP TABLE IF EXISTS article_tag_mutation_;
 DROP TABLE IF EXISTS article_tag_;
 DROP TABLE IF EXISTS article_deleted_;
 DROP TABLE IF EXISTS article_content_mutation_;
