@@ -26,9 +26,9 @@ func GoaServiceErrorName(err error) string {
 	return "NOT_GOA_SERVICE_ERROR"
 }
 
-func SetRequestUser(t *testing.T, ctx context.Context, qt *sqlctest.Queries, username string) context.Context {
+func SetRequestUser(t *testing.T, ctx context.Context, db myrdb.DB, username string) context.Context {
 	t.Helper()
-	p, err := qt.GetUserProfileByUsername(ctx, username)
+	p, err := sqlctest.Q.GetUserProfileByUsername(ctx, db, username)
 	require.NoError(t, err)
 	return myctx.SetRequestUserID(ctx, p.UserID)
 }
@@ -40,18 +40,18 @@ type CreateUserResult struct {
 	ImageUrl string
 }
 
-func CreateUser(t *testing.T, ctx context.Context, rdb myrdb.Conn) CreateUserResult {
+func CreateUser(t *testing.T, ctx context.Context, db myrdb.DB) CreateUserResult {
 	t.Helper()
 
 	username := uuid.New().String()
-	_, err := service.NewUser(rdb).Register(ctx, &user.RegisterPayload{
+	_, err := service.NewUser(db).Register(ctx, &user.RegisterPayload{
 		Username: username,
 		Email:    username + "@example.com",
 		Password: "password",
 	})
 	require.NoError(t, err)
 
-	p, err := sqlctest.New(rdb).GetUserProfileByUsername(ctx, username)
+	p, err := sqlctest.Q.GetUserProfileByUsername(ctx, db, username)
 	require.NoError(t, err)
 
 	return CreateUserResult{

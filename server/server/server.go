@@ -11,11 +11,11 @@ import (
 func Run() error {
 	ctx := context.Background()
 
-	rdb, err := myrdb.OpenLocalRDB(ctx)
+	rdb, err := myrdb.OpenLocalDB(ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer rdb.Close(ctx)
+	defer rdb.Close()
 
 	endpoints := setupEndpoints(rdb)
 	mux := setupHttpServers(endpoints)

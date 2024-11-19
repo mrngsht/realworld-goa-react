@@ -14,33 +14,34 @@ import (
 )
 
 type Article struct {
-	rdb myrdb.Conn
+	db myrdb.DB
 }
 
-func NewArticle(rdb myrdb.Conn) *Article {
-	return &Article{rdb: rdb}
+func NewArticle(rdb myrdb.DB) *Article {
+	return &Article{db: rdb}
 }
 
 var _ goa.Service = &Article{}
 
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
 	userID := myctx.MustGetRequestUserID(ctx)
+	db := s.db
 
 	var articleID = uuid.Nil
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
-		q := sqlcgen.New(tx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
 
 		now := mytime.Now(ctx)
 		newArticleID := uuid.New()
 
-		if err := q.InsertArticle(ctx, sqlcgen.InsertArticleParams{
+		if err := sqlcgen.Q.InsertArticle(ctx, db, sqlcgen.InsertArticleParams{
 			CreatedAt: now,
 			ID:        newArticleID,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertArticleContent(ctx, sqlcgen.InsertArticleContentParams{
+		if err := sqlcgen.Q.InsertArticleContent(ctx, db, sqlcgen.InsertArticleContentParams{
 			CreatedAt:    now,
 			ArticleID:    newArticleID,
 			Title:        payload.Title,
@@ -50,7 +51,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 		}); err != nil {
 			return errors.WithStack(err)
 		}
-		if err := q.InsertArticleContentMutation(ctx, sqlcgen.InsertArticleContentMutationParams{
+		if err := sqlcgen.Q.InsertArticleContentMutation(ctx, db, sqlcgen.InsertArticleContentMutationParams{
 			CreatedAt:    now,
 			ArticleID:    newArticleID,
 			Title:        payload.Title,
@@ -61,7 +62,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertArticleStats(ctx, sqlcgen.InsertArticleStatsParams{
+		if err := sqlcgen.Q.InsertArticleStats(ctx, db, sqlcgen.InsertArticleStatsParams{
 			CreatedAt:      now,
 			ArticleID:      newArticleID,
 			FavoritesCount: null.IntFrom(0).Ptr(),

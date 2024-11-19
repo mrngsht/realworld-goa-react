@@ -23,8 +23,8 @@ type InsertArticleParams struct {
 	ID        uuid.UUID
 }
 
-func (q *Queries) InsertArticle(ctx context.Context, arg InsertArticleParams) error {
-	_, err := q.db.Exec(ctx, insertArticle, arg.CreatedAt, arg.ID)
+func (q *Queries) InsertArticle(ctx context.Context, db DBTX, arg InsertArticleParams) error {
+	_, err := db.Exec(ctx, insertArticle, arg.CreatedAt, arg.ID)
 	return err
 }
 
@@ -43,8 +43,8 @@ type InsertArticleContentParams struct {
 	CreatedAt    time.Time
 }
 
-func (q *Queries) InsertArticleContent(ctx context.Context, arg InsertArticleContentParams) error {
-	_, err := q.db.Exec(ctx, insertArticleContent,
+func (q *Queries) InsertArticleContent(ctx context.Context, db DBTX, arg InsertArticleContentParams) error {
+	_, err := db.Exec(ctx, insertArticleContent,
 		arg.ArticleID,
 		arg.Title,
 		arg.Description,
@@ -70,8 +70,8 @@ type InsertArticleContentMutationParams struct {
 	AuthorUserID uuid.UUID
 }
 
-func (q *Queries) InsertArticleContentMutation(ctx context.Context, arg InsertArticleContentMutationParams) error {
-	_, err := q.db.Exec(ctx, insertArticleContentMutation,
+func (q *Queries) InsertArticleContentMutation(ctx context.Context, db DBTX, arg InsertArticleContentMutationParams) error {
+	_, err := db.Exec(ctx, insertArticleContentMutation,
 		arg.CreatedAt,
 		arg.ArticleID,
 		arg.Title,
@@ -94,8 +94,8 @@ type InsertArticleStatsParams struct {
 	CreatedAt      time.Time
 }
 
-func (q *Queries) InsertArticleStats(ctx context.Context, arg InsertArticleStatsParams) error {
-	_, err := q.db.Exec(ctx, insertArticleStats, arg.ArticleID, arg.FavoritesCount, arg.CreatedAt)
+func (q *Queries) InsertArticleStats(ctx context.Context, db DBTX, arg InsertArticleStatsParams) error {
+	_, err := db.Exec(ctx, insertArticleStats, arg.ArticleID, arg.FavoritesCount, arg.CreatedAt)
 	return err
 }
 
@@ -117,7 +117,7 @@ type InsertArticleTagMutationParams struct {
 	Tags      []byte
 }
 
-func (q *Queries) InsertArticleTagMutation(ctx context.Context, arg InsertArticleTagMutationParams) error {
-	_, err := q.db.Exec(ctx, insertArticleTagMutation, arg.CreatedAt, arg.ArticleID, arg.Tags)
+func (q *Queries) InsertArticleTagMutation(ctx context.Context, db DBTX, arg InsertArticleTagMutationParams) error {
+	_, err := db.Exec(ctx, insertArticleTagMutation, arg.CreatedAt, arg.ArticleID, arg.Tags)
 	return err
 }

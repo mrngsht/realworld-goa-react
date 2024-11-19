@@ -9,6 +9,7 @@ import (
 	goa "github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest"
+	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
 	"github.com/mrngsht/realworld-goa-react/mytime/mytimetest"
 	"github.com/mrngsht/realworld-goa-react/service"
 	"github.com/mrngsht/realworld-goa-react/service/servicetest"
@@ -18,9 +19,9 @@ import (
 
 func TestUser_Login(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, _ := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewUser(rdb)
+	svc := service.NewUser(db)
 
 	t.Run("succeed", func(t *testing.T) {
 		registerPayload := &goa.RegisterPayload{
@@ -85,9 +86,9 @@ func TestUser_Login(t *testing.T) {
 
 func TestUser_Register(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewUser(rdb)
+	svc := service.NewUser(db)
 
 	t.Run("succeed", func(t *testing.T) {
 		executedAt := mytimetest.AdjustTimeForTest(time.Now())
@@ -106,13 +107,13 @@ func TestUser_Register(t *testing.T) {
 		assert.Equal(t, "", res.User.Bio)
 		assert.Equal(t, "", res.User.Image)
 
-		p, err := qt.GetUserProfileByUsername(ctx, payload.Username)
+		p, err := sqlctest.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 		require.NoError(t, err)
 		assert.Equal(t, "", p.Bio)
 		assert.Equal(t, "", p.ImageUrl)
 		assert.Equal(t, executedAt, p.CreatedAt)
 
-		pms, err := qt.ListUserProfileMutationByUserID(ctx, p.UserID)
+		pms, err := sqlctest.Q.ListUserProfileMutationByUserID(ctx, db, p.UserID)
 		require.NoError(t, err)
 		require.Len(t, pms, 1)
 		pm := pms[0]
@@ -121,19 +122,19 @@ func TestUser_Register(t *testing.T) {
 		assert.Equal(t, "", pm.ImageUrl)
 		assert.Equal(t, executedAt, pm.CreatedAt)
 
-		e, err := qt.GetUserEmailByID(ctx, p.UserID)
+		e, err := sqlctest.Q.GetUserEmailByID(ctx, db, p.UserID)
 		require.NoError(t, err)
 		assert.Equal(t, payload.Email, e.Email)
 		assert.Equal(t, executedAt, e.CreatedAt)
 
-		ems, err := qt.ListUserEmailMutationByUserID(ctx, p.UserID)
+		ems, err := sqlctest.Q.ListUserEmailMutationByUserID(ctx, db, p.UserID)
 		require.NoError(t, err)
 		require.Len(t, ems, 1)
 		em := ems[0]
 		assert.Equal(t, payload.Email, em.Email)
 		assert.Equal(t, executedAt, em.CreatedAt)
 
-		u, err := qt.GetUserByID(ctx, p.UserID)
+		u, err := sqlctest.Q.GetUserByID(ctx, db, p.UserID)
 		require.NoError(t, err)
 		assert.Equal(t, executedAt, u.CreatedAt)
 	})
@@ -159,7 +160,7 @@ func TestUser_Register(t *testing.T) {
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUser_UsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
-			_, err = qt.GetUserEmailByEmail(ctx, payload.Email)
+			_, err = sqlctest.Q.GetUserEmailByEmail(ctx, db, payload.Email)
 			require.Error(t, err)
 			assert.True(t, myrdb.IsErrNoRows(err))
 		}
@@ -186,7 +187,7 @@ func TestUser_Register(t *testing.T) {
 			require.Error(t, err)
 			assert.Equal(t, design.ErrorUser_EmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
 
-			_, err = qt.GetUserProfileByUsername(ctx, payload.Username)
+			_, err = sqlctest.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 			require.Error(t, err)
 			assert.True(t, myrdb.IsErrNoRows(err))
 		}
@@ -195,9 +196,9 @@ func TestUser_Register(t *testing.T) {
 
 func TestUser_GetCurrentUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewUser(rdb)
+	svc := service.NewUser(db)
 
 	t.Run("succeed", func(t *testing.T) {
 		registerPayload := &goa.RegisterPayload{
@@ -208,7 +209,7 @@ func TestUser_GetCurrentUser(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		res, err := svc.GetCurrent(ctx) // Act
 		require.NoError(t, err)
@@ -223,9 +224,9 @@ func TestUser_GetCurrentUser(t *testing.T) {
 
 func TestUser_Update(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewUser(rdb)
+	svc := service.NewUser(db)
 
 	t.Run("update all", func(t *testing.T) {
 		registerPayload := &goa.RegisterPayload{
@@ -242,7 +243,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: null.StringFrom("update_all").Ptr(),
@@ -291,7 +292,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -334,7 +335,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -383,7 +384,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -426,7 +427,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, qt, registerPayload.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
 
 		res, err := svc.Update(ctx, &goa.UpdatePayload{}) // Act
 		require.NoError(t, err)

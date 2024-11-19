@@ -13,40 +13,40 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func OpenLocalRDB(ctx context.Context) (conn, error) {
+func OpenLocalDB(ctx context.Context) (db, error) {
 	cfg, err := pgxpool.ParseConfig(config.C.RDBConnectionString)
 	if err != nil {
-		return conn{}, errors.WithStack(err)
+		return db{}, errors.WithStack(err)
 	}
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
-		return conn{}, errors.WithStack(err)
+		return db{}, errors.WithStack(err)
 	}
-	return conn{pool}, nil
+	return db{pool}, nil
 }
 
-type conn struct {
-	*pgxpool.Pool // use pool as connection because we don't need the queries to run on the same connection except the transaction.
+type db struct {
+	*pgxpool.Pool // use pool as rdb because we don't need the queries to run on the same connection except the transaction.
 }
 
-var _ Conn = (*conn)(nil)
+var _ DB = (*db)(nil)
 
-func (r conn) BeginTx(ctx context.Context, opts pgx.TxOptions) (TxConn, error) {
+func (r db) BeginTx(ctx context.Context, opts pgx.TxOptions) (TxDB, error) {
 	return r.Pool.BeginTx(ctx, opts)
 }
 
-type Conn interface {
+type DB interface {
 	sqlcgen.DBTX
-	BeginTx(context.Context, pgx.TxOptions) (TxConn, error)
+	BeginTx(context.Context, pgx.TxOptions) (TxDB, error)
 }
 
-type TxConn interface {
+type TxDB interface {
 	sqlcgen.DBTX
 	Rollback(context.Context) error
 	Commit(context.Context) error
 }
 
-func Tx(ctx context.Context, db Conn, txFunc func(context.Context, TxConn) error) (err error) {
+func Tx(ctx context.Context, db DB, txFunc func(context.Context, TxDB) error) (err error) {
 	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return errors.WithStack(err)

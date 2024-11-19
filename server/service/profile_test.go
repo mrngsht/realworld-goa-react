@@ -16,15 +16,15 @@ import (
 
 func TestProfile_FollowUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewProfile(rdb)
+	svc := service.NewProfile(db)
 
 	t.Run("succeed", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
-		u2 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
+		u2 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		res, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: u2.Username,
 		})
@@ -35,13 +35,13 @@ func TestProfile_FollowUser(t *testing.T) {
 		assert.Equal(t, u2.ImageUrl, res.Profile.Image)
 		assert.Equal(t, true, res.Profile.Following)
 
-		fs, err := qt.ListUserFollowByUserID(ctx, u1.UserID)
+		fs, err := sqlctest.Q.ListUserFollowByUserID(ctx, db, u1.UserID)
 		require.NoError(t, err)
 
 		require.Len(t, fs, 1)
 		assert.Equal(t, u2.UserID, fs[0].FollowedUserID)
 
-		ms, err := qt.ListUserFollowMutationByUserID(ctx, u1.UserID)
+		ms, err := sqlctest.Q.ListUserFollowMutationByUserID(ctx, db, u1.UserID)
 		require.NoError(t, err)
 
 		require.Len(t, ms, 1)
@@ -50,18 +50,18 @@ func TestProfile_FollowUser(t *testing.T) {
 	})
 
 	t.Run("mutual follow", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
-		u2 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
+		u2 := servicetest.CreateUser(t, ctx, db)
 
 		// u1 -> u2
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: u2.Username,
 		})
 		require.NoError(t, err)
 
 		// u2 -> u1
-		ctx = servicetest.SetRequestUser(t, ctx, qt, u2.Username)
+		ctx = servicetest.SetRequestUser(t, ctx, db, u2.Username)
 		res, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: u1.Username,
 		})
@@ -70,7 +70,7 @@ func TestProfile_FollowUser(t *testing.T) {
 		assert.Equal(t, u1.Username, res.Profile.Username)
 		assert.Equal(t, true, res.Profile.Following)
 
-		fs, err := qt.ListUserFollowByUserID(ctx, u2.UserID)
+		fs, err := sqlctest.Q.ListUserFollowByUserID(ctx, db, u2.UserID)
 		require.NoError(t, err)
 
 		require.Len(t, fs, 1)
@@ -78,9 +78,9 @@ func TestProfile_FollowUser(t *testing.T) {
 	})
 
 	t.Run("user not found", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: "WRONG_USERNAME",
 		})
@@ -89,11 +89,11 @@ func TestProfile_FollowUser(t *testing.T) {
 	})
 
 	t.Run("user already following", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
-		u2 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
+		u2 := servicetest.CreateUser(t, ctx, db)
 
 		// 1st
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: u2.Username,
 		})
@@ -110,13 +110,13 @@ func TestProfile_FollowUser(t *testing.T) {
 
 func TestProfile_UnfollowUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	rdb, _, qt := rdbtest.CreateRDB(t, ctx)
+	db := rdbtest.CreateDB(t, ctx)
 
-	svc := service.NewProfile(rdb)
+	svc := service.NewProfile(db)
 
 	follow := func(t *testing.T, ctx context.Context, usernameFrom, usernameTo string) {
 		t.Helper()
-		ctx = servicetest.SetRequestUser(t, ctx, qt, usernameFrom)
+		ctx = servicetest.SetRequestUser(t, ctx, db, usernameFrom)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: usernameTo,
 		})
@@ -124,16 +124,16 @@ func TestProfile_UnfollowUser(t *testing.T) {
 	}
 
 	t.Run("succeed", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
-		u2 := servicetest.CreateUser(t, ctx, rdb)
-		u3 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
+		u2 := servicetest.CreateUser(t, ctx, db)
+		u3 := servicetest.CreateUser(t, ctx, db)
 
 		follow(t, ctx, u1.Username, u2.Username)
 		follow(t, ctx, u1.Username, u3.Username)
 		follow(t, ctx, u2.Username, u3.Username)
 		follow(t, ctx, u3.Username, u1.Username)
 
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		res, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: u3.Username,
 		})
@@ -145,13 +145,13 @@ func TestProfile_UnfollowUser(t *testing.T) {
 		assert.Equal(t, false, res.Profile.Following)
 
 		{
-			fs, err := qt.ListUserFollowByUserID(ctx, u1.UserID)
+			fs, err := sqlctest.Q.ListUserFollowByUserID(ctx, db, u1.UserID)
 			require.NoError(t, err)
 
 			require.Len(t, fs, 1)
 			assert.Equal(t, u2.UserID, fs[0].FollowedUserID)
 
-			ms, err := qt.ListUserFollowMutationByUserID(ctx, u1.UserID)
+			ms, err := sqlctest.Q.ListUserFollowMutationByUserID(ctx, db, u1.UserID)
 			require.NoError(t, err)
 
 			require.Len(t, ms, 3)
@@ -160,14 +160,14 @@ func TestProfile_UnfollowUser(t *testing.T) {
 			assert.Equal(t, sqlctest.UserFollowMutationTypeUnfollow, latest.Type)
 		}
 		{
-			fs, err := qt.ListUserFollowByUserID(ctx, u2.UserID)
+			fs, err := sqlctest.Q.ListUserFollowByUserID(ctx, db, u2.UserID)
 			require.NoError(t, err)
 
 			require.Len(t, fs, 1)
 			assert.Equal(t, u3.UserID, fs[0].FollowedUserID)
 		}
 		{
-			fs, err := qt.ListUserFollowByUserID(ctx, u3.UserID)
+			fs, err := sqlctest.Q.ListUserFollowByUserID(ctx, db, u3.UserID)
 			require.NoError(t, err)
 
 			require.Len(t, fs, 1)
@@ -176,9 +176,9 @@ func TestProfile_UnfollowUser(t *testing.T) {
 	})
 
 	t.Run("user not found", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		_, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: "WRONG_USERNAME",
 		})
@@ -187,12 +187,12 @@ func TestProfile_UnfollowUser(t *testing.T) {
 	})
 
 	t.Run("user not following", func(t *testing.T) {
-		u1 := servicetest.CreateUser(t, ctx, rdb)
-		u2 := servicetest.CreateUser(t, ctx, rdb)
+		u1 := servicetest.CreateUser(t, ctx, db)
+		u2 := servicetest.CreateUser(t, ctx, db)
 
 		// u1 is not following u2
 
-		ctx := servicetest.SetRequestUser(t, ctx, qt, u1.Username)
+		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
 		_, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: u2.Username,
 		})

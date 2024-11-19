@@ -14,11 +14,11 @@ import (
 )
 
 type Profile struct {
-	rdb myrdb.Conn
+	db myrdb.DB
 }
 
-func NewProfile(rdb myrdb.Conn) *Profile {
-	return &Profile{rdb: rdb}
+func NewProfile(rdb myrdb.DB) *Profile {
+	return &Profile{db: rdb}
 }
 
 var _ goa.Service = &Profile{}
@@ -35,10 +35,10 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 		}
 	}()
 
-	q := sqlcgen.New(s.rdb)
+	db := s.db
 	requestUserID := myctx.MustGetRequestUserID(ctx)
 
-	followingProfile, err := q.GetUserProfileByUsername(ctx, payload.Username)
+	followingProfile, err := sqlcgen.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 	if err != nil {
 		if myrdb.IsErrNoRows(err) {
 			return nil, user.ErrUserNotFound
@@ -46,11 +46,11 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 		return nil, errors.WithStack(err)
 	}
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
-		q = sqlcgen.New(tx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
 		now := mytime.Now(ctx)
 
-		if err := q.InsertUserFollow(ctx, sqlcgen.InsertUserFollowParams{
+		if err := sqlcgen.Q.InsertUserFollow(ctx, db, sqlcgen.InsertUserFollowParams{
 			CreatedAt:      now,
 			UserID:         requestUserID,
 			FollowedUserID: followingProfile.UserID,
@@ -61,7 +61,7 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertUserFollowMutation(ctx, sqlcgen.InsertUserFollowMutationParams{
+		if err := sqlcgen.Q.InsertUserFollowMutation(ctx, db, sqlcgen.InsertUserFollowMutationParams{
 			CreatedAt:      now,
 			UserID:         requestUserID,
 			FollowedUserID: followingProfile.UserID,
@@ -97,10 +97,10 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 		}
 	}()
 
-	q := sqlcgen.New(s.rdb)
+	db := s.db
 	requestUserID := myctx.MustGetRequestUserID(ctx)
 
-	followingProfile, err := q.GetUserProfileByUsername(ctx, payload.Username)
+	followingProfile, err := sqlcgen.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 	if err != nil {
 		if myrdb.IsErrNoRows(err) {
 			return nil, user.ErrUserNotFound
@@ -108,11 +108,11 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 		return nil, errors.WithStack(err)
 	}
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
-		q = sqlcgen.New(tx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
 		now := mytime.Now(ctx)
 
-		rowsAffected, err := q.DeleteUserFollow(ctx, sqlcgen.DeleteUserFollowParams{
+		rowsAffected, err := sqlcgen.Q.DeleteUserFollow(ctx, db, sqlcgen.DeleteUserFollowParams{
 			UserID:         requestUserID,
 			FollowedUserID: followingProfile.UserID,
 		})
@@ -123,7 +123,7 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 			return user.ErrUserNotFollowing
 		}
 
-		if err := q.InsertUserFollowMutation(ctx, sqlcgen.InsertUserFollowMutationParams{
+		if err := sqlcgen.Q.InsertUserFollowMutation(ctx, db, sqlcgen.InsertUserFollowMutationParams{
 			CreatedAt:      now,
 			UserID:         requestUserID,
 			FollowedUserID: followingProfile.UserID,

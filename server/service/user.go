@@ -16,11 +16,11 @@ import (
 )
 
 type User struct {
-	rdb myrdb.Conn
+	db myrdb.DB
 }
 
-func NewUser(rdb myrdb.Conn) *User {
-	return &User{rdb: rdb}
+func NewUser(rdb myrdb.DB) *User {
+	return &User{db: rdb}
 }
 
 var _ goa.Service = &User{}
@@ -37,9 +37,9 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 		}
 	}()
 
-	q := sqlcgen.New(s.rdb)
+	db := s.db
 
-	userID, err := q.GetUserIDByEmail(ctx, payload.Email)
+	userID, err := sqlcgen.Q.GetUserIDByEmail(ctx, db, payload.Email)
 	if err != nil {
 		if myrdb.IsErrNoRows(err) {
 			return nil, user.ErrEmailNotFound
@@ -47,7 +47,7 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 		return nil, errors.WithStack(err)
 	}
 
-	storedPasswordHash, err := q.GetPasswordHashByUserID(ctx, userID)
+	storedPasswordHash, err := sqlcgen.Q.GetPasswordHashByUserID(ctx, db, userID)
 	if err != nil {
 		// handle ErrNoRows as internal server error
 		return nil, errors.WithStack(err)
@@ -67,7 +67,7 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 		return nil, errors.WithStack(err)
 	}
 
-	profile, err := q.GetUserProfileByUserID(ctx, userID)
+	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
 	if err != nil {
 		// handle ErrNoRows as internal server error
 		return nil, errors.WithStack(err)
@@ -102,20 +102,20 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 	}
 
 	var userID = uuid.Nil
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
-		q := sqlcgen.New(tx)
+	if err := myrdb.Tx(ctx, s.db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
 
 		now := mytime.Now(ctx)
 		newUserID := uuid.New()
 
-		if err := q.InsertUser(ctx, sqlcgen.InsertUserParams{
+		if err := sqlcgen.Q.InsertUser(ctx, db, sqlcgen.InsertUserParams{
 			CreatedAt: now,
 			ID:        newUserID,
 		}); err != nil {
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertUserProfile(ctx, sqlcgen.InsertUserProfileParams{
+		if err := sqlcgen.Q.InsertUserProfile(ctx, db, sqlcgen.InsertUserProfileParams{
 			UserID:    newUserID,
 			Username:  payload.Username,
 			Bio:       "",
@@ -127,7 +127,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			}
 			return errors.WithStack(err)
 		}
-		if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
+		if err := sqlcgen.Q.InsertUserProfileMutation(ctx, db, sqlcgen.InsertUserProfileMutationParams{
 			UserID:    newUserID,
 			Username:  payload.Username,
 			Bio:       "",
@@ -137,7 +137,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertUserEmail(ctx, sqlcgen.InsertUserEmailParams{
+		if err := sqlcgen.Q.InsertUserEmail(ctx, db, sqlcgen.InsertUserEmailParams{
 			UserID:    newUserID,
 			Email:     payload.Email,
 			CreatedAt: now,
@@ -147,7 +147,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			}
 			return errors.WithStack(err)
 		}
-		if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{
+		if err := sqlcgen.Q.InsertUserEmailMutation(ctx, db, sqlcgen.InsertUserEmailMutationParams{
 			UserID:    newUserID,
 			Email:     payload.Email,
 			CreatedAt: now,
@@ -155,7 +155,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 			return errors.WithStack(err)
 		}
 
-		if err := q.InsertUserAuthPassword(ctx, sqlcgen.InsertUserAuthPasswordParams{
+		if err := sqlcgen.Q.InsertUserAuthPassword(ctx, db, sqlcgen.InsertUserAuthPasswordParams{
 			UserID:       newUserID,
 			PasswordHash: string(passwordHash),
 			CreatedAt:    now,
@@ -187,11 +187,9 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 }
 
 func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
-	q := sqlcgen.New(s.rdb)
-
 	userID := myctx.MustGetRequestUserID(ctx)
 
-	user, err := s.getUserByUserID(ctx, q, userID)
+	user, err := s.getUserByUserID(ctx, s.db, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -200,16 +198,15 @@ func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 }
 
 func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
-	q := sqlcgen.New(s.rdb)
-
 	userID := myctx.MustGetRequestUserID(ctx)
 	now := mytime.Now(ctx)
+	db := s.db
 
-	if err := myrdb.Tx(ctx, s.rdb, func(ctx context.Context, tx myrdb.TxConn) error {
-		q := sqlcgen.New(tx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
 
 		if payload.Email != nil {
-			if err := q.UpdateUserEmail(ctx, sqlcgen.UpdateUserEmailParams{
+			if err := sqlcgen.Q.UpdateUserEmail(ctx, db, sqlcgen.UpdateUserEmailParams{
 				UserID:    userID,
 				UpdatedAt: now,
 				Email:     *payload.Email,
@@ -217,7 +214,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 				return errors.WithStack(err)
 			}
 
-			if err := q.InsertUserEmailMutation(ctx, sqlcgen.InsertUserEmailMutationParams{
+			if err := sqlcgen.Q.InsertUserEmailMutation(ctx, db, sqlcgen.InsertUserEmailMutationParams{
 				UserID:    userID,
 				Email:     *payload.Email,
 				CreatedAt: now,
@@ -231,7 +228,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			if err := q.UpdateUserAuthPasswordHash(ctx, sqlcgen.UpdateUserAuthPasswordHashParams{
+			if err := sqlcgen.Q.UpdateUserAuthPasswordHash(ctx, db, sqlcgen.UpdateUserAuthPasswordHashParams{
 				UserID:       userID,
 				UpdatedAt:    now,
 				PasswordHash: string(passwordHash),
@@ -241,7 +238,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 		}
 
 		if payload.Username != nil || payload.Bio != nil || payload.Image != nil {
-			current, err := q.GetUserProfileByUserID(ctx, userID)
+			current, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -264,10 +261,10 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 				param.ImageUrl = *payload.Image
 			}
 
-			if err := q.UpdateUserProfile(ctx, param); err != nil {
+			if err := sqlcgen.Q.UpdateUserProfile(ctx, db, param); err != nil {
 				return errors.WithStack(err)
 			}
-			if err := q.InsertUserProfileMutation(ctx, sqlcgen.InsertUserProfileMutationParams{
+			if err := sqlcgen.Q.InsertUserProfileMutation(ctx, db, sqlcgen.InsertUserProfileMutationParams{
 				CreatedAt: now,
 				UserID:    userID,
 				Username:  param.Username,
@@ -283,7 +280,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 		return nil, errors.WithStack(err)
 	}
 
-	user, err := s.getUserByUserID(ctx, q, userID)
+	user, err := s.getUserByUserID(ctx, db, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -291,14 +288,14 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 	return &goa.UpdateResult{User: user}, nil
 }
 
-func (s *User) getUserByUserID(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID) (*goa.User, error) {
-	email, err := q.GetUserEmailByUserID(ctx, userID)
+func (s *User) getUserByUserID(ctx context.Context, db myrdb.DB, userID uuid.UUID) (*goa.User, error) {
+	email, err := sqlcgen.Q.GetUserEmailByUserID(ctx, db, userID)
 	if err != nil {
 		// handle ErrNoRows as internal server error
 		return nil, errors.WithStack(err)
 	}
 
-	profile, err := q.GetUserProfileByUserID(ctx, userID)
+	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
 	if err != nil {
 		// handle ErrNoRows as internal server error
 		return nil, errors.WithStack(err)

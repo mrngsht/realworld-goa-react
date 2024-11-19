@@ -39,6 +39,6 @@ func (r iteratorForInsertArticleTag) Err() error {
 	return nil
 }
 
-func (q *Queries) InsertArticleTag(ctx context.Context, arg []InsertArticleTagParams) (int64, error) {
-	return q.db.CopyFrom(ctx, []string{"article_tag_"}, []string{"created_at_", "article_id_", "tag_"}, &iteratorForInsertArticleTag{rows: arg})
+func (q *Queries) InsertArticleTag(ctx context.Context, db DBTX, arg []InsertArticleTagParams) (int64, error) {
+	return db.CopyFrom(ctx, []string{"article_tag_"}, []string{"created_at_", "article_id_", "tag_"}, &iteratorForInsertArticleTag{rows: arg})
 }

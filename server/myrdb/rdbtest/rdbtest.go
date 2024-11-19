@@ -10,14 +10,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
-	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
-	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 )
 
-func CreateRDB(t *testing.T, ctx context.Context) (*testdb, *sqlcgen.Queries, *sqlctest.Queries) {
+func CreateDB(t *testing.T, ctx context.Context) *testdb {
 	t.Helper()
 
-	db, err := myrdb.OpenLocalRDB(ctx)
+	db, err := myrdb.OpenLocalDB(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +32,7 @@ func CreateRDB(t *testing.T, ctx context.Context) (*testdb, *sqlcgen.Queries, *s
 		db.Pool.Close()
 	})
 
-	return &testdb{Tx: tx, savePointName: uuid.New().String()}, sqlcgen.New(tx), sqlctest.New(tx)
+	return &testdb{Tx: tx, savePointName: uuid.New().String()}
 }
 
 type testdb struct {
@@ -43,10 +41,10 @@ type testdb struct {
 	savePointName string
 }
 
-var _ myrdb.Conn = (*testdb)(nil)
-var _ myrdb.TxConn = (*testdb)(nil)
+var _ myrdb.DB = (*testdb)(nil)
+var _ myrdb.TxDB = (*testdb)(nil)
 
-func (t *testdb) BeginTx(ctx context.Context, _ pgx.TxOptions) (myrdb.TxConn, error) {
+func (t *testdb) BeginTx(ctx context.Context, _ pgx.TxOptions) (myrdb.TxDB, error) {
 	_, err := t.Exec(ctx, fmt.Sprintf(`SAVEPOINT "%s"`, t.savePointName))
 	if err != nil {
 		return nil, errors.WithStack(err)

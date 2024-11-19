@@ -17,8 +17,8 @@ WHERE user_id_ = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserAuthPasswordByUserID(ctx context.Context, userID uuid.UUID) (UserAuthPassword, error) {
-	row := q.db.QueryRow(ctx, getUserAuthPasswordByUserID, userID)
+func (q *Queries) GetUserAuthPasswordByUserID(ctx context.Context, db DBTX, userID uuid.UUID) (UserAuthPassword, error) {
+	row := db.QueryRow(ctx, getUserAuthPasswordByUserID, userID)
 	var i UserAuthPassword
 	err := row.Scan(
 		&i.CreatedAt,
@@ -35,8 +35,8 @@ WHERE id_ = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, id)
+func (q *Queries) GetUserByID(ctx context.Context, db DBTX, id uuid.UUID) (User, error) {
+	row := db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(&i.CreatedAt, &i.ID)
 	return i, err
@@ -48,8 +48,8 @@ WHERE email_ = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserEmailByEmail(ctx context.Context, email string) (UserEmail, error) {
-	row := q.db.QueryRow(ctx, getUserEmailByEmail, email)
+func (q *Queries) GetUserEmailByEmail(ctx context.Context, db DBTX, email string) (UserEmail, error) {
+	row := db.QueryRow(ctx, getUserEmailByEmail, email)
 	var i UserEmail
 	err := row.Scan(
 		&i.CreatedAt,
@@ -66,8 +66,8 @@ WHERE user_id_ = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserEmailByID(ctx context.Context, userID uuid.UUID) (UserEmail, error) {
-	row := q.db.QueryRow(ctx, getUserEmailByID, userID)
+func (q *Queries) GetUserEmailByID(ctx context.Context, db DBTX, userID uuid.UUID) (UserEmail, error) {
+	row := db.QueryRow(ctx, getUserEmailByID, userID)
 	var i UserEmail
 	err := row.Scan(
 		&i.CreatedAt,
@@ -84,8 +84,8 @@ WHERE username_ = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string) (UserProfile, error) {
-	row := q.db.QueryRow(ctx, getUserProfileByUsername, username)
+func (q *Queries) GetUserProfileByUsername(ctx context.Context, db DBTX, username string) (UserProfile, error) {
+	row := db.QueryRow(ctx, getUserProfileByUsername, username)
 	var i UserProfile
 	err := row.Scan(
 		&i.CreatedAt,
@@ -104,8 +104,8 @@ WHERE user_id_ = $1
 ORDER BY created_at_ ASC
 `
 
-func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserEmailMutation, error) {
-	rows, err := q.db.Query(ctx, listUserEmailMutationByUserID, userID)
+func (q *Queries) ListUserEmailMutationByUserID(ctx context.Context, db DBTX, userID uuid.UUID) ([]UserEmailMutation, error) {
+	rows, err := db.Query(ctx, listUserEmailMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ WHERE user_id_ = $1
 ORDER BY created_at_ ASC
 `
 
-func (q *Queries) ListUserFollowByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollow, error) {
-	rows, err := q.db.Query(ctx, listUserFollowByUserID, userID)
+func (q *Queries) ListUserFollowByUserID(ctx context.Context, db DBTX, userID uuid.UUID) ([]UserFollow, error) {
+	rows, err := db.Query(ctx, listUserFollowByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +156,8 @@ WHERE user_id_ = $1
 ORDER BY created_at_ ASC
 `
 
-func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserFollowMutation, error) {
-	rows, err := q.db.Query(ctx, listUserFollowMutationByUserID, userID)
+func (q *Queries) ListUserFollowMutationByUserID(ctx context.Context, db DBTX, userID uuid.UUID) ([]UserFollowMutation, error) {
+	rows, err := db.Query(ctx, listUserFollowMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -187,8 +187,8 @@ WHERE user_id_ = $1
 ORDER BY created_at_ ASC
 `
 
-func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, userID uuid.UUID) ([]UserProfileMutation, error) {
-	rows, err := q.db.Query(ctx, listUserProfileMutationByUserID, userID)
+func (q *Queries) ListUserProfileMutationByUserID(ctx context.Context, db DBTX, userID uuid.UUID) ([]UserProfileMutation, error) {
+	rows, err := db.Query(ctx, listUserProfileMutationByUserID, userID)
 	if err != nil {
 		return nil, err
 	}

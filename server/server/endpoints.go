@@ -13,7 +13,7 @@ type endpoints struct {
 	Profile *profile.Endpoints
 }
 
-func setupEndpoints(rdb myrdb.RDB) *endpoints {
+func setupEndpoints(rdb myrdb.DB) *endpoints {
 	return &endpoints{
 		User:    setupEndpoint(user.NewEndpoints(service.NewUser(rdb))),
 		Profile: setupEndpoint(profile.NewEndpoints(service.NewProfile(rdb))),
