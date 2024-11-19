@@ -6,7 +6,6 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
-	"github.com/guregu/null"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
 	"github.com/mrngsht/realworld-goa-react/myctx"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
@@ -99,7 +98,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 		if err := sqlcgen.Q.InsertArticleStats(ctx, db, sqlcgen.InsertArticleStatsParams{
 			CreatedAt:      now,
 			ArticleID:      articleID,
-			FavoritesCount: null.IntFrom(0).Ptr(),
+			FavoritesCount: int64(0),
 		}); err != nil {
 			return errors.WithStack(err)
 		}

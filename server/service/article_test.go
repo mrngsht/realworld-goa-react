@@ -91,9 +91,10 @@ func TestArticle_Create(t *testing.T) {
 		require.Len(t, atms, 1)
 		atm := atms[0]
 		assert.Equal(t, executedAtOnDB, atm.CreatedAt)
-		expectedTagListJson, err := json.Marshal(payload.TagList)
-		require.NoError(t, err)
-		assert.Equal(t, expectedTagListJson, atm.Tags)
+
+		var actualTagList []string
+		require.NoError(t, json.Unmarshal(atm.Tags, &actualTagList))
+		assert.Equal(t, payload.TagList, actualTagList)
 
 		as, err := sqlctest.Q.GetArticleStatsByArticleID(ctx, db, articleID)
 		require.NoError(t, err)
@@ -101,6 +102,30 @@ func TestArticle_Create(t *testing.T) {
 	})
 
 	t.Run("succeed without tag", func(t *testing.T) {
+		u := servicetest.CreateUser(t, ctx, db)
 
+		executedAt := mytime.Now(ctx)
+		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
+
+		ctx = servicetest.SetRequestUser(t, ctx, db, u.Username)
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		assert.Equal(t, payload.TagList, res.Article.TagList)
+
+		articleID := uuid.MustParse(res.Article.ID)
+
+		ats, err := sqlctest.Q.ListArticleTagByArticleID(ctx, db, articleID)
+		require.NoError(t, err)
+		assert.Len(t, ats, 0)
+
+		atms, err := sqlctest.Q.ListArticleTagMutationByArticleID(ctx, db, articleID)
+		require.NoError(t, err)
+		assert.Len(t, atms, 0)
 	})
 }
