@@ -91,7 +91,7 @@ func TestUser_Register(t *testing.T) {
 	svc := service.NewUser(db)
 
 	t.Run("succeed", func(t *testing.T) {
-		executedAt := mytimetest.AdjustTimeForTest(time.Now())
+		executedAt := mytimetest.TruncateTimeForDB(time.Now())
 		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
 		payload := &goa.RegisterPayload{
 			Username: "succeed",

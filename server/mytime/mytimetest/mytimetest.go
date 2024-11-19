@@ -29,6 +29,6 @@ func WithFixedNow(t *testing.T, ctx context.Context, tm time.Time) context.Conte
 	return context.WithValue(ctx, ctxkeynow{}, tm)
 }
 
-func AdjustTimeForTest(tm time.Time) time.Time {
+func TruncateTimeForDB(tm time.Time) time.Time {
 	return tm.Truncate(time.Microsecond).Local()
 }
