@@ -18,6 +18,39 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// EncodeGetResponse returns an encoder for responses returned by the article
+// get endpoint.
+func EncodeGetResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*article.GetResult)
+		enc := encoder(ctx, w)
+		body := NewGetResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetRequest returns a decoder for requests sent to the article get
+// endpoint.
+func DecodeGetRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			articleID string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		articleID = params["articleId"]
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetPayload(articleID)
+
+		return payload, nil
+	}
+}
+
 // EncodeCreateResponse returns an encoder for responses returned by the
 // article create endpoint.
 func EncodeCreateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
@@ -63,7 +96,7 @@ func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 // type *ArticleDetailResponseBody from a value of type *article.ArticleDetail.
 func marshalArticleArticleDetailToArticleDetailResponseBody(v *article.ArticleDetail) *ArticleDetailResponseBody {
 	res := &ArticleDetailResponseBody{
-		ID:             v.ID,
+		ArticleID:      v.ArticleID,
 		Title:          v.Title,
 		Description:    v.Description,
 		Body:           v.Body,

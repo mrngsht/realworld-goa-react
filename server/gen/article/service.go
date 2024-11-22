@@ -13,6 +13,8 @@ import (
 
 // article
 type Service interface {
+	// Get implements get.
+	Get(context.Context, *GetPayload) (res *GetResult, err error)
 	// Create implements create.
 	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
 }
@@ -31,10 +33,10 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"create"}
+var MethodNames = [2]string{"get", "create"}
 
 type ArticleDetail struct {
-	ID             string
+	ArticleID      string
 	Title          string
 	Description    string
 	Body           string
@@ -56,6 +58,16 @@ type CreatePayload struct {
 
 // CreateResult is the result type of the article service create method.
 type CreateResult struct {
+	Article *ArticleDetail
+}
+
+// GetPayload is the payload type of the article service get method.
+type GetPayload struct {
+	ArticleID string
+}
+
+// GetResult is the result type of the article service get method.
+type GetResult struct {
 	Article *ArticleDetail
 }
 

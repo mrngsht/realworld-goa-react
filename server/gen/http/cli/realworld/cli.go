@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article create
+	return `article (get|create)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,23 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article create --body '{
-      "body": "Autem officiis nisi.",
-      "description": "Ut ex minus culpa nam ipsam reiciendis.",
-      "tagList": [
-         "Incidunt quia neque.",
-         "Quos omnis magni iste explicabo.",
-         "Optio vitae facilis cumque consequatur sapiente.",
-         "Voluptatem sunt est non odit rerum sapiente."
-      ],
-      "title": "6nr"
-   }'` + "\n" +
+	return os.Args[0] + ` article get --article-id "7a83faeb-5214-407d-8eab-25979a3b1d73"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "IB8q"
+      "username": "MFI"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "dallin.auer@stamm.name",
-      "password": "eav"
+      "email": "bryce_frami@kuhic.net",
+      "password": "n85"
    }'` + "\n" +
 		""
 }
@@ -64,6 +54,9 @@ func ParseEndpoint(
 ) (goa.Endpoint, any, error) {
 	var (
 		articleFlags = flag.NewFlagSet("article", flag.ContinueOnError)
+
+		articleGetFlags         = flag.NewFlagSet("get", flag.ExitOnError)
+		articleGetArticleIDFlag = articleGetFlags.String("article-id", "REQUIRED", "")
 
 		articleCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
 		articleCreateBodyFlag = articleCreateFlags.String("body", "REQUIRED", "")
@@ -90,6 +83,7 @@ func ParseEndpoint(
 		userUpdateBodyFlag = userUpdateFlags.String("body", "REQUIRED", "")
 	)
 	articleFlags.Usage = articleUsage
+	articleGetFlags.Usage = articleGetUsage
 	articleCreateFlags.Usage = articleCreateUsage
 
 	profileFlags.Usage = profileUsage
@@ -140,6 +134,9 @@ func ParseEndpoint(
 		switch svcn {
 		case "article":
 			switch epn {
+			case "get":
+				epf = articleGetFlags
+
 			case "create":
 				epf = articleCreateFlags
 
@@ -194,6 +191,9 @@ func ParseEndpoint(
 		case "article":
 			c := articlec.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
+			case "get":
+				endpoint = c.Get()
+				data, err = articlec.BuildGetPayload(*articleGetArticleIDFlag)
 			case "create":
 				endpoint = c.Create()
 				data, err = articlec.BuildCreatePayload(*articleCreateBodyFlag)
@@ -239,12 +239,24 @@ Usage:
     %[1]s [globalflags] article COMMAND [flags]
 
 COMMAND:
+    get: Get implements get.
     create: Create implements create.
 
 Additional help:
     %[1]s article COMMAND --help
 `, os.Args[0])
 }
+func articleGetUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article get -article-id STRING
+
+Get implements get.
+    -article-id STRING: 
+
+Example:
+    %[1]s article get --article-id "7a83faeb-5214-407d-8eab-25979a3b1d73"
+`, os.Args[0])
+}
+
 func articleCreateUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] article create -body JSON
 
@@ -253,15 +265,15 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Autem officiis nisi.",
-      "description": "Ut ex minus culpa nam ipsam reiciendis.",
+      "body": "Et voluptatem asperiores.",
+      "description": "Asperiores iste quibusdam maiores eum quo.",
       "tagList": [
-         "Incidunt quia neque.",
-         "Quos omnis magni iste explicabo.",
-         "Optio vitae facilis cumque consequatur sapiente.",
-         "Voluptatem sunt est non odit rerum sapiente."
+         "Sint necessitatibus ab.",
+         "Rem maiores ut ratione.",
+         "Sit repellat id libero a architecto omnis.",
+         "Nostrum fugit laudantium ipsam mollitia."
       ],
-      "title": "6nr"
+      "title": "tor"
    }'
 `, os.Args[0])
 }
@@ -288,7 +300,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "IB8q"
+      "username": "MFI"
    }'
 `, os.Args[0])
 }
@@ -301,7 +313,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "aL9"
+      "username": "NaN"
    }'
 `, os.Args[0])
 }
@@ -330,8 +342,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "dallin.auer@stamm.name",
-      "password": "eav"
+      "email": "bryce_frami@kuhic.net",
+      "password": "n85"
    }'
 `, os.Args[0])
 }
@@ -344,9 +356,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "filiberto_adams@brekke.com",
-      "password": "aei",
-      "username": "vTPO"
+      "email": "hilbert@kassulkekris.net",
+      "password": "4xh",
+      "username": "ioA"
    }'
 `, os.Args[0])
 }
@@ -369,11 +381,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "5bk",
-      "email": "kallie@veum.biz",
-      "image": "https://jn",
-      "password": "w34",
-      "username": "MQha"
+      "bio": "tas",
+      "email": "napoleon.jenkins@hauck.biz",
+      "image": "https://2p",
+      "password": "o24",
+      "username": "UEEk"
    }'
 `, os.Args[0])
 }

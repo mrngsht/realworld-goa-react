@@ -15,14 +15,26 @@ import (
 
 // Client is the "article" service client.
 type Client struct {
+	GetEndpoint    goa.Endpoint
 	CreateEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(create goa.Endpoint) *Client {
+func NewClient(get, create goa.Endpoint) *Client {
 	return &Client{
+		GetEndpoint:    get,
 		CreateEndpoint: create,
 	}
+}
+
+// Get calls the "get" endpoint of the "article" service.
+func (c *Client) Get(ctx context.Context, p *GetPayload) (res *GetResult, err error) {
+	var ires any
+	ires, err = c.GetEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*GetResult), nil
 }
 
 // Create calls the "create" endpoint of the "article" service.

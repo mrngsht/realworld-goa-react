@@ -21,6 +21,12 @@ type CreateRequestBody struct {
 	TagList     []string `form:"tagList" json:"tagList" xml:"tagList"`
 }
 
+// GetResponseBody is the type of the "article" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
+}
+
 // CreateResponseBody is the type of the "article" service "create" endpoint
 // HTTP response body.
 type CreateResponseBody struct {
@@ -29,7 +35,7 @@ type CreateResponseBody struct {
 
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
-	ID             *string              `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ArticleID      *string              `form:"articleId,omitempty" json:"articleId,omitempty" xml:"articleId,omitempty"`
 	Title          *string              `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Description    *string              `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Body           *string              `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
@@ -68,6 +74,15 @@ func NewCreateRequestBody(p *article.CreatePayload) *CreateRequestBody {
 	return body
 }
 
+// NewGetResultOK builds a "article" service "get" endpoint result from a HTTP
+// "OK" response.
+func NewGetResultOK(body *GetResponseBody) *article.GetResult {
+	v := &article.GetResult{}
+	v.Article = unmarshalArticleDetailResponseBodyToArticleArticleDetail(body.Article)
+
+	return v
+}
+
 // NewCreateResultOK builds a "article" service "create" endpoint result from a
 // HTTP "OK" response.
 func NewCreateResultOK(body *CreateResponseBody) *article.CreateResult {
@@ -75,6 +90,19 @@ func NewCreateResultOK(body *CreateResponseBody) *article.CreateResult {
 	v.Article = unmarshalArticleDetailResponseBodyToArticleArticleDetail(body.Article)
 
 	return v
+}
+
+// ValidateGetResponseBody runs the validations defined on GetResponseBody
+func ValidateGetResponseBody(body *GetResponseBody) (err error) {
+	if body.Article == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("article", "body"))
+	}
+	if body.Article != nil {
+		if err2 := ValidateArticleDetailResponseBody(body.Article); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
 }
 
 // ValidateCreateResponseBody runs the validations defined on CreateResponseBody
@@ -93,8 +121,8 @@ func ValidateCreateResponseBody(body *CreateResponseBody) (err error) {
 // ValidateArticleDetailResponseBody runs the validations defined on
 // ArticleDetailResponseBody
 func ValidateArticleDetailResponseBody(body *ArticleDetailResponseBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	if body.ArticleID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("articleId", "body"))
 	}
 	if body.Title == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
@@ -123,8 +151,8 @@ func ValidateArticleDetailResponseBody(body *ArticleDetailResponseBody) (err err
 	if body.Author == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
-	if body.ID != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
+	if body.ArticleID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.articleId", *body.ArticleID, goa.FormatUUID))
 	}
 	if body.CreatedAt != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.createdAt", *body.CreatedAt, goa.FormatDateTime))

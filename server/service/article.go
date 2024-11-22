@@ -23,8 +23,16 @@ func NewArticle(rdb myrdb.DB) *Article {
 
 var _ goa.Service = &Article{}
 
+func (s *Article) Get(context.Context, *goa.GetPayload) (res *goa.GetResult, err error) {
+	return nil, nil
+}
+
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
-	userID := myctx.MustGetRequestUserID(ctx)
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	db := s.db
 
 	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
@@ -110,7 +118,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 
 	return &goa.CreateResult{
 		Article: &goa.ArticleDetail{
-			ID:             articleID.String(),
+			ArticleID:      articleID.String(),
 			Title:          payload.Title,
 			Description:    payload.Description,
 			Body:           payload.Body,

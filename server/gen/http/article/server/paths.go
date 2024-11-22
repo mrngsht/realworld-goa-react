@@ -7,6 +7,15 @@
 
 package server
 
+import (
+	"fmt"
+)
+
+// GetArticlePath returns the URL path to the article service get HTTP endpoint.
+func GetArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v", articleID)
+}
+
 // CreateArticlePath returns the URL path to the article service create HTTP endpoint.
 func CreateArticlePath() string {
 	return "/api/article/create"

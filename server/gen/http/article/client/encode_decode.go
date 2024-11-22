@@ -18,6 +18,71 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
+// BuildGetRequest instantiates a HTTP request object with method and path set
+// to call the "article" service "get" endpoint
+func (c *Client) BuildGetRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.GetPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "get", "*article.GetPayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetArticlePath(articleID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "get", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeGetResponse returns a decoder for responses returned by the article
+// get endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "get", err)
+			}
+			err = ValidateGetResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "get", err)
+			}
+			res := NewGetResultOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "get", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildCreateRequest instantiates a HTTP request object with method and path
 // set to call the "article" service "create" endpoint
 func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, error) {
@@ -93,7 +158,7 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {
 	res := &article.ArticleDetail{
-		ID:             *v.ID,
+		ArticleID:      *v.ArticleID,
 		Title:          *v.Title,
 		Description:    *v.Description,
 		Body:           *v.Body,

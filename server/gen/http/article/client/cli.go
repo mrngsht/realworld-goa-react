@@ -16,6 +16,24 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// BuildGetPayload builds the payload for the article get endpoint from CLI
+// flags.
+func BuildGetPayload(articleGetArticleID string) (*article.GetPayload, error) {
+	var err error
+	var articleID string
+	{
+		articleID = articleGetArticleID
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &article.GetPayload{}
+	v.ArticleID = articleID
+
+	return v, nil
+}
+
 // BuildCreatePayload builds the payload for the article create endpoint from
 // CLI flags.
 func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error) {
@@ -24,7 +42,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Autem officiis nisi.\",\n      \"description\": \"Ut ex minus culpa nam ipsam reiciendis.\",\n      \"tagList\": [\n         \"Incidunt quia neque.\",\n         \"Quos omnis magni iste explicabo.\",\n         \"Optio vitae facilis cumque consequatur sapiente.\",\n         \"Voluptatem sunt est non odit rerum sapiente.\"\n      ],\n      \"title\": \"6nr\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Et voluptatem asperiores.\",\n      \"description\": \"Asperiores iste quibusdam maiores eum quo.\",\n      \"tagList\": [\n         \"Sint necessitatibus ab.\",\n         \"Rem maiores ut ratione.\",\n         \"Sit repellat id libero a architecto omnis.\",\n         \"Nostrum fugit laudantium ipsam mollitia.\"\n      ],\n      \"title\": \"tor\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))

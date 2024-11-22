@@ -17,6 +17,9 @@ import (
 
 // Client lists the article service endpoint HTTP clients.
 type Client struct {
+	// Get Doer is the HTTP client used to make requests to the get endpoint.
+	GetDoer goahttp.Doer
+
 	// Create Doer is the HTTP client used to make requests to the create endpoint.
 	CreateDoer goahttp.Doer
 
@@ -40,12 +43,32 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
+		GetDoer:             doer,
 		CreateDoer:          doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
 		decoder:             dec,
 		encoder:             enc,
+	}
+}
+
+// Get returns an endpoint that makes HTTP requests to the article service get
+// server.
+func (c *Client) Get() goa.Endpoint {
+	var (
+		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGetRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "get", err)
+		}
+		return decodeResponse(resp)
 	}
 }
 

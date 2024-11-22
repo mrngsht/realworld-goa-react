@@ -14,6 +14,27 @@ produces:
     - application/xml
     - application/gob
 paths:
+    /api/article/{articleId}:
+        get:
+            tags:
+                - article
+            summary: get article
+            operationId: article#get
+            parameters:
+                - name: articleId
+                  in: path
+                  required: true
+                  type: string
+                  format: uuid
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/ArticleGetResponseBody'
+                        required:
+                            - article
+            schemes:
+                - http
     /api/article/create:
         post:
             tags:
@@ -194,31 +215,32 @@ definitions:
         properties:
             body:
                 type: string
-                example: Optio vel omnis repellendus voluptate.
+                example: Voluptas rerum beatae enim aut.
             description:
                 type: string
-                example: Exercitationem accusamus accusamus assumenda dolorem sunt.
+                example: Sunt voluptatem a et quidem culpa.
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Itaque ab.
+                    example: Et veniam.
                 example:
-                    - Rerum minima.
-                    - Modi eveniet cupiditate sunt dolorem repellendus.
+                    - Autem et sit in repellat.
+                    - Quaerat deserunt est est minus dolor libero.
+                    - Excepturi praesentium.
+                    - Ipsa eum ea.
             title:
                 type: string
-                example: lhv
+                example: w5y
                 maxLength: 128
         example:
-            body: Minus est ratione modi fugit laboriosam harum.
-            description: Quia corporis sunt iusto.
+            body: Similique provident praesentium deserunt illo.
+            description: Id qui voluptatem quod.
             tagList:
-                - Aut qui facilis necessitatibus voluptatem facilis.
-                - Dolorum repellendus quia qui eos.
-                - Sapiente et minima fugit labore corporis omnis.
-                - Ducimus et sint debitis.
-            title: "997"
+                - Excepturi minima delectus asperiores est rerum quaerat.
+                - Est autem sed.
+                - Ut excepturi ut et similique.
+            title: 0zl
         required:
             - title
             - description
@@ -232,87 +254,90 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
+                articleId: a921415e-e6b0-4cc4-998e-bd4c65b9a5aa
                 author:
-                    bio: Voluptatibus ut alias voluptatem velit.
+                    bio: Iste id aliquid nam.
                     following: true
-                    image: Impedit sed non laudantium autem.
-                    username: Dolore corporis quas.
-                body: Laboriosam quis corporis.
-                createdAt: "1989-08-08T11:57:59Z"
-                description: Nemo aliquid iste delectus.
+                    image: Autem velit nesciunt voluptates ratione vel.
+                    username: Dolore distinctio et dolores deleniti quo voluptas.
+                body: Perspiciatis voluptatem dolore.
+                createdAt: "2011-10-20T06:52:09Z"
+                description: Esse neque distinctio.
                 favorited: true
-                favoritesCount: 3324503399791485161
-                id: 80af43ba-a3bd-482d-8bd5-f211fbc495c3
+                favoritesCount: 16308129935446877526
                 tagList:
-                    - Nesciunt voluptatem sunt harum nam sed et.
-                    - Porro consequuntur dolore recusandae aut aut.
-                title: Quae quo voluptatem.
-                updatedAt: "2011-02-03T21:56:03Z"
+                    - In voluptatibus ut alias.
+                    - Velit culpa impedit sed non laudantium.
+                    - Quasi voluptates est eos tempore.
+                    - Quis eligendi earum voluptatem sunt.
+                title: Exercitationem dicta dignissimos accusamus facilis et.
+                updatedAt: "1971-01-17T05:07:32Z"
         required:
             - article
     ArticleDetail:
         title: ArticleDetail
         type: object
         properties:
+            articleId:
+                type: string
+                example: e53ac315-87a1-4b3a-ad63-fdb1da4f4a6c
+                format: uuid
             author:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Eum corrupti non neque.
+                example: Omnis saepe unde voluptas sit eos.
             createdAt:
                 type: string
-                example: "2004-02-02T01:51:16Z"
+                example: "2000-08-04T23:50:07Z"
                 format: date-time
             description:
                 type: string
-                example: Totam numquam quia consequuntur blanditiis velit.
+                example: Assumenda a repellat quod harum.
             favorited:
                 type: boolean
                 example: true
             favoritesCount:
                 type: integer
-                example: 11660296247879669102
+                example: 18064423122293770980
                 format: int64
-            id:
-                type: string
-                example: 80c55ac6-7910-42a3-b3d8-fdde66ebadf7
-                format: uuid
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Consequatur dolorum rerum eum nisi voluptatem.
+                    example: Dolorem ex nesciunt officia debitis quia repudiandae.
                 example:
-                    - Cum aut.
-                    - Voluptatum tempore error occaecati quis earum laudantium.
+                    - Quas quis aut ut qui fugit.
+                    - Quis voluptatem.
+                    - Ab sit enim ea ratione tenetur.
             title:
                 type: string
-                example: Animi et omnis rem aliquam libero inventore.
+                example: Ab neque nesciunt.
             updatedAt:
                 type: string
-                example: "2002-04-05T02:44:30Z"
+                example: "1979-08-27T16:50:21Z"
                 format: date-time
         example:
+            articleId: 4a067404-e5cf-47ce-9de6-62c375d8e306
             author:
-                bio: Voluptatibus ut alias voluptatem velit.
+                bio: Iste id aliquid nam.
                 following: true
-                image: Impedit sed non laudantium autem.
-                username: Dolore corporis quas.
-            body: Voluptate minima incidunt hic quis.
-            createdAt: "1979-08-27T16:50:21Z"
-            description: Cupiditate qui.
-            favorited: true
-            favoritesCount: 16040738032521365018
-            id: 20715034-2b4a-43f3-bb78-1cdbaddc1c02
+                image: Autem velit nesciunt voluptates ratione vel.
+                username: Dolore distinctio et dolores deleniti quo voluptas.
+            body: Harum architecto.
+            createdAt: "1998-05-20T11:24:49Z"
+            description: Modi fugit.
+            favorited: false
+            favoritesCount: 1428019099717624712
             tagList:
-                - Architecto voluptas tenetur reiciendis.
-                - Voluptas adipisci.
-                - Eum repellat.
-                - Ut aut.
-            title: Consequatur eos est suscipit.
-            updatedAt: "1999-01-31T22:23:46Z"
+                - Qui facilis necessitatibus voluptatem.
+                - Nesciunt dolorum repellendus.
+                - Qui eos laborum sapiente et.
+                - Fugit labore corporis omnis ut.
+            title: Corporis sunt iusto aut minus est.
+            updatedAt: "1990-04-04T05:21:13Z"
         required:
-            - id
+            - articleId
             - title
             - description
             - body
@@ -322,27 +347,55 @@ definitions:
             - favorited
             - favoritesCount
             - author
+    ArticleGetResponseBody:
+        title: ArticleGetResponseBody
+        type: object
+        properties:
+            article:
+                $ref: '#/definitions/ArticleDetail'
+        example:
+            article:
+                articleId: a921415e-e6b0-4cc4-998e-bd4c65b9a5aa
+                author:
+                    bio: Iste id aliquid nam.
+                    following: true
+                    image: Autem velit nesciunt voluptates ratione vel.
+                    username: Dolore distinctio et dolores deleniti quo voluptas.
+                body: Perspiciatis voluptatem dolore.
+                createdAt: "2011-10-20T06:52:09Z"
+                description: Esse neque distinctio.
+                favorited: true
+                favoritesCount: 16308129935446877526
+                tagList:
+                    - In voluptatibus ut alias.
+                    - Velit culpa impedit sed non laudantium.
+                    - Quasi voluptates est eos tempore.
+                    - Quis eligendi earum voluptatem sunt.
+                title: Exercitationem dicta dignissimos accusamus facilis et.
+                updatedAt: "1971-01-17T05:07:32Z"
+        required:
+            - article
     Profile:
         title: Profile
         type: object
         properties:
             bio:
                 type: string
-                example: Culpa ipsam excepturi vitae voluptatem.
+                example: Aut quae.
             following:
                 type: boolean
                 example: true
             image:
                 type: string
-                example: Temporibus minus enim voluptatum ut.
+                example: Ducimus fugit est qui ut.
             username:
                 type: string
-                example: Quaerat culpa nihil exercitationem vero delectus.
+                example: Qui quia et odit omnis non.
         example:
-            bio: Laboriosam assumenda a repellat quod.
+            bio: Ea mollitia facere ut inventore voluptatem.
             following: false
-            image: Enim omnis saepe.
-            username: Placeat odit cupiditate unde eos ab neque.
+            image: A perferendis quo pariatur nulla.
+            username: Optio quia sint sequi ut.
         required:
             - username
             - bio
@@ -355,7 +408,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -371,19 +424,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: followUser_CannotFollowYourself_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -397,10 +450,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: 7zK
+                example: vzz
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: ItmJdq
+            username: FBZKocC
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -411,10 +464,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Voluptatibus ut alias voluptatem velit.
+                bio: Iste id aliquid nam.
                 following: true
-                image: Impedit sed non laudantium autem.
-                username: Dolore corporis quas.
+                image: Autem velit nesciunt voluptates ratione vel.
+                username: Dolore distinctio et dolores deleniti quo voluptas.
         required:
             - profile
     ProfileFollowUserUserAlreadyFollowingResponseBody:
@@ -444,15 +497,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: followUser_UserAlreadyFollowing_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -467,7 +520,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -490,7 +543,7 @@ definitions:
                 example: false
         description: followUser_UserNotFound_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -509,10 +562,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: sCm
+                example: KS7d
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: qC_
+            username: b1Y
         required:
             - username
     ProfileUnfollowUserResponseBody:
@@ -523,10 +576,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Voluptatibus ut alias voluptatem velit.
+                bio: Iste id aliquid nam.
                 following: true
-                image: Impedit sed non laudantium autem.
-                username: Dolore corporis quas.
+                image: Autem velit nesciunt voluptates ratione vel.
+                username: Dolore distinctio et dolores deleniti quo voluptas.
         required:
             - profile
     ProfileUnfollowUserUserNotFollowingResponseBody:
@@ -536,7 +589,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -563,7 +616,7 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -602,12 +655,12 @@ definitions:
                 example: false
         description: unfollowUser_UserNotFound_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -621,25 +674,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Quo temporibus.
+                example: Rem quia ex et eos et ut.
             email:
                 type: string
-                example: Rerum cumque id animi nesciunt inventore nulla.
+                example: Ut corporis optio omnis a perferendis.
             image:
                 type: string
-                example: Magnam quia.
+                example: Fugit optio.
             token:
                 type: string
-                example: Impedit dolorem est eligendi voluptatem expedita.
+                example: Nihil asperiores autem.
             username:
                 type: string
-                example: Est quidem sed tenetur.
+                example: Dolorum ullam voluptatem ut ea doloribus et.
         example:
-            bio: Eligendi incidunt quis et laudantium eum nulla.
-            email: Et inventore.
-            image: Qui et vel sint possimus at.
-            token: Similique est neque nemo.
-            username: Ullam excepturi dolor.
+            bio: Eos libero aut.
+            email: Sit sunt sunt.
+            image: Nihil ipsam.
+            token: Sit ab veritatis optio.
+            username: Rerum amet nihil.
         required:
             - email
             - token
@@ -654,11 +707,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Rem est reprehenderit.
-                email: Aut quas officiis ducimus et.
-                image: Veritatis doloribus officiis qui.
-                token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
-                username: Et doloremque eligendi quae excepturi.
+                bio: Aspernatur tempore ea non similique.
+                email: Ab ipsa autem dolore nisi aut.
+                image: Et sed voluptatem voluptatibus.
+                token: Quos doloribus qui blanditiis est perferendis.
+                username: Voluptatibus iure.
         required:
             - user
     UserLoginEmailNotFoundResponseBody:
@@ -668,7 +721,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -691,7 +744,7 @@ definitions:
                 example: true
         description: login_EmailNotFound_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -711,7 +764,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -727,19 +780,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: login_PasswordIsIncorrect_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: true
+            temporary: false
+            timeout: false
         required:
             - name
             - id
@@ -753,16 +806,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: julien@reingerkulas.name
+                example: abbie@willms.info
                 format: email
             password:
                 type: string
-                example: 0zb
+                example: p4r
                 minLength: 6
                 maxLength: 128
         example:
-            email: oral.nader@sanford.net
-            password: 7y4
+            email: ryleigh_schuppe@franecki.org
+            password: xe2
         required:
             - email
             - password
@@ -774,11 +827,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Rem est reprehenderit.
-                email: Aut quas officiis ducimus et.
-                image: Veritatis doloribus officiis qui.
-                token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
-                username: Et doloremque eligendi quae excepturi.
+                bio: Aspernatur tempore ea non similique.
+                email: Ab ipsa autem dolore nisi aut.
+                image: Et sed voluptatem voluptatibus.
+                token: Quos doloribus qui blanditiis est perferendis.
+                username: Voluptatibus iure.
         required:
             - user
     UserRegisterEmailAlreadyUsedResponseBody:
@@ -804,18 +857,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: register_EmailAlreadyUsed_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: false
         required:
             - name
@@ -830,21 +883,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: haylie_rosenbaum@paucekmarquardt.org
+                example: rozella.mertz@carroll.net
                 format: email
             password:
                 type: string
-                example: fof
+                example: dcv
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: 4jb
+                example: Uzmb0s
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: jada@lakinvonrueden.biz
-            password: jed
-            username: 7CL
+            email: emiliano@mcclure.name
+            password: x0f
+            username: QWmLN
         required:
             - username
             - email
@@ -857,11 +910,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Rem est reprehenderit.
-                email: Aut quas officiis ducimus et.
-                image: Veritatis doloribus officiis qui.
-                token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
-                username: Et doloremque eligendi quae excepturi.
+                bio: Aspernatur tempore ea non similique.
+                email: Ab ipsa autem dolore nisi aut.
+                image: Et sed voluptatem voluptatibus.
+                token: Quos doloribus qui blanditiis est perferendis.
+                username: Voluptatibus iure.
         required:
             - user
     UserRegisterUsernameAlreadyUsedResponseBody:
@@ -887,18 +940,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: register_UsernameAlreadyUsed_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: false
         required:
             - name
@@ -913,31 +966,31 @@ definitions:
         properties:
             bio:
                 type: string
-                example: 57x
+                example: 9ss
                 maxLength: 4096
             email:
                 type: string
-                example: verona@leschhills.net
+                example: angelina_langworth@brown.biz
                 format: email
             image:
                 type: string
-                example: https://s6
+                example: http://q
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: q9q
+                example: ctr
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: 6uFA5
+                example: xZB
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: 43u
-            email: eldora@carroll.com
-            image: http://g
-            password: vbp
-            username: 8b5
+            bio: jzn
+            email: francisco@adams.name
+            image: https://ld
+            password: hoh
+            username: utLx
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -946,10 +999,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Rem est reprehenderit.
-                email: Aut quas officiis ducimus et.
-                image: Veritatis doloribus officiis qui.
-                token: Quibusdam qui nostrum dolorum dicta voluptatem distinctio.
-                username: Et doloremque eligendi quae excepturi.
+                bio: Aspernatur tempore ea non similique.
+                email: Ab ipsa autem dolore nisi aut.
+                image: Et sed voluptatem voluptatibus.
+                token: Quos doloribus qui blanditiis est perferendis.
+                username: Voluptatibus iure.
         required:
             - user

@@ -23,6 +23,12 @@ type CreateRequestBody struct {
 	TagList     []string `form:"tagList,omitempty" json:"tagList,omitempty" xml:"tagList,omitempty"`
 }
 
+// GetResponseBody is the type of the "article" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
+}
+
 // CreateResponseBody is the type of the "article" service "create" endpoint
 // HTTP response body.
 type CreateResponseBody struct {
@@ -31,7 +37,7 @@ type CreateResponseBody struct {
 
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
-	ID             string               `form:"id" json:"id" xml:"id"`
+	ArticleID      string               `form:"articleId" json:"articleId" xml:"articleId"`
 	Title          string               `form:"title" json:"title" xml:"title"`
 	Description    string               `form:"description" json:"description" xml:"description"`
 	Body           string               `form:"body" json:"body" xml:"body"`
@@ -51,6 +57,16 @@ type ProfileResponseBody struct {
 	Following bool   `form:"following" json:"following" xml:"following"`
 }
 
+// NewGetResponseBody builds the HTTP response body from the result of the
+// "get" endpoint of the "article" service.
+func NewGetResponseBody(res *article.GetResult) *GetResponseBody {
+	body := &GetResponseBody{}
+	if res.Article != nil {
+		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
+	}
+	return body
+}
+
 // NewCreateResponseBody builds the HTTP response body from the result of the
 // "create" endpoint of the "article" service.
 func NewCreateResponseBody(res *article.CreateResult) *CreateResponseBody {
@@ -59,6 +75,14 @@ func NewCreateResponseBody(res *article.CreateResult) *CreateResponseBody {
 		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
 	}
 	return body
+}
+
+// NewGetPayload builds a article service get endpoint payload.
+func NewGetPayload(articleID string) *article.GetPayload {
+	v := &article.GetPayload{}
+	v.ArticleID = articleID
+
+	return v
 }
 
 // NewCreatePayload builds a article service create endpoint payload.

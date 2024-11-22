@@ -15,19 +15,31 @@ import (
 
 // Endpoints wraps the "article" service endpoints.
 type Endpoints struct {
+	Get    goa.Endpoint
 	Create goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "article" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
+		Get:    NewGetEndpoint(s),
 		Create: NewCreateEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "article" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
+	e.Get = m(e.Get)
 	e.Create = m(e.Create)
+}
+
+// NewGetEndpoint returns an endpoint function that calls the method "get" of
+// service "article".
+func NewGetEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*GetPayload)
+		return s.Get(ctx, p)
+	}
 }
 
 // NewCreateEndpoint returns an endpoint function that calls the method
