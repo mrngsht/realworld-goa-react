@@ -9,8 +9,6 @@ package profile
 
 import (
 	"context"
-
-	goa "goa.design/goa/v3/pkg"
 )
 
 // profile
@@ -55,6 +53,14 @@ type Profile struct {
 	Following bool
 }
 
+type ProfileFollowUserBadRequest struct {
+	Code string
+}
+
+type ProfileUnfollowUserBadRequest struct {
+	Code string
+}
+
 // UnfollowUserPayload is the payload type of the profile service unfollowUser
 // method.
 type UnfollowUserPayload struct {
@@ -67,22 +73,36 @@ type UnfollowUserResult struct {
 	Profile *Profile
 }
 
-// MakeUserNotFound builds a goa.ServiceError from an error.
-func MakeUserNotFound(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "UserNotFound", false, false, false)
+// Error returns an error description.
+func (e *ProfileFollowUserBadRequest) Error() string {
+	return ""
 }
 
-// MakeUserAlreadyFollowing builds a goa.ServiceError from an error.
-func MakeUserAlreadyFollowing(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "UserAlreadyFollowing", false, false, false)
+// ErrorName returns "ProfileFollowUserBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ProfileFollowUserBadRequest) ErrorName() string {
+	return e.GoaErrorName()
 }
 
-// MakeUserNotFollowing builds a goa.ServiceError from an error.
-func MakeUserNotFollowing(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "UserNotFollowing", false, false, false)
+// GoaErrorName returns "ProfileFollowUserBadRequest".
+func (e *ProfileFollowUserBadRequest) GoaErrorName() string {
+	return "ProfileFollowUserBadRequest"
 }
 
-// MakeCannotFollowYourself builds a goa.ServiceError from an error.
-func MakeCannotFollowYourself(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "CannotFollowYourself", false, false, false)
+// Error returns an error description.
+func (e *ProfileUnfollowUserBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ProfileUnfollowUserBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ProfileUnfollowUserBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ProfileUnfollowUserBadRequest".
+func (e *ProfileUnfollowUserBadRequest) GoaErrorName() string {
+	return "ProfileUnfollowUserBadRequest"
 }

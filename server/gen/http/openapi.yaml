@@ -85,7 +85,9 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/ProfileFollowUserCannotFollowYourselfResponseBody'
+                        $ref: '#/definitions/ProfileFollowUserBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/profile/unfollow_user:
@@ -112,7 +114,9 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/ProfileUnfollowUserUserNotFollowingResponseBody'
+                        $ref: '#/definitions/ProfileUnfollowUserBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/user/current:
@@ -155,7 +159,9 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/UserLoginPasswordIsIncorrectResponseBody'
+                        $ref: '#/definitions/UserLoginBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/user/register:
@@ -184,7 +190,9 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/UserRegisterEmailAlreadyUsedResponseBody'
+                        $ref: '#/definitions/UserRegisterBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/user/update:
@@ -215,32 +223,29 @@ definitions:
         properties:
             body:
                 type: string
-                example: Voluptas rerum beatae enim aut.
+                example: Vero enim qui in.
             description:
                 type: string
-                example: Sunt voluptatem a et quidem culpa.
+                example: Quidem est quo tempore.
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Et veniam.
+                    example: Nobis ut mollitia harum.
                 example:
-                    - Autem et sit in repellat.
-                    - Quaerat deserunt est est minus dolor libero.
-                    - Excepturi praesentium.
-                    - Ipsa eum ea.
+                    - A et quidem.
+                    - Vero voluptas.
             title:
                 type: string
-                example: w5y
+                example: 2zs
                 maxLength: 128
         example:
-            body: Similique provident praesentium deserunt illo.
-            description: Id qui voluptatem quod.
+            body: Saepe autem et sit in repellat debitis.
+            description: Et veniam.
             tagList:
-                - Excepturi minima delectus asperiores est rerum quaerat.
-                - Est autem sed.
-                - Ut excepturi ut et similique.
-            title: 0zl
+                - Est est minus dolor libero.
+                - Excepturi praesentium.
+            title: uq3
         required:
             - title
             - description
@@ -280,62 +285,62 @@ definitions:
         properties:
             articleId:
                 type: string
-                example: e53ac315-87a1-4b3a-ad63-fdb1da4f4a6c
+                example: 172003cb-321e-4fb6-9431-cce082581cad
                 format: uuid
             author:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Omnis saepe unde voluptas sit eos.
+                example: Odit cupiditate unde eos ab.
             createdAt:
                 type: string
-                example: "2000-08-04T23:50:07Z"
+                example: "1993-11-25T18:12:56Z"
                 format: date-time
             description:
                 type: string
-                example: Assumenda a repellat quod harum.
+                example: Ut eaque odit.
             favorited:
                 type: boolean
-                example: true
+                example: false
             favoritesCount:
                 type: integer
-                example: 18064423122293770980
+                example: 8609551922543811895
                 format: int64
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Dolorem ex nesciunt officia debitis quia repudiandae.
+                    example: Nesciunt laboriosam assumenda.
                 example:
-                    - Quas quis aut ut qui fugit.
-                    - Quis voluptatem.
-                    - Ab sit enim ea ratione tenetur.
+                    - Quod harum enim omnis.
+                    - Unde voluptas.
+                    - Eos enim dolorem ex nesciunt officia.
             title:
                 type: string
-                example: Ab neque nesciunt.
+                example: Qui temporibus minus enim.
             updatedAt:
                 type: string
-                example: "1979-08-27T16:50:21Z"
+                example: "2009-09-22T19:22:23Z"
                 format: date-time
         example:
-            articleId: 4a067404-e5cf-47ce-9de6-62c375d8e306
+            articleId: f86c2f0c-0b3f-41a4-9c33-35f335b8d090
             author:
                 bio: Iste id aliquid nam.
                 following: true
                 image: Autem velit nesciunt voluptates ratione vel.
                 username: Dolore distinctio et dolores deleniti quo voluptas.
-            body: Harum architecto.
-            createdAt: "1998-05-20T11:24:49Z"
-            description: Modi fugit.
+            body: Aspernatur rerum minima harum modi eveniet.
+            createdAt: "1988-03-31T08:30:44Z"
+            description: Itaque ab.
             favorited: false
-            favoritesCount: 1428019099717624712
+            favoritesCount: 7551345885491060277
             tagList:
-                - Qui facilis necessitatibus voluptatem.
-                - Nesciunt dolorum repellendus.
-                - Qui eos laborum sapiente et.
-                - Fugit labore corporis omnis ut.
-            title: Corporis sunt iusto aut minus est.
-            updatedAt: "1990-04-04T05:21:13Z"
+                - Dolorem repellendus est vero totam sunt.
+                - Quia corporis sunt iusto.
+                - Minus est ratione modi fugit laboriosam harum.
+                - Voluptatem aut qui facilis necessitatibus.
+            title: Sunt commodi optio vel omnis repellendus voluptate.
+            updatedAt: "2011-06-08T00:42:37Z"
         required:
             - articleId
             - title
@@ -381,79 +386,52 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Aut quae.
+                example: Rem non enim doloribus.
             following:
                 type: boolean
-                example: true
+                example: false
             image:
                 type: string
-                example: Ducimus fugit est qui ut.
+                example: Fuga eaque voluptatum unde.
             username:
                 type: string
-                example: Qui quia et odit omnis non.
+                example: Recusandae eum.
         example:
-            bio: Ea mollitia facere ut inventore voluptatem.
+            bio: Qui quia et odit omnis non.
             following: false
-            image: A perferendis quo pariatur nulla.
-            username: Optio quia sint sequi ut.
+            image: Aut quae.
+            username: Porro perspiciatis mollitia maxime in repellendus non.
         required:
             - username
             - bio
             - image
             - following
-    ProfileFollowUserCannotFollowYourselfResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    ProfileFollowUserBadRequest:
+        title: ProfileFollowUserBadRequest
         type: object
         properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
+            code:
                 type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: false
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: followUser_CannotFollowYourself_response_body result type (default view)
+                example: CannotFollowYourself
+                enum:
+                    - Unspecified
+                    - UserNotFound
+                    - UserAlreadyFollowing
+                    - CannotFollowYourself
         example:
-            fault: false
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: true
-            timeout: true
+            code: Unspecified
         required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
+            - code
     ProfileFollowUserRequestBody:
         title: ProfileFollowUserRequestBody
         type: object
         properties:
             username:
                 type: string
-                example: vzz
+                example: _y28
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: FBZKocC
+            username: GH3
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -470,102 +448,31 @@ definitions:
                 username: Dolore distinctio et dolores deleniti quo voluptas.
         required:
             - profile
-    ProfileFollowUserUserAlreadyFollowingResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    ProfileUnfollowUserBadRequest:
+        title: ProfileUnfollowUserBadRequest
         type: object
         properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: false
-            id:
+            code:
                 type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: false
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: followUser_UserAlreadyFollowing_response_body result type (default view)
+                example: UserNotFollowing
+                enum:
+                    - Unspecified
+                    - UserNotFound
+                    - UserNotFollowing
         example:
-            fault: false
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: false
-            timeout: false
+            code: Unspecified
         required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
-    ProfileFollowUserUserNotFoundResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-        type: object
-        properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
-                type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: false
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: followUser_UserNotFound_response_body result type (default view)
-        example:
-            fault: false
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: true
-            timeout: true
-        required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
+            - code
     ProfileUnfollowUserRequestBody:
         title: ProfileUnfollowUserRequestBody
         type: object
         properties:
             username:
                 type: string
-                example: KS7d
+                example: bt_
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: b1Y
+            username: 2s2xr
         required:
             - username
     ProfileUnfollowUserResponseBody:
@@ -582,117 +489,31 @@ definitions:
                 username: Dolore distinctio et dolores deleniti quo voluptas.
         required:
             - profile
-    ProfileUnfollowUserUserNotFollowingResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-        type: object
-        properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: false
-            id:
-                type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: true
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: unfollowUser_UserNotFollowing_response_body result type (default view)
-        example:
-            fault: false
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: false
-            timeout: true
-        required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
-    ProfileUnfollowUserUserNotFoundResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-        type: object
-        properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
-                type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: false
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: unfollowUser_UserNotFound_response_body result type (default view)
-        example:
-            fault: true
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: true
-            timeout: true
-        required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
     User:
         title: User
         type: object
         properties:
             bio:
                 type: string
-                example: Rem quia ex et eos et ut.
+                example: Repellat nihil facilis cupiditate.
             email:
                 type: string
-                example: Ut corporis optio omnis a perferendis.
+                example: Quaerat eligendi est.
             image:
                 type: string
-                example: Fugit optio.
+                example: Dolores ad magni blanditiis voluptatem qui.
             token:
                 type: string
-                example: Nihil asperiores autem.
+                example: Sed nulla.
             username:
                 type: string
-                example: Dolorum ullam voluptatem ut ea doloribus et.
+                example: Excepturi ut et similique.
         example:
-            bio: Eos libero aut.
-            email: Sit sunt sunt.
-            image: Nihil ipsam.
-            token: Sit ab veritatis optio.
-            username: Rerum amet nihil.
+            bio: Qui ullam quis sapiente.
+            email: Et et architecto fugiat.
+            image: Voluptatem soluta porro consequatur.
+            token: Quis aut ea rerum.
+            username: Sunt at vero fugit.
         required:
             - email
             - token
@@ -707,115 +528,44 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Aspernatur tempore ea non similique.
-                email: Ab ipsa autem dolore nisi aut.
-                image: Et sed voluptatem voluptatibus.
-                token: Quos doloribus qui blanditiis est perferendis.
-                username: Voluptatibus iure.
+                bio: Quos doloribus qui blanditiis est perferendis.
+                email: Sunt et debitis et facere.
+                image: Voluptatibus iure.
+                token: Recusandae ab distinctio qui ratione earum.
+                username: Nihil ab ipsa autem dolore nisi aut.
         required:
             - user
-    UserLoginEmailNotFoundResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    UserLoginBadRequest:
+        title: UserLoginBadRequest
         type: object
         properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
+            code:
                 type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: false
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: true
-        description: login_EmailNotFound_response_body result type (default view)
+                example: EmailNotFound
+                enum:
+                    - Unspecified
+                    - EmailNotFound
+                    - PasswordIsIncorrect
         example:
-            fault: true
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: false
-            timeout: false
+            code: Unspecified
         required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
-    UserLoginPasswordIsIncorrectResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-        type: object
-        properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: false
-            id:
-                type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: true
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: login_PasswordIsIncorrect_response_body result type (default view)
-        example:
-            fault: true
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: false
-            timeout: false
-        required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
+            - code
     UserLoginRequestBody:
         title: UserLoginRequestBody
         type: object
         properties:
             email:
                 type: string
-                example: abbie@willms.info
+                example: izabella@coleabbott.org
                 format: email
             password:
                 type: string
-                example: p4r
+                example: d23
                 minLength: 6
                 maxLength: 128
         example:
-            email: ryleigh_schuppe@franecki.org
-            password: xe2
+            email: neal.oberbrunner@langosh.net
+            password: 7ap
         required:
             - email
             - password
@@ -827,77 +577,49 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Aspernatur tempore ea non similique.
-                email: Ab ipsa autem dolore nisi aut.
-                image: Et sed voluptatem voluptatibus.
-                token: Quos doloribus qui blanditiis est perferendis.
-                username: Voluptatibus iure.
+                bio: Quos doloribus qui blanditiis est perferendis.
+                email: Sunt et debitis et facere.
+                image: Voluptatibus iure.
+                token: Recusandae ab distinctio qui ratione earum.
+                username: Nihil ab ipsa autem dolore nisi aut.
         required:
             - user
-    UserRegisterEmailAlreadyUsedResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    UserRegisterBadRequest:
+        title: UserRegisterBadRequest
         type: object
         properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
+            code:
                 type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: true
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: register_EmailAlreadyUsed_response_body result type (default view)
+                example: EmailAlreadyUsed
+                enum:
+                    - Unspecified
+                    - UsernameAlreadyUsed
+                    - EmailAlreadyUsed
         example:
-            fault: true
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: true
-            timeout: false
+            code: EmailAlreadyUsed
         required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
+            - code
     UserRegisterRequestBody:
         title: UserRegisterRequestBody
         type: object
         properties:
             email:
                 type: string
-                example: rozella.mertz@carroll.net
+                example: haylee.botsford@kreiger.net
                 format: email
             password:
                 type: string
-                example: dcv
+                example: udj
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: Uzmb0s
+                example: 3NCh
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: emiliano@mcclure.name
-            password: x0f
-            username: QWmLN
+            email: antonina@damore.name
+            password: xrm
+            username: Tiyc
         required:
             - username
             - email
@@ -910,87 +632,44 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Aspernatur tempore ea non similique.
-                email: Ab ipsa autem dolore nisi aut.
-                image: Et sed voluptatem voluptatibus.
-                token: Quos doloribus qui blanditiis est perferendis.
-                username: Voluptatibus iure.
+                bio: Quos doloribus qui blanditiis est perferendis.
+                email: Sunt et debitis et facere.
+                image: Voluptatibus iure.
+                token: Recusandae ab distinctio qui ratione earum.
+                username: Nihil ab ipsa autem dolore nisi aut.
         required:
             - user
-    UserRegisterUsernameAlreadyUsedResponseBody:
-        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-        type: object
-        properties:
-            fault:
-                type: boolean
-                description: Is the error a server-side fault?
-                example: true
-            id:
-                type: string
-                description: ID is a unique identifier for this particular occurrence of the problem.
-                example: 123abc
-            message:
-                type: string
-                description: Message is a human-readable explanation specific to this occurrence of the problem.
-                example: parameter 'p' must be an integer
-            name:
-                type: string
-                description: Name is the name of this class of errors.
-                example: bad_request
-            temporary:
-                type: boolean
-                description: Is the error temporary?
-                example: true
-            timeout:
-                type: boolean
-                description: Is the error a timeout?
-                example: false
-        description: register_UsernameAlreadyUsed_response_body result type (default view)
-        example:
-            fault: true
-            id: 123abc
-            message: parameter 'p' must be an integer
-            name: bad_request
-            temporary: true
-            timeout: false
-        required:
-            - name
-            - id
-            - message
-            - temporary
-            - timeout
-            - fault
     UserUpdateRequestBody:
         title: UserUpdateRequestBody
         type: object
         properties:
             bio:
                 type: string
-                example: 9ss
+                example: idw
                 maxLength: 4096
             email:
                 type: string
-                example: angelina_langworth@brown.biz
+                example: cassandra.graham@corwindietrich.org
                 format: email
             image:
                 type: string
-                example: http://q
+                example: https://c
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: ctr
+                example: mvx
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: xZB
+                example: 4Jz8
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: jzn
-            email: francisco@adams.name
-            image: https://ld
-            password: hoh
-            username: utLx
+            bio: 9vc
+            email: efren_runte@schmeler.name
+            image: https://y0
+            password: x46
+            username: oZx
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -999,10 +678,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Aspernatur tempore ea non similique.
-                email: Ab ipsa autem dolore nisi aut.
-                image: Et sed voluptatem voluptatibus.
-                token: Quos doloribus qui blanditiis est perferendis.
-                username: Voluptatibus iure.
+                bio: Quos doloribus qui blanditiis est perferendis.
+                email: Sunt et debitis et facere.
+                image: Voluptatibus iure.
+                token: Recusandae ab distinctio qui ratione earum.
+                username: Nihil ab ipsa autem dolore nisi aut.
         required:
             - user

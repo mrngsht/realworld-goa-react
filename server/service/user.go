@@ -6,6 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 
+	"github.com/mrngsht/realworld-goa-react/design"
 	"github.com/mrngsht/realworld-goa-react/domain/user"
 	goa "github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myctx"
@@ -30,9 +31,9 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
 			case user.ErrEmailNotFound:
-				err = goa.MakeEmailNotFound(err)
+				err = &goa.UserLoginBadRequest{Code: design.ErrCode_User_EmailNotFound}
 			case user.ErrPasswordIsIncorrect:
-				err = goa.MakePasswordIsIncorrect(err)
+				err = &goa.UserLoginBadRequest{Code: design.ErrCode_User_PasswordIsIncorrect}
 			}
 		}
 	}()
@@ -89,9 +90,9 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
 			case user.ErrUsernameAlreadyUsed:
-				err = goa.MakeUsernameAlreadyUsed(err)
+				err = &goa.UserRegisterBadRequest{Code: design.ErrCode_User_UsernameAlreadyUsed}
 			case user.ErrEmailAlreadyUsed:
-				err = goa.MakeEmailAlreadyUsed(err)
+				err = &goa.UserRegisterBadRequest{Code: design.ErrCode_User_EmailAlreadyUsed}
 			}
 		}
 	}()

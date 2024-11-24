@@ -63,76 +63,17 @@ type UpdateResponseBody struct {
 	User *UserResponseBody `form:"user" json:"user" xml:"user"`
 }
 
-// LoginEmailNotFoundResponseBody is the type of the "user" service "login"
-// endpoint HTTP response body for the "EmailNotFound" error.
-type LoginEmailNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
+// LoginUserLoginBadRequestResponseBody is the type of the "user" service
+// "login" endpoint HTTP response body for the "UserLoginBadRequest" error.
+type LoginUserLoginBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
 }
 
-// LoginPasswordIsIncorrectResponseBody is the type of the "user" service
-// "login" endpoint HTTP response body for the "PasswordIsIncorrect" error.
-type LoginPasswordIsIncorrectResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// RegisterUsernameAlreadyUsedResponseBody is the type of the "user" service
-// "register" endpoint HTTP response body for the "UsernameAlreadyUsed" error.
-type RegisterUsernameAlreadyUsedResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// RegisterEmailAlreadyUsedResponseBody is the type of the "user" service
-// "register" endpoint HTTP response body for the "EmailAlreadyUsed" error.
-type RegisterEmailAlreadyUsedResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
+// RegisterUserRegisterBadRequestResponseBody is the type of the "user" service
+// "register" endpoint HTTP response body for the "UserRegisterBadRequest"
+// error.
+type RegisterUserRegisterBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
 }
 
 // UserResponseBody is used to define fields on response body types.
@@ -184,58 +125,20 @@ func NewUpdateResponseBody(res *user.UpdateResult) *UpdateResponseBody {
 	return body
 }
 
-// NewLoginEmailNotFoundResponseBody builds the HTTP response body from the
-// result of the "login" endpoint of the "user" service.
-func NewLoginEmailNotFoundResponseBody(res *goa.ServiceError) *LoginEmailNotFoundResponseBody {
-	body := &LoginEmailNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewLoginPasswordIsIncorrectResponseBody builds the HTTP response body from
+// NewLoginUserLoginBadRequestResponseBody builds the HTTP response body from
 // the result of the "login" endpoint of the "user" service.
-func NewLoginPasswordIsIncorrectResponseBody(res *goa.ServiceError) *LoginPasswordIsIncorrectResponseBody {
-	body := &LoginPasswordIsIncorrectResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
+func NewLoginUserLoginBadRequestResponseBody(res *user.UserLoginBadRequest) *LoginUserLoginBadRequestResponseBody {
+	body := &LoginUserLoginBadRequestResponseBody{
+		Code: res.Code,
 	}
 	return body
 }
 
-// NewRegisterUsernameAlreadyUsedResponseBody builds the HTTP response body
+// NewRegisterUserRegisterBadRequestResponseBody builds the HTTP response body
 // from the result of the "register" endpoint of the "user" service.
-func NewRegisterUsernameAlreadyUsedResponseBody(res *goa.ServiceError) *RegisterUsernameAlreadyUsedResponseBody {
-	body := &RegisterUsernameAlreadyUsedResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewRegisterEmailAlreadyUsedResponseBody builds the HTTP response body from
-// the result of the "register" endpoint of the "user" service.
-func NewRegisterEmailAlreadyUsedResponseBody(res *goa.ServiceError) *RegisterEmailAlreadyUsedResponseBody {
-	body := &RegisterEmailAlreadyUsedResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
+func NewRegisterUserRegisterBadRequestResponseBody(res *user.UserRegisterBadRequest) *RegisterUserRegisterBadRequestResponseBody {
+	body := &RegisterUserRegisterBadRequestResponseBody{
+		Code: res.Code,
 	}
 	return body
 }

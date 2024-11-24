@@ -1,58 +1,57 @@
 package design
 
-import . "goa.design/goa/v3/dsl"
+import (
+	. "goa.design/goa/v3/dsl"
+)
 
 var _ = Service("user", func() {
 	Description("user")
-
-	Error(ErrorUser_UsernameAlreadyUsed)
-	Error(ErrorUser_EmailAlreadyUsed)
-	Error(ErrorUser_EmailNotFound)
-	Error(ErrorUser_PasswordIsIncorrect)
 
 	Method("login", func() {
 		HTTP(func() {
 			POST("user/login")
 			Response(StatusOK)
-			Response(ErrorUser_EmailNotFound, StatusBadRequest)
-			Response(ErrorUser_PasswordIsIncorrect, StatusBadRequest)
+			Response(errType_UserLoginBadRequest.Name(), StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeWithName("email", String, DefUser_RequestEmail),
-				AttributeWithName("password", String, DefUser_RequestPassword),
+				AttributeWithName("email", String, def_User_RequestEmail),
+				AttributeWithName("password", String, def_User_RequestPassword),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", Type_User),
+				AttributeWithName("user", type_User),
 			)
 		})
+
+		Error(errType_UserLoginBadRequest.Name(), errType_UserLoginBadRequest)
 	})
 
 	Method("register", func() {
 		HTTP(func() {
 			POST("user/register")
 			Response(StatusOK)
-			Response(ErrorUser_UsernameAlreadyUsed, StatusBadRequest)
-			Response(ErrorUser_EmailAlreadyUsed, StatusBadRequest)
+			Response(errType_UserRegisterBadRequest.Name(), StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeWithName("username", String, DefUser_RequestUsername),
-				AttributeWithName("email", String, DefUser_RequestEmail),
-				AttributeWithName("password", String, DefUser_RequestPassword),
+				AttributeWithName("username", String, def_User_RequestUsername),
+				AttributeWithName("email", String, def_User_RequestEmail),
+				AttributeWithName("password", String, def_User_RequestPassword),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", Type_User),
+				AttributeWithName("user", type_User),
 			)
 		})
+
+		Error(errType_UserRegisterBadRequest.Name(), errType_UserRegisterBadRequest)
 	})
 
 	Method("getCurrent", func() {
@@ -63,7 +62,7 @@ var _ = Service("user", func() {
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", Type_User),
+				AttributeWithName("user", type_User),
 			)
 		})
 	})
@@ -75,50 +74,43 @@ var _ = Service("user", func() {
 		})
 
 		Payload(func() {
-			AttributeWithName("username", String, DefUser_RequestUsername)
-			AttributeWithName("email", String, DefUser_RequestEmail)
-			AttributeWithName("password", String, DefUser_RequestPassword)
-			AttributeWithName("image", String, DefUser_RequestImage)
-			AttributeWithName("bio", String, DefUser_RequestBio)
+			AttributeWithName("username", String, def_User_RequestUsername)
+			AttributeWithName("email", String, def_User_RequestEmail)
+			AttributeWithName("password", String, def_User_RequestPassword)
+			AttributeWithName("image", String, def_User_RequestImage)
+			AttributeWithName("bio", String, def_User_RequestBio)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("user", Type_User),
+				AttributeWithName("user", type_User),
 			)
 		})
 	})
 
 })
 
-const (
-	ErrorUser_UsernameAlreadyUsed = "UsernameAlreadyUsed"
-	ErrorUser_EmailAlreadyUsed    = "EmailAlreadyUsed"
-	ErrorUser_EmailNotFound       = "EmailNotFound"
-	ErrorUser_PasswordIsIncorrect = "PasswordIsIncorrect"
-)
-
 var (
-	DefUser_RequestUsername = func() {
+	def_User_RequestUsername = func() {
 		Pattern(`^[a-zA-Z0-9_]{3,32}$`)
 	}
-	DefUser_RequestEmail = func() {
+	def_User_RequestEmail = func() {
 		Format(FormatEmail)
 	}
-	DefUser_RequestPassword = func() {
+	def_User_RequestPassword = func() {
 		MinLength(6)
 		MaxLength(128)
 	}
-	DefUser_RequestImage = func() {
+	def_User_RequestImage = func() {
 		Pattern(`^https?://.+$`)
 	}
-	DefUser_RequestBio = func() {
+	def_User_RequestBio = func() {
 		MaxLength(4096)
 	}
 )
 
 var (
-	Type_User = Type("User", func() {
+	type_User = Type("User", func() {
 		Required(
 			AttributeWithName("email", String),
 			AttributeWithName("token", String),
@@ -127,4 +119,23 @@ var (
 			AttributeWithName("image", String),
 		)
 	})
+)
+
+var (
+	errType_UserLoginBadRequest = myErrorType("UserLoginBadRequest", []any{
+		ErrCode_User_EmailNotFound,
+		ErrCode_User_PasswordIsIncorrect,
+	}, nil)
+
+	errType_UserRegisterBadRequest = myErrorType("UserRegisterBadRequest", []any{
+		ErrCode_User_UsernameAlreadyUsed,
+		ErrCode_User_EmailAlreadyUsed,
+	}, nil)
+)
+
+const (
+	ErrCode_User_EmailNotFound       = "EmailNotFound"
+	ErrCode_User_PasswordIsIncorrect = "PasswordIsIncorrect"
+	ErrCode_User_UsernameAlreadyUsed = "UsernameAlreadyUsed"
+	ErrCode_User_EmailAlreadyUsed    = "EmailAlreadyUsed"
 )

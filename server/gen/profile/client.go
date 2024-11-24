@@ -29,10 +29,7 @@ func NewClient(followUser, unfollowUser goa.Endpoint) *Client {
 
 // FollowUser calls the "followUser" endpoint of the "profile" service.
 // FollowUser may return the following errors:
-//   - "UserNotFound" (type *goa.ServiceError)
-//   - "UserAlreadyFollowing" (type *goa.ServiceError)
-//   - "UserNotFollowing" (type *goa.ServiceError)
-//   - "CannotFollowYourself" (type *goa.ServiceError)
+//   - "ProfileFollowUserBadRequest" (type *ProfileFollowUserBadRequest)
 //   - error: internal error
 func (c *Client) FollowUser(ctx context.Context, p *FollowUserPayload) (res *FollowUserResult, err error) {
 	var ires any
@@ -45,10 +42,7 @@ func (c *Client) FollowUser(ctx context.Context, p *FollowUserPayload) (res *Fol
 
 // UnfollowUser calls the "unfollowUser" endpoint of the "profile" service.
 // UnfollowUser may return the following errors:
-//   - "UserNotFound" (type *goa.ServiceError)
-//   - "UserAlreadyFollowing" (type *goa.ServiceError)
-//   - "UserNotFollowing" (type *goa.ServiceError)
-//   - "CannotFollowYourself" (type *goa.ServiceError)
+//   - "ProfileUnfollowUserBadRequest" (type *ProfileUnfollowUserBadRequest)
 //   - error: internal error
 func (c *Client) UnfollowUser(ctx context.Context, p *UnfollowUserPayload) (res *UnfollowUserResult, err error) {
 	var ires any

@@ -45,7 +45,7 @@ func BuildUnfollowUserPayload(profileUnfollowUserBody string) (*profile.Unfollow
 	{
 		err = json.Unmarshal([]byte(profileUnfollowUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"NaN\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"9Ii\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 		if err != nil {

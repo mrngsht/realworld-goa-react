@@ -36,97 +36,18 @@ type UnfollowUserResponseBody struct {
 	Profile *ProfileResponseBody `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
 }
 
-// FollowUserUserNotFoundResponseBody is the type of the "profile" service
-// "followUser" endpoint HTTP response body for the "UserNotFound" error.
-type FollowUserUserNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+// FollowUserProfileFollowUserBadRequestResponseBody is the type of the
+// "profile" service "followUser" endpoint HTTP response body for the
+// "ProfileFollowUserBadRequest" error.
+type FollowUserProfileFollowUserBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
-// FollowUserUserAlreadyFollowingResponseBody is the type of the "profile"
-// service "followUser" endpoint HTTP response body for the
-// "UserAlreadyFollowing" error.
-type FollowUserUserAlreadyFollowingResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
-}
-
-// FollowUserCannotFollowYourselfResponseBody is the type of the "profile"
-// service "followUser" endpoint HTTP response body for the
-// "CannotFollowYourself" error.
-type FollowUserCannotFollowYourselfResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
-}
-
-// UnfollowUserUserNotFoundResponseBody is the type of the "profile" service
-// "unfollowUser" endpoint HTTP response body for the "UserNotFound" error.
-type UnfollowUserUserNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
-}
-
-// UnfollowUserUserNotFollowingResponseBody is the type of the "profile"
-// service "unfollowUser" endpoint HTTP response body for the
-// "UserNotFollowing" error.
-type UnfollowUserUserNotFollowingResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+// UnfollowUserProfileUnfollowUserBadRequestResponseBody is the type of the
+// "profile" service "unfollowUser" endpoint HTTP response body for the
+// "ProfileUnfollowUserBadRequest" error.
+type UnfollowUserProfileUnfollowUserBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
 // ProfileResponseBody is used to define fields on response body types.
@@ -164,46 +85,11 @@ func NewFollowUserResultOK(body *FollowUserResponseBody) *profile.FollowUserResu
 	return v
 }
 
-// NewFollowUserUserNotFound builds a profile service followUser endpoint
-// UserNotFound error.
-func NewFollowUserUserNotFound(body *FollowUserUserNotFoundResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
-
-	return v
-}
-
-// NewFollowUserUserAlreadyFollowing builds a profile service followUser
-// endpoint UserAlreadyFollowing error.
-func NewFollowUserUserAlreadyFollowing(body *FollowUserUserAlreadyFollowingResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
-
-	return v
-}
-
-// NewFollowUserCannotFollowYourself builds a profile service followUser
-// endpoint CannotFollowYourself error.
-func NewFollowUserCannotFollowYourself(body *FollowUserCannotFollowYourselfResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
+// NewFollowUserProfileFollowUserBadRequest builds a profile service followUser
+// endpoint ProfileFollowUserBadRequest error.
+func NewFollowUserProfileFollowUserBadRequest(body *FollowUserProfileFollowUserBadRequestResponseBody) *profile.ProfileFollowUserBadRequest {
+	v := &profile.ProfileFollowUserBadRequest{
+		Code: *body.Code,
 	}
 
 	return v
@@ -218,31 +104,11 @@ func NewUnfollowUserResultOK(body *UnfollowUserResponseBody) *profile.UnfollowUs
 	return v
 }
 
-// NewUnfollowUserUserNotFound builds a profile service unfollowUser endpoint
-// UserNotFound error.
-func NewUnfollowUserUserNotFound(body *UnfollowUserUserNotFoundResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
-
-	return v
-}
-
-// NewUnfollowUserUserNotFollowing builds a profile service unfollowUser
-// endpoint UserNotFollowing error.
-func NewUnfollowUserUserNotFollowing(body *UnfollowUserUserNotFollowingResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
+// NewUnfollowUserProfileUnfollowUserBadRequest builds a profile service
+// unfollowUser endpoint ProfileUnfollowUserBadRequest error.
+func NewUnfollowUserProfileUnfollowUserBadRequest(body *UnfollowUserProfileUnfollowUserBadRequestResponseBody) *profile.ProfileUnfollowUserBadRequest {
+	v := &profile.ProfileUnfollowUserBadRequest{
+		Code: *body.Code,
 	}
 
 	return v
@@ -276,122 +142,31 @@ func ValidateUnfollowUserResponseBody(body *UnfollowUserResponseBody) (err error
 	return
 }
 
-// ValidateFollowUserUserNotFoundResponseBody runs the validations defined on
-// followUser_UserNotFound_response_body
-func ValidateFollowUserUserNotFoundResponseBody(body *FollowUserUserNotFoundResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+// ValidateFollowUserProfileFollowUserBadRequestResponseBody runs the
+// validations defined on followUser_ProfileFollowUserBadRequest_response_body
+func ValidateFollowUserProfileFollowUserBadRequestResponseBody(body *FollowUserProfileFollowUserBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "UserNotFound" || *body.Code == "UserAlreadyFollowing" || *body.Code == "CannotFollowYourself") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "UserNotFound", "UserAlreadyFollowing", "CannotFollowYourself"}))
+		}
 	}
 	return
 }
 
-// ValidateFollowUserUserAlreadyFollowingResponseBody runs the validations
-// defined on followUser_UserAlreadyFollowing_response_body
-func ValidateFollowUserUserAlreadyFollowingResponseBody(body *FollowUserUserAlreadyFollowingResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+// ValidateUnfollowUserProfileUnfollowUserBadRequestResponseBody runs the
+// validations defined on
+// unfollowUser_ProfileUnfollowUserBadRequest_response_body
+func ValidateUnfollowUserProfileUnfollowUserBadRequestResponseBody(body *UnfollowUserProfileUnfollowUserBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
-	}
-	return
-}
-
-// ValidateFollowUserCannotFollowYourselfResponseBody runs the validations
-// defined on followUser_CannotFollowYourself_response_body
-func ValidateFollowUserCannotFollowYourselfResponseBody(body *FollowUserCannotFollowYourselfResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
-	}
-	return
-}
-
-// ValidateUnfollowUserUserNotFoundResponseBody runs the validations defined on
-// unfollowUser_UserNotFound_response_body
-func ValidateUnfollowUserUserNotFoundResponseBody(body *UnfollowUserUserNotFoundResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
-	}
-	return
-}
-
-// ValidateUnfollowUserUserNotFollowingResponseBody runs the validations
-// defined on unfollowUser_UserNotFollowing_response_body
-func ValidateUnfollowUserUserNotFollowingResponseBody(body *UnfollowUserUserNotFollowingResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "UserNotFound" || *body.Code == "UserNotFollowing") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "UserNotFound", "UserNotFollowing"}))
+		}
 	}
 	return
 }

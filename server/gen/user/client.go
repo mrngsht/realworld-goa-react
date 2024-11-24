@@ -33,10 +33,7 @@ func NewClient(login, register, getCurrent, update goa.Endpoint) *Client {
 
 // Login calls the "login" endpoint of the "user" service.
 // Login may return the following errors:
-//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailNotFound" (type *goa.ServiceError)
-//   - "PasswordIsIncorrect" (type *goa.ServiceError)
+//   - "UserLoginBadRequest" (type *UserLoginBadRequest)
 //   - error: internal error
 func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, err error) {
 	var ires any
@@ -49,10 +46,7 @@ func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, 
 
 // Register calls the "register" endpoint of the "user" service.
 // Register may return the following errors:
-//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailNotFound" (type *goa.ServiceError)
-//   - "PasswordIsIncorrect" (type *goa.ServiceError)
+//   - "UserRegisterBadRequest" (type *UserRegisterBadRequest)
 //   - error: internal error
 func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *RegisterResult, err error) {
 	var ires any
@@ -64,12 +58,6 @@ func (c *Client) Register(ctx context.Context, p *RegisterPayload) (res *Registe
 }
 
 // GetCurrent calls the "getCurrent" endpoint of the "user" service.
-// GetCurrent may return the following errors:
-//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailNotFound" (type *goa.ServiceError)
-//   - "PasswordIsIncorrect" (type *goa.ServiceError)
-//   - error: internal error
 func (c *Client) GetCurrent(ctx context.Context) (res *GetCurrentResult, err error) {
 	var ires any
 	ires, err = c.GetCurrentEndpoint(ctx, nil)
@@ -80,12 +68,6 @@ func (c *Client) GetCurrent(ctx context.Context) (res *GetCurrentResult, err err
 }
 
 // Update calls the "update" endpoint of the "user" service.
-// Update may return the following errors:
-//   - "UsernameAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailAlreadyUsed" (type *goa.ServiceError)
-//   - "EmailNotFound" (type *goa.ServiceError)
-//   - "PasswordIsIncorrect" (type *goa.ServiceError)
-//   - error: internal error
 func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *UpdateResult, err error) {
 	var ires any
 	ires, err = c.UpdateEndpoint(ctx, p)

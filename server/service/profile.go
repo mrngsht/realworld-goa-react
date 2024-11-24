@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cockroachdb/errors"
+	"github.com/mrngsht/realworld-goa-react/design"
 	"github.com/mrngsht/realworld-goa-react/domain/user"
 	goa "github.com/mrngsht/realworld-goa-react/gen/profile"
 	"github.com/mrngsht/realworld-goa-react/myctx"
@@ -28,11 +29,11 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
 			case user.ErrUserNotFound:
-				err = goa.MakeUserNotFound(err)
+				err = &goa.ProfileFollowUserBadRequest{Code: design.ErrCode_Profile_UserNotFound}
 			case user.ErrUserAlreadyFollowing:
-				err = goa.MakeUserAlreadyFollowing(err)
+				err = &goa.ProfileFollowUserBadRequest{Code: design.ErrCode_Profile_UserAlreadyFollowing}
 			case user.ErrCannotFollowYourself:
-				err = goa.MakeCannotFollowYourself(err)
+				err = &goa.ProfileFollowUserBadRequest{Code: design.ErrCode_Profile_UserCannotFollowYourself}
 			}
 		}
 	}()
@@ -100,9 +101,9 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
 			case user.ErrUserNotFound:
-				err = goa.MakeUserNotFound(err)
+				err = &goa.ProfileUnfollowUserBadRequest{Code: design.ErrCode_Profile_UserNotFound}
 			case user.ErrUserNotFollowing:
-				err = goa.MakeUserNotFollowing(err)
+				err = &goa.ProfileUnfollowUserBadRequest{Code: design.ErrCode_Profile_UserNotFollowing}
 			}
 		}
 	}()

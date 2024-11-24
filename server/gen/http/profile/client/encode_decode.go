@@ -53,9 +53,7 @@ func EncodeFollowUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // profile followUser endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeFollowUserResponse may return the following errors:
-//   - "UserNotFound" (type *goa.ServiceError): http.StatusBadRequest
-//   - "UserAlreadyFollowing" (type *goa.ServiceError): http.StatusBadRequest
-//   - "CannotFollowYourself" (type *goa.ServiceError): http.StatusBadRequest
+//   - "ProfileFollowUserBadRequest" (type *profile.ProfileFollowUserBadRequest): http.StatusBadRequest
 //   - error: internal error
 func DecodeFollowUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -88,54 +86,19 @@ func DecodeFollowUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			res := NewFollowUserResultOK(&body)
 			return res, nil
 		case http.StatusBadRequest:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "UserNotFound":
-				var (
-					body FollowUserUserNotFoundResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("profile", "followUser", err)
-				}
-				err = ValidateFollowUserUserNotFoundResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("profile", "followUser", err)
-				}
-				return nil, NewFollowUserUserNotFound(&body)
-			case "UserAlreadyFollowing":
-				var (
-					body FollowUserUserAlreadyFollowingResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("profile", "followUser", err)
-				}
-				err = ValidateFollowUserUserAlreadyFollowingResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("profile", "followUser", err)
-				}
-				return nil, NewFollowUserUserAlreadyFollowing(&body)
-			case "CannotFollowYourself":
-				var (
-					body FollowUserCannotFollowYourselfResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("profile", "followUser", err)
-				}
-				err = ValidateFollowUserCannotFollowYourselfResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("profile", "followUser", err)
-				}
-				return nil, NewFollowUserCannotFollowYourself(&body)
-			default:
-				body, _ := io.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("profile", "followUser", resp.StatusCode, string(body))
+			var (
+				body FollowUserProfileFollowUserBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("profile", "followUser", err)
 			}
+			err = ValidateFollowUserProfileFollowUserBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("profile", "followUser", err)
+			}
+			return nil, NewFollowUserProfileFollowUserBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("profile", "followUser", resp.StatusCode, string(body))
@@ -178,8 +141,7 @@ func EncodeUnfollowUserRequest(encoder func(*http.Request) goahttp.Encoder) func
 // profile unfollowUser endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeUnfollowUserResponse may return the following errors:
-//   - "UserNotFound" (type *goa.ServiceError): http.StatusBadRequest
-//   - "UserNotFollowing" (type *goa.ServiceError): http.StatusBadRequest
+//   - "ProfileUnfollowUserBadRequest" (type *profile.ProfileUnfollowUserBadRequest): http.StatusBadRequest
 //   - error: internal error
 func DecodeUnfollowUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -212,40 +174,19 @@ func DecodeUnfollowUserResponse(decoder func(*http.Response) goahttp.Decoder, re
 			res := NewUnfollowUserResultOK(&body)
 			return res, nil
 		case http.StatusBadRequest:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "UserNotFound":
-				var (
-					body UnfollowUserUserNotFoundResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("profile", "unfollowUser", err)
-				}
-				err = ValidateUnfollowUserUserNotFoundResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("profile", "unfollowUser", err)
-				}
-				return nil, NewUnfollowUserUserNotFound(&body)
-			case "UserNotFollowing":
-				var (
-					body UnfollowUserUserNotFollowingResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("profile", "unfollowUser", err)
-				}
-				err = ValidateUnfollowUserUserNotFollowingResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("profile", "unfollowUser", err)
-				}
-				return nil, NewUnfollowUserUserNotFollowing(&body)
-			default:
-				body, _ := io.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("profile", "unfollowUser", resp.StatusCode, string(body))
+			var (
+				body UnfollowUserProfileUnfollowUserBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("profile", "unfollowUser", err)
 			}
+			err = ValidateUnfollowUserProfileUnfollowUserBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("profile", "unfollowUser", err)
+			}
+			return nil, NewUnfollowUserProfileUnfollowUserBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("profile", "unfollowUser", resp.StatusCode, string(body))

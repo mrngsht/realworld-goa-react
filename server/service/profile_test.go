@@ -85,7 +85,10 @@ func TestProfile_FollowUser(t *testing.T) {
 			Username: "WRONG_USERNAME",
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorProfile_UserNotFound, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.ProfileFollowUserBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Profile_UserNotFound, badRequest.Code)
 	})
 
 	t.Run("user already following", func(t *testing.T) {
@@ -104,7 +107,10 @@ func TestProfile_FollowUser(t *testing.T) {
 			Username: u2.Username,
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorProfile_UserAlreadyFollowing, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.ProfileFollowUserBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Profile_UserAlreadyFollowing, badRequest.Code)
 	})
 
 	t.Run("user cannot follow itself", func(t *testing.T) {
@@ -115,7 +121,10 @@ func TestProfile_FollowUser(t *testing.T) {
 			Username: u1.Username,
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorProfile_UserCannotFollowYourself, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.ProfileFollowUserBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Profile_UserCannotFollowYourself, badRequest.Code)
 	})
 }
 
@@ -194,7 +203,10 @@ func TestProfile_UnfollowUser(t *testing.T) {
 			Username: "WRONG_USERNAME",
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorProfile_UserNotFound, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.ProfileUnfollowUserBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Profile_UserNotFound, badRequest.Code)
 	})
 
 	t.Run("user not following", func(t *testing.T) {
@@ -208,6 +220,9 @@ func TestProfile_UnfollowUser(t *testing.T) {
 			Username: u2.Username,
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorProfile_UserNotFollowing, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.ProfileUnfollowUserBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Profile_UserNotFollowing, badRequest.Code)
 	})
 }

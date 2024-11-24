@@ -53,8 +53,7 @@ func EncodeLoginRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 // login endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeLoginResponse may return the following errors:
-//   - "EmailNotFound" (type *goa.ServiceError): http.StatusBadRequest
-//   - "PasswordIsIncorrect" (type *goa.ServiceError): http.StatusBadRequest
+//   - "UserLoginBadRequest" (type *user.UserLoginBadRequest): http.StatusBadRequest
 //   - error: internal error
 func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -87,40 +86,19 @@ func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			res := NewLoginResultOK(&body)
 			return res, nil
 		case http.StatusBadRequest:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "EmailNotFound":
-				var (
-					body LoginEmailNotFoundResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("user", "login", err)
-				}
-				err = ValidateLoginEmailNotFoundResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("user", "login", err)
-				}
-				return nil, NewLoginEmailNotFound(&body)
-			case "PasswordIsIncorrect":
-				var (
-					body LoginPasswordIsIncorrectResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("user", "login", err)
-				}
-				err = ValidateLoginPasswordIsIncorrectResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("user", "login", err)
-				}
-				return nil, NewLoginPasswordIsIncorrect(&body)
-			default:
-				body, _ := io.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("user", "login", resp.StatusCode, string(body))
+			var (
+				body LoginUserLoginBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "login", err)
 			}
+			err = ValidateLoginUserLoginBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "login", err)
+			}
+			return nil, NewLoginUserLoginBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("user", "login", resp.StatusCode, string(body))
@@ -163,8 +141,7 @@ func EncodeRegisterRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // register endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeRegisterResponse may return the following errors:
-//   - "UsernameAlreadyUsed" (type *goa.ServiceError): http.StatusBadRequest
-//   - "EmailAlreadyUsed" (type *goa.ServiceError): http.StatusBadRequest
+//   - "UserRegisterBadRequest" (type *user.UserRegisterBadRequest): http.StatusBadRequest
 //   - error: internal error
 func DecodeRegisterResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -197,40 +174,19 @@ func DecodeRegisterResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			res := NewRegisterResultOK(&body)
 			return res, nil
 		case http.StatusBadRequest:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "UsernameAlreadyUsed":
-				var (
-					body RegisterUsernameAlreadyUsedResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("user", "register", err)
-				}
-				err = ValidateRegisterUsernameAlreadyUsedResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("user", "register", err)
-				}
-				return nil, NewRegisterUsernameAlreadyUsed(&body)
-			case "EmailAlreadyUsed":
-				var (
-					body RegisterEmailAlreadyUsedResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("user", "register", err)
-				}
-				err = ValidateRegisterEmailAlreadyUsedResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("user", "register", err)
-				}
-				return nil, NewRegisterEmailAlreadyUsed(&body)
-			default:
-				body, _ := io.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("user", "register", resp.StatusCode, string(body))
+			var (
+				body RegisterUserRegisterBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "register", err)
 			}
+			err = ValidateRegisterUserRegisterBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "register", err)
+			}
+			return nil, NewRegisterUserRegisterBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("user", "register", resp.StatusCode, string(body))

@@ -9,8 +9,6 @@ package user
 
 import (
 	"context"
-
-	goa "goa.design/goa/v3/pkg"
 )
 
 // user
@@ -91,22 +89,44 @@ type User struct {
 	Image    string
 }
 
-// MakeUsernameAlreadyUsed builds a goa.ServiceError from an error.
-func MakeUsernameAlreadyUsed(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "UsernameAlreadyUsed", false, false, false)
+type UserLoginBadRequest struct {
+	Code string
 }
 
-// MakeEmailAlreadyUsed builds a goa.ServiceError from an error.
-func MakeEmailAlreadyUsed(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "EmailAlreadyUsed", false, false, false)
+type UserRegisterBadRequest struct {
+	Code string
 }
 
-// MakeEmailNotFound builds a goa.ServiceError from an error.
-func MakeEmailNotFound(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "EmailNotFound", false, false, false)
+// Error returns an error description.
+func (e *UserLoginBadRequest) Error() string {
+	return ""
 }
 
-// MakePasswordIsIncorrect builds a goa.ServiceError from an error.
-func MakePasswordIsIncorrect(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "PasswordIsIncorrect", false, false, false)
+// ErrorName returns "UserLoginBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *UserLoginBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "UserLoginBadRequest".
+func (e *UserLoginBadRequest) GoaErrorName() string {
+	return "UserLoginBadRequest"
+}
+
+// Error returns an error description.
+func (e *UserRegisterBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "UserRegisterBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *UserRegisterBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "UserRegisterBadRequest".
+func (e *UserRegisterBadRequest) GoaErrorName() string {
+	return "UserRegisterBadRequest"
 }

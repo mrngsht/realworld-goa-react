@@ -37,8 +37,8 @@ func UsageExamples() string {
       "username": "MFI"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "bryce_frami@kuhic.net",
-      "password": "n85"
+      "email": "isidro_blanda@eichmann.net",
+      "password": "t9g"
    }'` + "\n" +
 		""
 }
@@ -313,7 +313,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "NaN"
+      "username": "9Ii"
    }'
 `, os.Args[0])
 }
@@ -342,8 +342,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "bryce_frami@kuhic.net",
-      "password": "n85"
+      "email": "isidro_blanda@eichmann.net",
+      "password": "t9g"
    }'
 `, os.Args[0])
 }
@@ -356,9 +356,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "hilbert@kassulkekris.net",
-      "password": "4xh",
-      "username": "ioA"
+      "email": "kirk@buckridgeemmerich.biz",
+      "password": "hx9",
+      "username": "Qdp8A"
    }'
 `, os.Args[0])
 }
@@ -381,11 +381,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "tas",
-      "email": "napoleon.jenkins@hauck.biz",
-      "image": "https://2p",
-      "password": "o24",
-      "username": "UEEk"
+      "bio": "5gx",
+      "email": "vaughn@bode.com",
+      "image": "https://iq",
+      "password": "515",
+      "username": "meQ_n"
    }'
 `, os.Args[0])
 }

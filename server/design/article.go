@@ -13,13 +13,13 @@ var _ = Service("article", func() {
 
 		Payload(func() {
 			Required(
-				AttributeWithName("articleId", String, DefArticle_RequestArticleID),
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("article", Type_ArticleDetail),
+				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
 	})
@@ -32,7 +32,7 @@ var _ = Service("article", func() {
 
 		Payload(func() {
 			Required(
-				AttributeWithName("title", String, DefArticle_RequestTitle),
+				AttributeWithName("title", String, def_Article_RequestTitle),
 				AttributeWithName("description", String),
 				AttributeWithName("body", String),
 				AttributeWithName("tagList", ArrayOf(String)),
@@ -41,23 +41,23 @@ var _ = Service("article", func() {
 
 		Result(func() {
 			Required(
-				AttributeWithName("article", Type_ArticleDetail),
+				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
 	})
 })
 
 var (
-	DefArticle_RequestTitle = func() {
+	def_Article_RequestTitle = func() {
 		MaxLength(128)
 	}
-	DefArticle_RequestArticleID = func() {
+	def_Article_RequestArticleID = func() {
 		Format(FormatUUID)
 	}
 )
 
 var (
-	Type_ArticleDetail = Type("ArticleDetail", func() {
+	type_ArticleDetail = Type("ArticleDetail", func() {
 		Required(
 			AttributeWithName("articleId", String, func() {
 				Format(FormatUUID)
@@ -74,7 +74,7 @@ var (
 			}),
 			AttributeWithName("favorited", Boolean),
 			AttributeWithName("favoritesCount", UInt),
-			AttributeWithName("author", Type_Profile),
+			AttributeWithName("author", type_Profile),
 		)
 	})
 )

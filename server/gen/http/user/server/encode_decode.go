@@ -69,28 +69,15 @@ func EncodeLoginError(encoder func(context.Context, http.ResponseWriter) goahttp
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "EmailNotFound":
-			var res *goa.ServiceError
+		case "UserLoginBadRequest":
+			var res *user.UserLoginBadRequest
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
 			var body any
 			if formatter != nil {
 				body = formatter(ctx, res)
 			} else {
-				body = NewLoginEmailNotFoundResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		case "PasswordIsIncorrect":
-			var res *goa.ServiceError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			var body any
-			if formatter != nil {
-				body = formatter(ctx, res)
-			} else {
-				body = NewLoginPasswordIsIncorrectResponseBody(res)
+				body = NewLoginUserLoginBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
@@ -152,28 +139,15 @@ func EncodeRegisterError(encoder func(context.Context, http.ResponseWriter) goah
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "UsernameAlreadyUsed":
-			var res *goa.ServiceError
+		case "UserRegisterBadRequest":
+			var res *user.UserRegisterBadRequest
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
 			var body any
 			if formatter != nil {
 				body = formatter(ctx, res)
 			} else {
-				body = NewRegisterUsernameAlreadyUsedResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		case "EmailAlreadyUsed":
-			var res *goa.ServiceError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			var body any
-			if formatter != nil {
-				body = formatter(ctx, res)
-			} else {
-				body = NewRegisterEmailAlreadyUsedResponseBody(res)
+				body = NewRegisterUserRegisterBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)

@@ -1,6 +1,12 @@
 package design
 
-import . "goa.design/goa/v3/dsl"
+import (
+	"fmt"
+	"slices"
+
+	. "goa.design/goa/v3/dsl"
+	"goa.design/goa/v3/expr"
+)
 
 var _ = API("readlworld", func() {
 	Title("readworld app example")
@@ -20,4 +26,25 @@ var _ = API("readlworld", func() {
 
 const (
 	ErrorCommon_AuthenticationRequired = "AuthenticationRequired"
+
+	CodeCommon_Unspecified = "Unspecified"
 )
+
+func myErrorType(name string, codes []any, ext func()) expr.UserType {
+	if slices.Contains(codes, CodeCommon_Unspecified) {
+		panic(fmt.Sprintf("%s is already included implicitly", CodeCommon_Unspecified))
+	}
+
+	codesWithDefaults := slices.Concat([]any{"Unspecified"}, codes)
+
+	return Type(name, func() {
+		Required(
+			AttributeWithName("code", String, func() {
+				Enum(codesWithDefaults...)
+			}),
+		)
+		if ext != nil {
+			ext()
+		}
+	})
+}

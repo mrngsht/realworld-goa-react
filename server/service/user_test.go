@@ -59,7 +59,10 @@ func TestUser_Login(t *testing.T) {
 			Password: registerPayload.Password,
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorUser_EmailNotFound, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.UserLoginBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_User_EmailNotFound, badRequest.Code)
 
 		assert.Empty(t, res)
 	})
@@ -78,7 +81,10 @@ func TestUser_Login(t *testing.T) {
 			Password: "INCORRECT_PASSWORD",
 		})
 		require.Error(t, err)
-		assert.Equal(t, design.ErrorUser_PasswordIsIncorrect, servicetest.GoaServiceErrorName(err))
+
+		var badRequest *goa.UserLoginBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_User_PasswordIsIncorrect, badRequest.Code)
 
 		assert.Empty(t, res)
 	})
@@ -158,7 +164,10 @@ func TestUser_Register(t *testing.T) {
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
-			assert.Equal(t, design.ErrorUser_UsernameAlreadyUsed, servicetest.GoaServiceErrorName(err))
+
+			var badRequest *goa.UserRegisterBadRequest
+			require.ErrorAs(t, err, &badRequest)
+			assert.Equal(t, design.ErrCode_User_UsernameAlreadyUsed, badRequest.Code)
 
 			_, err = sqlctest.Q.GetUserEmailByEmail(ctx, db, payload.Email)
 			require.Error(t, err)
@@ -185,7 +194,10 @@ func TestUser_Register(t *testing.T) {
 			}
 			_, err := svc.Register(ctx, payload) // Act
 			require.Error(t, err)
-			assert.Equal(t, design.ErrorUser_EmailAlreadyUsed, servicetest.GoaServiceErrorName(err))
+
+			var badRequest *goa.UserRegisterBadRequest
+			require.ErrorAs(t, err, &badRequest)
+			assert.Equal(t, design.ErrCode_User_EmailAlreadyUsed, badRequest.Code)
 
 			_, err = sqlctest.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 			require.Error(t, err)

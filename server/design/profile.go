@@ -5,65 +5,54 @@ import . "goa.design/goa/v3/dsl"
 var _ = Service("profile", func() {
 	Description("profile")
 
-	Error(ErrorProfile_UserNotFound)
-	Error(ErrorProfile_UserAlreadyFollowing)
-	Error(ErrorProfile_UserNotFollowing)
-	Error(ErrorProfile_UserCannotFollowYourself)
-
 	Method("followUser", func() {
 		HTTP(func() {
 			POST("profile/follow_user")
 			Response(StatusOK)
-			Response(ErrorProfile_UserNotFound, StatusBadRequest)
-			Response(ErrorProfile_UserAlreadyFollowing, StatusBadRequest)
-			Response(ErrorProfile_UserCannotFollowYourself, StatusBadRequest)
+			Response(errType_ProfileFollowUserBadRequest.Name(), StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeWithName("username", String, DefUser_RequestUsername),
+				AttributeWithName("username", String, def_User_RequestUsername),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("profile", Type_Profile),
+				AttributeWithName("profile", type_Profile),
 			)
 		})
+
+		Error(errType_ProfileFollowUserBadRequest.Name(), errType_ProfileFollowUserBadRequest)
 	})
 
 	Method("unfollowUser", func() {
 		HTTP(func() {
 			POST("profile/unfollow_user")
 			Response(StatusOK)
-			Response(ErrorProfile_UserNotFound, StatusBadRequest)
-			Response(ErrorProfile_UserNotFollowing, StatusBadRequest)
+			Response(errType_ProfileUnfollowUserBadRequest.Name(), StatusBadRequest)
 		})
 
 		Payload(func() {
 			Required(
-				AttributeWithName("username", String, DefUser_RequestUsername),
+				AttributeWithName("username", String, def_User_RequestUsername),
 			)
 		})
 
 		Result(func() {
 			Required(
-				AttributeWithName("profile", Type_Profile),
+				AttributeWithName("profile", type_Profile),
 			)
 		})
+
+		Error(errType_ProfileUnfollowUserBadRequest.Name(), errType_ProfileUnfollowUserBadRequest)
 	})
 
 })
 
-const (
-	ErrorProfile_UserNotFound             = "UserNotFound"
-	ErrorProfile_UserAlreadyFollowing     = "UserAlreadyFollowing"
-	ErrorProfile_UserNotFollowing         = "UserNotFollowing"
-	ErrorProfile_UserCannotFollowYourself = "CannotFollowYourself"
-)
-
 var (
-	Type_Profile = Type("Profile", func() {
+	type_Profile = Type("Profile", func() {
 		Required(
 			AttributeWithName("username", String),
 			AttributeWithName("bio", String),
@@ -71,4 +60,24 @@ var (
 			AttributeWithName("following", Boolean),
 		)
 	})
+)
+
+var (
+	errType_ProfileFollowUserBadRequest = myErrorType("ProfileFollowUserBadRequest", []any{
+		ErrCode_Profile_UserNotFound,
+		ErrCode_Profile_UserAlreadyFollowing,
+		ErrCode_Profile_UserCannotFollowYourself,
+	}, nil)
+
+	errType_ProfileUnfollowUserBadRequest = myErrorType("ProfileUnfollowUserBadRequest", []any{
+		ErrCode_Profile_UserNotFound,
+		ErrCode_Profile_UserNotFollowing,
+	}, nil)
+)
+
+const (
+	ErrCode_Profile_UserNotFound             = "UserNotFound"
+	ErrCode_Profile_UserAlreadyFollowing     = "UserAlreadyFollowing"
+	ErrCode_Profile_UserNotFollowing         = "UserNotFollowing"
+	ErrCode_Profile_UserCannotFollowYourself = "CannotFollowYourself"
 )
