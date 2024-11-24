@@ -39,7 +39,7 @@ func setupHttpServer(s httpServer, mux goahttp.Muxer) {
 func customErrorResponse(ctx context.Context, err error) goahttp.Statuser {
 	if serr, ok := err.(*goa.ServiceError); ok {
 		switch serr.Name {
-		case design.ErrorCommon_AuthenticationRequired:
+		case design.Error_Common_AuthenticationRequired:
 			return errAuthenticationRequired
 		default:
 			// Use Goa default

@@ -19,7 +19,7 @@ func newErrorHandlerMiddleware() func(goa.Endpoint) goa.Endpoint {
 				return res, err
 			}
 			if errors.Is(err, myctx.ErrAuthenticationRequired) {
-				return res, goa.NewServiceError(err, design.ErrorCommon_AuthenticationRequired, false, false, false)
+				return res, goa.NewServiceError(err, design.Error_Common_AuthenticationRequired, false, false, false)
 			}
 			if serr := (*goa.ServiceError)(nil); errors.As(err, &serr) {
 				//already handled

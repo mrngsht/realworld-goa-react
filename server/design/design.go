@@ -12,11 +12,11 @@ var _ = API("readlworld", func() {
 	Title("readworld app example")
 	Description("readworld app example")
 
-	Error(ErrorCommon_AuthenticationRequired)
+	Error(Error_Common_AuthenticationRequired)
 
 	HTTP(func() {
 		Path("api")
-		Response(ErrorCommon_AuthenticationRequired, StatusUnauthorized)
+		Response(Error_Common_AuthenticationRequired, StatusUnauthorized)
 	})
 
 	Server("realworld", func() {
@@ -25,14 +25,14 @@ var _ = API("readlworld", func() {
 })
 
 const (
-	ErrorCommon_AuthenticationRequired = "AuthenticationRequired"
+	Error_Common_AuthenticationRequired = "AuthenticationRequired"
 
-	CodeCommon_Unspecified = "Unspecified"
+	ErrCode_Common_Unspecified = "Unspecified"
 )
 
 func myErrorType(name string, codes []any, ext func()) expr.UserType {
-	if slices.Contains(codes, CodeCommon_Unspecified) {
-		panic(fmt.Sprintf("%s is already included implicitly", CodeCommon_Unspecified))
+	if slices.Contains(codes, ErrCode_Common_Unspecified) {
+		panic(fmt.Sprintf("%s is already included implicitly", ErrCode_Common_Unspecified))
 	}
 
 	codesWithDefaults := slices.Concat([]any{"Unspecified"}, codes)
