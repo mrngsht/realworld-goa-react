@@ -17,18 +17,6 @@ import (
 	"github.com/mrngsht/realworld-goa-react/mytime"
 )
 
-var (
-	noAuthorizationRequired = map[string]map[string]bool{ // service -> method -> is auth required?
-		"user": {
-			"login":    true,
-			"register": true,
-		},
-		"article": {
-			"get": true,
-		},
-	}
-)
-
 func newUserAuthorizationMiddleware() func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
