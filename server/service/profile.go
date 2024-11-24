@@ -37,8 +37,12 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 		}
 	}()
 
+	requestUserID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	db := s.db
-	requestUserID := myctx.MustGetRequestUserID(ctx)
 
 	followingProfile, err := sqlcgen.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 	if err != nil {
@@ -103,8 +107,12 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 		}
 	}()
 
+	requestUserID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	db := s.db
-	requestUserID := myctx.MustGetRequestUserID(ctx)
 
 	followingProfile, err := sqlcgen.Q.GetUserProfileByUsername(ctx, db, payload.Username)
 	if err != nil {

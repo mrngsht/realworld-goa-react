@@ -28,7 +28,7 @@ func TestArticle_Create(t *testing.T) {
 		executedAt := mytime.Now(ctx)
 		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, u.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, u.Username)
 		payload := &goa.CreatePayload{
 			Title:       "title",
 			Description: "description",
@@ -38,7 +38,7 @@ func TestArticle_Create(t *testing.T) {
 		res, err := svc.Create(ctx, payload)
 		require.NoError(t, err)
 
-		assert.NotEmpty(t, res.Article.ID)
+		assert.NotEmpty(t, res.Article.ArticleID)
 		assert.Equal(t, payload.Title, res.Article.Title)
 		assert.Equal(t, payload.Description, res.Article.Description)
 		assert.Equal(t, payload.Body, res.Article.Body)
@@ -53,7 +53,7 @@ func TestArticle_Create(t *testing.T) {
 		assert.Equal(t, false, res.Article.Author.Following)
 
 		executedAtOnDB := mytimetest.TruncateTimeForDB(executedAt)
-		articleID := uuid.MustParse(res.Article.ID)
+		articleID := uuid.MustParse(res.Article.ArticleID)
 
 		a, err := sqlctest.Q.GetArticleByID(ctx, db, articleID)
 		require.NoError(t, err)
@@ -107,7 +107,7 @@ func TestArticle_Create(t *testing.T) {
 		executedAt := mytime.Now(ctx)
 		ctx := mytimetest.WithFixedNow(t, ctx, executedAt)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, u.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, u.Username)
 		payload := &goa.CreatePayload{
 			Title:       "title",
 			Description: "description",
@@ -118,7 +118,7 @@ func TestArticle_Create(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, payload.TagList, res.Article.TagList)
 
-		articleID := uuid.MustParse(res.Article.ID)
+		articleID := uuid.MustParse(res.Article.ArticleID)
 
 		ats, err := sqlctest.Q.ListArticleTagByArticleID(ctx, db, articleID)
 		require.NoError(t, err)

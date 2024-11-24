@@ -26,11 +26,11 @@ func GoaServiceErrorName(err error) string {
 	return "NOT_GOA_SERVICE_ERROR"
 }
 
-func SetRequestUser(t *testing.T, ctx context.Context, db myrdb.DB, username string) context.Context {
+func SetAuthenticatedUser(t *testing.T, ctx context.Context, db myrdb.DB, username string) context.Context {
 	t.Helper()
 	p, err := sqlctest.Q.GetUserProfileByUsername(ctx, db, username)
 	require.NoError(t, err)
-	return myctx.SetRequestUserID(ctx, p.UserID)
+	return myctx.SetAuthenticatedUserID(ctx, p.UserID)
 }
 
 type CreateUserResult struct {

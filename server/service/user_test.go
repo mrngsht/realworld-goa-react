@@ -209,7 +209,7 @@ func TestUser_GetCurrentUser(t *testing.T) {
 		_, err := svc.Register(ctx, registerPayload)
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		res, err := svc.GetCurrent(ctx) // Act
 		require.NoError(t, err)
@@ -243,7 +243,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: null.StringFrom("update_all").Ptr(),
@@ -292,7 +292,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -335,7 +335,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -384,7 +384,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		updatePayload := &goa.UpdatePayload{
 			Username: nil,
@@ -427,7 +427,7 @@ func TestUser_Update(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		ctx = servicetest.SetRequestUser(t, ctx, db, registerPayload.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, registerPayload.Username)
 
 		res, err := svc.Update(ctx, &goa.UpdatePayload{}) // Act
 		require.NoError(t, err)

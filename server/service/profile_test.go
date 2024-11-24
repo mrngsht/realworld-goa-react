@@ -24,7 +24,7 @@ func TestProfile_FollowUser(t *testing.T) {
 		u1 := servicetest.CreateUser(t, ctx, db)
 		u2 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		res, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: u2.Username,
 		})
@@ -54,14 +54,14 @@ func TestProfile_FollowUser(t *testing.T) {
 		u2 := servicetest.CreateUser(t, ctx, db)
 
 		// u1 -> u2
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: u2.Username,
 		})
 		require.NoError(t, err)
 
 		// u2 -> u1
-		ctx = servicetest.SetRequestUser(t, ctx, db, u2.Username)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, u2.Username)
 		res, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: u1.Username,
 		})
@@ -80,7 +80,7 @@ func TestProfile_FollowUser(t *testing.T) {
 	t.Run("user not found", func(t *testing.T) {
 		u1 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{ // Act
 			Username: "WRONG_USERNAME",
 		})
@@ -93,7 +93,7 @@ func TestProfile_FollowUser(t *testing.T) {
 		u2 := servicetest.CreateUser(t, ctx, db)
 
 		// 1st
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: u2.Username,
 		})
@@ -110,7 +110,7 @@ func TestProfile_FollowUser(t *testing.T) {
 	t.Run("user cannot follow itself", func(t *testing.T) {
 		u1 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: u1.Username,
 		})
@@ -127,7 +127,7 @@ func TestProfile_UnfollowUser(t *testing.T) {
 
 	follow := func(t *testing.T, ctx context.Context, usernameFrom, usernameTo string) {
 		t.Helper()
-		ctx = servicetest.SetRequestUser(t, ctx, db, usernameFrom)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, usernameFrom)
 		_, err := svc.FollowUser(ctx, &goa.FollowUserPayload{
 			Username: usernameTo,
 		})
@@ -144,7 +144,7 @@ func TestProfile_UnfollowUser(t *testing.T) {
 		follow(t, ctx, u2.Username, u3.Username)
 		follow(t, ctx, u3.Username, u1.Username)
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		res, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: u3.Username,
 		})
@@ -189,7 +189,7 @@ func TestProfile_UnfollowUser(t *testing.T) {
 	t.Run("user not found", func(t *testing.T) {
 		u1 := servicetest.CreateUser(t, ctx, db)
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: "WRONG_USERNAME",
 		})
@@ -203,7 +203,7 @@ func TestProfile_UnfollowUser(t *testing.T) {
 
 		// u1 is not following u2
 
-		ctx := servicetest.SetRequestUser(t, ctx, db, u1.Username)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, u1.Username)
 		_, err := svc.UnfollowUser(ctx, &goa.UnfollowUserPayload{ // Act
 			Username: u2.Username,
 		})

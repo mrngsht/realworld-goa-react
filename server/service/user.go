@@ -183,7 +183,10 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 }
 
 func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
-	userID := myctx.MustGetRequestUserID(ctx)
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 
 	user, err := s.getUserByUserID(ctx, s.db, userID)
 	if err != nil {
@@ -194,7 +197,11 @@ func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 }
 
 func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
-	userID := myctx.MustGetRequestUserID(ctx)
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	now := mytime.Now(ctx)
 	db := s.db
 

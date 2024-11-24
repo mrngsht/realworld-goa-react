@@ -3,28 +3,37 @@ package myctx
 import (
 	"context"
 
+	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 )
 
 type (
-	ctxKeyRequestUserID struct{}
-	ctxKeyRequestID     struct{}
+	ctxKeyAuthenticatedUserID struct{}
+	ctxKeyRequestID           struct{}
 )
 
-func SetRequestUserID(ctx context.Context, userID uuid.UUID) context.Context {
-	return context.WithValue(ctx, ctxKeyRequestUserID{}, userID)
+var (
+	ErrAuthenticationRequired = errors.New("authentication required")
+)
+
+func SetAuthenticatedUserID(ctx context.Context, userID uuid.UUID) context.Context {
+	return context.WithValue(ctx, ctxKeyAuthenticatedUserID{}, userID)
 }
 
-func MustGetRequestUserID(ctx context.Context) uuid.UUID {
-	userID := GetRequestUserID(ctx)
-	if userID == nil {
-		panic("ctx value of request userID must not be nil")
+func ShouldGetAuthenticatedUserID(ctx context.Context) (uuid.UUID, error) {
+	uid := getAuthenticatedUserID(ctx)
+	if uid == nil {
+		return uuid.Nil, ErrAuthenticationRequired
 	}
-	return *userID
+	return *uid, nil
 }
 
-func GetRequestUserID(ctx context.Context) *uuid.UUID {
-	v := ctx.Value(ctxKeyRequestUserID{})
+func MayGetAuthenticatedUserID(ctx context.Context) *uuid.UUID {
+	return getAuthenticatedUserID(ctx)
+}
+
+func getAuthenticatedUserID(ctx context.Context) *uuid.UUID {
+	v := ctx.Value(ctxKeyAuthenticatedUserID{})
 	if v == nil {
 		return nil
 	}

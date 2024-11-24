@@ -15,14 +15,17 @@ import (
 	"github.com/mrngsht/realworld-goa-react/myctx"
 	"github.com/mrngsht/realworld-goa-react/mylog"
 	"github.com/mrngsht/realworld-goa-react/mytime"
-
-	user "github.com/mrngsht/realworld-goa-react/gen/http/user/server"
 )
 
 var (
-	noAuthorizationRequired = map[string]bool{
-		user.LoginUserPath():    true,
-		user.RegisterUserPath(): true,
+	noAuthorizationRequired = map[string]map[string]bool{ // service -> method -> is auth required?
+		"user": {
+			"login":    true,
+			"register": true,
+		},
+		"article": {
+			"get": true,
+		},
 	}
 )
 
@@ -31,20 +34,15 @@ func newUserAuthorizationMiddleware() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token, err := authorize(r)
 			if err != nil {
-				if noAuthorizationRequired[r.URL.Path] {
-					// swallow error
-				} else {
-					if errors.Is(err, domainUser.ErrTokenHasExpired) {
-						http.Error(w, "token has expired", http.StatusUnauthorized)
-						return
-					}
-					http.Error(w, "missing or invalid authorization token", http.StatusUnauthorized)
+				if errors.Is(err, domainUser.ErrTokenHasExpired) {
+					http.Error(w, "token has expired", http.StatusUnauthorized)
 					return
 				}
-			}
 
-			if token != nil {
-				ctx := myctx.SetRequestUserID(r.Context(), token.UserID)
+				mylog.Debug(r.Context(), "missing or invalid authorization token")
+				// handle as anonymous
+			} else if token != nil {
+				ctx := myctx.SetAuthenticatedUserID(r.Context(), token.UserID)
 				r = r.WithContext(ctx)
 			}
 
