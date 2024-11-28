@@ -5,7 +5,9 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/mrngsht/realworld-goa-react/design"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
+	"github.com/mrngsht/realworld-goa-react/gen/profile"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest"
 	"github.com/mrngsht/realworld-goa-react/myrdb/rdbtest/sqlctest"
 	"github.com/mrngsht/realworld-goa-react/mytime"
@@ -15,6 +17,85 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestArticle_Get(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.CreateDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	t.Run("succeed", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		createdAt := mytime.Now(ctx)
+		ctx := mytimetest.WithFixedNow(t, ctx, createdAt)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		}
+		createRes, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: createRes.Article.ArticleID}) // Act
+		require.NoError(t, err)
+
+		createdAtOnDB := mytimetest.TruncateTimeForDB(createdAt)
+
+		assert.NotEmpty(t, res.Article.ArticleID)
+		assert.Equal(t, payload.Title, res.Article.Title)
+		assert.Equal(t, payload.Description, res.Article.Description)
+		assert.Equal(t, payload.Body, res.Article.Body)
+		assert.Equal(t, payload.TagList, res.Article.TagList)
+		assert.Equal(t, createdAtOnDB.String(), res.Article.CreatedAt)
+		assert.Equal(t, createdAtOnDB.String(), res.Article.UpdatedAt)
+		assert.Equal(t, false, res.Article.Favorited)
+		assert.Equal(t, uint(0), res.Article.FavoritesCount)
+		assert.Equal(t, author.Username, res.Article.Author.Username)
+		assert.Equal(t, author.Bio, res.Article.Author.Bio)
+		assert.Equal(t, author.ImageUrl, res.Article.Author.Image)
+		assert.Equal(t, false, res.Article.Author.Following)
+
+		t.Run("when user favorited", func(t *testing.T) {
+			// TODO:
+			t.Run("also when another user favorited", func(t *testing.T) {
+				// TODO:
+			})
+		})
+
+		t.Run("when user Following", func(t *testing.T) {
+			ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+
+			_, err := service.NewProfile(db).FollowUser(ctx, &profile.FollowUserPayload{
+				Username: author.Username,
+			})
+			require.NoError(t, err)
+
+			res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: createRes.Article.ArticleID}) // Act
+			require.NoError(t, err)
+
+			assert.Equal(t, true, res.Article.Author.Following)
+		})
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		_, err := svc.Get(ctx, &goa.GetPayload{ArticleID: uuid.NewString()}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleGetArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+
+	t.Run("article deleted", func(t *testing.T) {
+		// TODO:
+	})
+}
 
 func TestArticle_Create(t *testing.T) {
 	ctx := servicetest.NewContext()
