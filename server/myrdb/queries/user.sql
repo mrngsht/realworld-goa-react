@@ -89,3 +89,10 @@ VALUES ($1, $2, $3, $4);
 -- name: DeleteUserFollow :execrows
 DELETE FROM user_follow_
 WHERE user_id_ = $1 AND followed_user_id_ = $2; 
+
+-- name: IsUserFollowing :one
+SELECT EXISTS (
+  SELECT 1
+  FROM user_follow_ 
+  WHERE user_id_ = $1 AND followed_user_id_ = $2
+);

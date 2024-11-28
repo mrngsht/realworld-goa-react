@@ -50,6 +50,10 @@ type ArticleDetail struct {
 	Author         *Profile
 }
 
+type ArticleGetArticleBadRequest struct {
+	Code string
+}
+
 // CreatePayload is the payload type of the article service create method.
 type CreatePayload struct {
 	Title       string
@@ -88,4 +92,21 @@ type Profile struct {
 	Bio       string
 	Image     string
 	Following bool
+}
+
+// Error returns an error description.
+func (e *ArticleGetArticleBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleGetArticleBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleGetArticleBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleGetArticleBadRequest".
+func (e *ArticleGetArticleBadRequest) GoaErrorName() string {
+	return "ArticleGetArticleBadRequest"
 }

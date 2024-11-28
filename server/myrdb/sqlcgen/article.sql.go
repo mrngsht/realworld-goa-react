@@ -12,6 +12,56 @@ import (
 	"github.com/google/uuid"
 )
 
+const getArticleContentByArticleID = `-- name: GetArticleContentByArticleID :one
+SELECT 
+  created_at_,
+  updated_at_,
+  article_id_,
+  title_,
+  description_,
+  body_,
+  author_user_id_
+FROM article_content_ 
+WHERE article_id_ = $1
+LIMIT 1
+`
+
+func (q *Queries) GetArticleContentByArticleID(ctx context.Context, db DBTX, articleID uuid.UUID) (ArticleContent, error) {
+	row := db.QueryRow(ctx, getArticleContentByArticleID, articleID)
+	var i ArticleContent
+	err := row.Scan(
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ArticleID,
+		&i.Title,
+		&i.Description,
+		&i.Body,
+		&i.AuthorUserID,
+	)
+	return i, err
+}
+
+const getArticleStatsByArticleID = `-- name: GetArticleStatsByArticleID :one
+SELECT 
+  article_id_,
+  favorites_count_
+FROM article_stats_ 
+WHERE article_id_ = $1
+LIMIT 1
+`
+
+type GetArticleStatsByArticleIDRow struct {
+	ArticleID      uuid.UUID
+	FavoritesCount int64
+}
+
+func (q *Queries) GetArticleStatsByArticleID(ctx context.Context, db DBTX, articleID uuid.UUID) (GetArticleStatsByArticleIDRow, error) {
+	row := db.QueryRow(ctx, getArticleStatsByArticleID, articleID)
+	var i GetArticleStatsByArticleIDRow
+	err := row.Scan(&i.ArticleID, &i.FavoritesCount)
+	return i, err
+}
+
 const insertArticle = `-- name: InsertArticle :exec
 INSERT INTO article_
 (created_at_, id_) 
@@ -121,4 +171,52 @@ type InsertArticleTagMutationParams struct {
 func (q *Queries) InsertArticleTagMutation(ctx context.Context, db DBTX, arg InsertArticleTagMutationParams) error {
 	_, err := db.Exec(ctx, insertArticleTagMutation, arg.CreatedAt, arg.ArticleID, arg.Tags)
 	return err
+}
+
+const isArticleFavoritedByArticleIDAndUserID = `-- name: IsArticleFavoritedByArticleIDAndUserID :one
+SELECT EXISTS (
+  SELECT 1
+  FROM article_favorite_ 
+  WHERE article_id_ = $1 AND user_id_ = $2
+)
+`
+
+type IsArticleFavoritedByArticleIDAndUserIDParams struct {
+	ArticleID uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) IsArticleFavoritedByArticleIDAndUserID(ctx context.Context, db DBTX, arg IsArticleFavoritedByArticleIDAndUserIDParams) (bool, error) {
+	row := db.QueryRow(ctx, isArticleFavoritedByArticleIDAndUserID, arg.ArticleID, arg.UserID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const listArticleTagByArticleID = `-- name: ListArticleTagByArticleID :many
+SELECT 
+  tag_
+FROM article_tag_
+WHERE article_id_ = $1
+ORDER BY seq_no_ ASC
+`
+
+func (q *Queries) ListArticleTagByArticleID(ctx context.Context, db DBTX, articleID uuid.UUID) ([]string, error) {
+	rows, err := db.Query(ctx, listArticleTagByArticleID, articleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var tag_ string
+		if err := rows.Scan(&tag_); err != nil {
+			return nil, err
+		}
+		items = append(items, tag_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

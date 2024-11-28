@@ -27,3 +27,38 @@ VALUES ($1, $2, $3);
 INSERT INTO article_stats_
 (created_at_, updated_at_, article_id_, favorites_count_)
 VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
+
+-- name: GetArticleContentByArticleID :one
+SELECT 
+  created_at_,
+  updated_at_,
+  article_id_,
+  title_,
+  description_,
+  body_,
+  author_user_id_
+FROM article_content_ 
+WHERE article_id_ = $1
+LIMIT 1;
+
+-- name: GetArticleStatsByArticleID :one
+SELECT 
+  article_id_,
+  favorites_count_
+FROM article_stats_ 
+WHERE article_id_ = $1
+LIMIT 1;
+
+-- name: ListArticleTagByArticleID :many
+SELECT 
+  tag_
+FROM article_tag_
+WHERE article_id_ = $1
+ORDER BY seq_no_ ASC;
+
+-- name: IsArticleFavoritedByArticleIDAndUserID :one
+SELECT EXISTS (
+  SELECT 1
+  FROM article_favorite_ 
+  WHERE article_id_ = $1 AND user_id_ = $2
+);

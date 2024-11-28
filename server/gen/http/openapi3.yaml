@@ -48,6 +48,14 @@ paths:
                                         - Possimus qui ad cum.
                                     title: Dolor nesciunt.
                                     updatedAt: "2006-11-16T05:09:33Z"
+                "400":
+                    description: 'ArticleGetArticleBadRequest: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleGetArticleBadRequest'
+                            example:
+                                code: Unspecified
     /api/article/{articleId}/favorite:
         post:
             tags:
@@ -103,12 +111,14 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateRequestBody'
                         example:
-                            body: Iste fugit eos et fugiat laudantium.
-                            description: Ipsam laborum expedita.
+                            body: Et pariatur inventore earum alias eius.
+                            description: Expedita ipsa iste fugit eos et fugiat.
                             tagList:
-                                - Inventore earum alias.
-                                - Facere corrupti est maxime qui.
-                            title: mqz
+                                - Est maxime qui est blanditiis reprehenderit.
+                                - Quis officiis.
+                                - Quia illo porro itaque odit ex velit.
+                                - Aliquid voluptatem adipisci magnam placeat.
+                            title: zwj
             responses:
                 "200":
                     description: OK response.
@@ -149,7 +159,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: cT5f
+                            username: 9ae
             responses:
                 "200":
                     description: OK response.
@@ -170,7 +180,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ProfileFollowUserBadRequest'
                             example:
-                                code: UserNotFound
+                                code: Unspecified
     /api/profile/unfollow_user:
         post:
             tags:
@@ -184,7 +194,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: 3Vfj
+                            username: W_Pu6
             responses:
                 "200":
                     description: OK response.
@@ -205,7 +215,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ProfileUnfollowUserBadRequest'
                             example:
-                                code: UserNotFollowing
+                                code: UserNotFound
     /api/user/current:
         get:
             tags:
@@ -221,11 +231,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Veniam voluptatem quis.
-                                    email: Culpa nobis temporibus voluptas.
-                                    image: Quas quis.
-                                    token: Quia omnis magnam velit distinctio soluta.
-                                    username: Quia odit excepturi possimus molestiae laudantium.
+                                    bio: Error incidunt iure optio.
+                                    email: Quis occaecati quas quis.
+                                    image: Et autem voluptates harum.
+                                    token: Et provident iste.
+                                    username: Sed ullam ea provident voluptates laborum hic.
     /api/user/login:
         post:
             tags:
@@ -239,8 +249,8 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: nikolas.white@jakubowski.net
-                            password: 4t2
+                            email: raheem@gibson.biz
+                            password: 5kh
             responses:
                 "200":
                     description: OK response.
@@ -250,11 +260,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Veniam voluptatem quis.
-                                    email: Culpa nobis temporibus voluptas.
-                                    image: Quas quis.
-                                    token: Quia omnis magnam velit distinctio soluta.
-                                    username: Quia odit excepturi possimus molestiae laudantium.
+                                    bio: Error incidunt iure optio.
+                                    email: Quis occaecati quas quis.
+                                    image: Et autem voluptates harum.
+                                    token: Et provident iste.
+                                    username: Sed ullam ea provident voluptates laborum hic.
                 "400":
                     description: 'UserLoginBadRequest: Bad Request response.'
                     content:
@@ -276,9 +286,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/RegisterRequestBody'
                         example:
-                            email: chance@bruen.net
-                            password: 0lu
-                            username: kKFdTP
+                            email: joey@douglasadams.net
+                            password: zh6
+                            username: xLXhj
             responses:
                 "200":
                     description: OK response.
@@ -288,11 +298,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Veniam voluptatem quis.
-                                    email: Culpa nobis temporibus voluptas.
-                                    image: Quas quis.
-                                    token: Quia omnis magnam velit distinctio soluta.
-                                    username: Quia odit excepturi possimus molestiae laudantium.
+                                    bio: Error incidunt iure optio.
+                                    email: Quis occaecati quas quis.
+                                    image: Et autem voluptates harum.
+                                    token: Et provident iste.
+                                    username: Sed ullam ea provident voluptates laborum hic.
                 "400":
                     description: 'UserRegisterBadRequest: Bad Request response.'
                     content:
@@ -314,11 +324,11 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateRequestBody'
                         example:
-                            bio: riv
-                            email: kraig@mccullough.com
-                            image: https://ql
-                            password: 7li
-                            username: Bht
+                            bio: gxk
+                            email: nicolette_powlowski@koch.info
+                            image: https://jn
+                            password: hkn
+                            username: i4e
             responses:
                 "200":
                     description: OK response.
@@ -328,11 +338,11 @@ paths:
                                 $ref: '#/components/schemas/LoginResponseBody'
                             example:
                                 user:
-                                    bio: Veniam voluptatem quis.
-                                    email: Culpa nobis temporibus voluptas.
-                                    image: Quas quis.
-                                    token: Quia omnis magnam velit distinctio soluta.
-                                    username: Quia odit excepturi possimus molestiae laudantium.
+                                    bio: Error incidunt iure optio.
+                                    email: Quis occaecati quas quis.
+                                    image: Et autem voluptates harum.
+                                    token: Et provident iste.
+                                    username: Sed ullam ea provident voluptates laborum hic.
 components:
     schemas:
         ArticleDetail:
@@ -340,60 +350,60 @@ components:
             properties:
                 articleId:
                     type: string
-                    example: 58337bb4-1f84-4d7b-914c-98dbb51d17b2
+                    example: 9ec418f4-87d1-47c3-9ae6-52d4e1b2dbd2
                     format: uuid
                 author:
                     $ref: '#/components/schemas/Profile'
                 body:
                     type: string
-                    example: Vel consequuntur ipsam minima minus quibusdam unde.
+                    example: Quia eligendi et molestiae beatae quibusdam rerum.
                 createdAt:
                     type: string
-                    example: "1970-08-22T01:08:40Z"
+                    example: "1989-06-01T16:26:06Z"
                     format: date-time
                 description:
                     type: string
-                    example: Voluptate praesentium doloremque reiciendis dolorem autem reprehenderit.
+                    example: Ratione dolore voluptates id consequatur earum dolor.
                 favorited:
                     type: boolean
-                    example: true
+                    example: false
                 favoritesCount:
                     type: integer
-                    example: 14631609971023265973
+                    example: 3765199657029195221
                     format: int64
                 tagList:
                     type: array
                     items:
                         type: string
-                        example: Nemo ut corporis.
+                        example: Rerum officiis.
                     example:
-                        - Quas sed autem.
-                        - Ea error beatae.
-                        - Rerum ipsum quos temporibus.
+                        - Voluptatibus non.
+                        - Sed qui mollitia provident.
                 title:
                     type: string
-                    example: Consequuntur aut fugit qui.
+                    example: Ut autem.
                 updatedAt:
                     type: string
-                    example: "1977-11-12T06:52:40Z"
+                    example: "1982-06-11T14:18:30Z"
                     format: date-time
             example:
-                articleId: 49aa5a37-8db6-49cb-8565-ef606da6b9c6
+                articleId: 317ce991-d810-4c59-bef3-d3076bd3cbfc
                 author:
                     bio: Rerum quia voluptate minus eum nisi.
                     following: false
                     image: Aut labore.
                     username: Nesciunt quasi totam.
-                body: Alias neque vel.
-                createdAt: "2010-12-20T19:54:11Z"
-                description: Rerum rerum aut nemo sunt.
-                favorited: false
-                favoritesCount: 5532803645896950907
+                body: Voluptas eos nostrum sed.
+                createdAt: "1991-02-18T05:57:10Z"
+                description: Omnis reprehenderit.
+                favorited: true
+                favoritesCount: 8874880326580614840
                 tagList:
-                    - Error expedita aspernatur.
-                    - Voluptatem qui iusto.
-                title: Voluptate assumenda qui at.
-                updatedAt: "2013-05-21T19:45:58Z"
+                    - Odit id suscipit sapiente sit.
+                    - Fuga ipsa sit dignissimos ipsa.
+                    - Enim quia necessitatibus unde cum ea.
+                title: Veritatis nihil aut voluptates aut blanditiis quia.
+                updatedAt: "2015-05-17T07:35:57Z"
             required:
                 - articleId
                 - title
@@ -405,38 +415,48 @@ components:
                 - favorited
                 - favoritesCount
                 - author
+        ArticleGetArticleBadRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                    example: ArticleNotFound
+                    enum:
+                        - Unspecified
+                        - ArticleNotFound
+            example:
+                code: ArticleNotFound
+            required:
+                - code
         CreateRequestBody:
             type: object
             properties:
                 body:
                     type: string
-                    example: Illo ex.
+                    example: Nostrum cumque.
                 description:
                     type: string
-                    example: Qui accusamus minus tenetur facilis dicta.
+                    example: Qui eos dolorem est.
                 tagList:
                     type: array
                     items:
                         type: string
-                        example: Sunt corporis sapiente perferendis.
+                        example: Vel inventore qui sed dolores.
                     example:
-                        - Perferendis harum qui voluptatem sit.
-                        - Esse vel dolores sunt est totam vel.
-                        - Minima ut nam perferendis delectus ducimus qui.
-                        - Et mollitia eius molestias consequatur explicabo.
+                        - Nam ipsam harum ut.
+                        - Necessitatibus magnam mollitia quia excepturi in.
+                        - Distinctio dolore itaque qui aut quia tempora.
                 title:
                     type: string
-                    example: fyg
+                    example: imy
                     maxLength: 128
             example:
-                body: Sed dolores et et nam ipsam harum.
-                description: Est accusamus nostrum cumque atque vel inventore.
+                body: Cupiditate aut quos architecto.
+                description: Aut dolores et.
                 tagList:
-                    - Necessitatibus magnam mollitia quia excepturi in.
-                    - Distinctio dolore itaque qui aut quia tempora.
-                    - Vel ad totam eveniet aut.
-                    - Et repudiandae cupiditate aut quos.
-                title: fg5
+                    - Ullam voluptatem qui ducimus.
+                    - Deleniti possimus molestiae.
+                title: kip
             required:
                 - title
                 - description
@@ -447,10 +467,10 @@ components:
             properties:
                 username:
                     type: string
-                    example: IOsTtWoOCV
+                    example: KOM
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                username: vBC
+                username: sV1BG3s
             required:
                 - username
         FollowUserResponseBody:
@@ -498,16 +518,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: stephany_feest@wizafisher.com
+                    example: desmond@lubowitz.info
                     format: email
                 password:
                     type: string
-                    example: jd6
+                    example: kru
                     minLength: 6
                     maxLength: 128
             example:
-                email: bernadine_dibbert@runolfsdottir.info
-                password: 2bm
+                email: michael@emardankunding.info
+                password: qgs
             required:
                 - email
                 - password
@@ -518,11 +538,11 @@ components:
                     $ref: '#/components/schemas/User'
             example:
                 user:
-                    bio: Veniam voluptatem quis.
-                    email: Culpa nobis temporibus voluptas.
-                    image: Quas quis.
-                    token: Quia omnis magnam velit distinctio soluta.
-                    username: Quia odit excepturi possimus molestiae laudantium.
+                    bio: Error incidunt iure optio.
+                    email: Quis occaecati quas quis.
+                    image: Et autem voluptates harum.
+                    token: Et provident iste.
+                    username: Sed ullam ea provident voluptates laborum hic.
             required:
                 - user
         Profile:
@@ -530,21 +550,21 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Quia quia qui est delectus quisquam dolorum.
+                    example: Consequatur laboriosam.
                 following:
                     type: boolean
                     example: false
                 image:
                     type: string
-                    example: Natus dignissimos porro vero impedit accusantium possimus.
+                    example: Eum et praesentium quia maxime quia dolorem.
                 username:
                     type: string
-                    example: Quidem ducimus.
+                    example: Expedita omnis nesciunt reiciendis voluptates.
             example:
-                bio: Placeat repudiandae modi non sint.
+                bio: Expedita animi id ut.
                 following: false
-                image: Qui iusto voluptates impedit.
-                username: Ipsum est aut ab totam.
+                image: Et exercitationem quam dolore.
+                username: Magni expedita sit.
             required:
                 - username
                 - bio
@@ -570,13 +590,13 @@ components:
             properties:
                 code:
                     type: string
-                    example: Unspecified
+                    example: UserNotFollowing
                     enum:
                         - Unspecified
                         - UserNotFound
                         - UserNotFollowing
             example:
-                code: UserNotFollowing
+                code: Unspecified
             required:
                 - code
         RegisterRequestBody:
@@ -593,7 +613,7 @@ components:
                     maxLength: 128
                 username:
                     type: string
-                    example: 6EwpNHe
+                    example: N9He
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
                 email: heath.schumm@keeblerberge.info
@@ -638,25 +658,25 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Omnis suscipit voluptas.
+                    example: Accusamus minus tenetur facilis dicta.
                 email:
                     type: string
-                    example: Adipisci qui reiciendis qui molestiae similique.
+                    example: Voluptatem et error consequatur nisi dolor.
                 image:
                     type: string
-                    example: At omnis illo tempore at eum.
+                    example: Illo ex.
                 token:
                     type: string
-                    example: Tempore nisi est.
+                    example: Eum ipsam ut omnis voluptatem in est.
                 username:
                     type: string
-                    example: Laudantium dolor rem aut.
+                    example: Dolorem quasi incidunt enim.
             example:
-                bio: Quasi nemo voluptatem et.
-                email: Tempora assumenda dolore.
-                image: Consequatur nisi dolor sapiente eum ipsam ut.
-                token: Voluptatem sunt et ab enim eaque.
-                username: Ex impedit cum eos sequi.
+                bio: Esse vel dolores sunt est totam vel.
+                email: Sunt corporis sapiente perferendis.
+                image: Minima ut nam perferendis delectus ducimus qui.
+                token: Provident perferendis.
+                username: Qui voluptatem sit.
             required:
                 - email
                 - token
@@ -668,7 +688,7 @@ components:
             properties:
                 code:
                     type: string
-                    example: PasswordIsIncorrect
+                    example: Unspecified
                     enum:
                         - Unspecified
                         - EmailNotFound
@@ -682,13 +702,13 @@ components:
             properties:
                 code:
                     type: string
-                    example: EmailAlreadyUsed
+                    example: UsernameAlreadyUsed
                     enum:
                         - Unspecified
                         - UsernameAlreadyUsed
                         - EmailAlreadyUsed
             example:
-                code: Unspecified
+                code: UsernameAlreadyUsed
             required:
                 - code
 tags:

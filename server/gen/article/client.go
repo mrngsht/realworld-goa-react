@@ -30,6 +30,9 @@ func NewClient(get, create, favorite goa.Endpoint) *Client {
 }
 
 // Get calls the "get" endpoint of the "article" service.
+// Get may return the following errors:
+//   - "ArticleGetArticleBadRequest" (type *ArticleGetArticleBadRequest)
+//   - error: internal error
 func (c *Client) Get(ctx context.Context, p *GetPayload) (res *GetResult, err error) {
 	var ires any
 	ires, err = c.GetEndpoint(ctx, p)

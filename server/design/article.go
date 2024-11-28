@@ -9,6 +9,7 @@ var _ = Service("article", func() {
 		HTTP(func() {
 			GET("article/{articleId}")
 			Response(StatusOK)
+			Response(errType_ArticleGetArticleBadRequest.Name(), StatusBadRequest)
 		})
 
 		Payload(func() {
@@ -22,6 +23,8 @@ var _ = Service("article", func() {
 				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
+
+		Error(errType_ArticleGetArticleBadRequest.Name(), errType_ArticleGetArticleBadRequest)
 	})
 
 	Method("create", func() {
@@ -96,4 +99,14 @@ var (
 			AttributeWithName("author", type_Profile),
 		)
 	})
+)
+
+var (
+	errType_ArticleGetArticleBadRequest = myErrorType("ArticleGetArticleBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+	}, nil)
+)
+
+const (
+	ErrCode_Article_ArticleNotFound = "ArticleNotFound"
 )

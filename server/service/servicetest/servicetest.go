@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/guregu/null"
 	"github.com/mrngsht/realworld-goa-react/gen/user"
 	"github.com/mrngsht/realworld-goa-react/myctx"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
@@ -44,7 +45,10 @@ func CreateUser(t *testing.T, ctx context.Context, db myrdb.DB) CreateUserResult
 	t.Helper()
 
 	username := uuid.New().String()
-	_, err := service.NewUser(db).Register(ctx, &user.RegisterPayload{
+
+	svc := service.NewUser(db)
+
+	_, err := svc.Register(ctx, &user.RegisterPayload{
 		Username: username,
 		Email:    username + "@example.com",
 		Password: "password",
@@ -54,10 +58,17 @@ func CreateUser(t *testing.T, ctx context.Context, db myrdb.DB) CreateUserResult
 	p, err := sqlctest.Q.GetUserProfileByUsername(ctx, db, username)
 	require.NoError(t, err)
 
+	ctx = myctx.SetAuthenticatedUserID(ctx, p.UserID)
+	u, err := svc.Update(ctx, &user.UpdatePayload{
+		Image: null.StringFrom("http://example.com/file/profile.png").Ptr(),
+		Bio:   null.StringFrom("hello world").Ptr(),
+	})
+	require.NoError(t, err)
+
 	return CreateUserResult{
 		UserID:   p.UserID,
-		Username: p.Username,
-		Bio:      p.Bio,
-		ImageUrl: p.ImageUrl,
+		Username: u.User.Username,
+		Bio:      u.User.Bio,
+		ImageUrl: u.User.Image,
 	}
 }

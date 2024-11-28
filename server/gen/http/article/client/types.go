@@ -39,6 +39,13 @@ type FavoriteResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
 }
 
+// GetArticleGetArticleBadRequestResponseBody is the type of the "article"
+// service "get" endpoint HTTP response body for the
+// "ArticleGetArticleBadRequest" error.
+type GetArticleGetArticleBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
 	ArticleID      *string              `form:"articleId,omitempty" json:"articleId,omitempty" xml:"articleId,omitempty"`
@@ -85,6 +92,16 @@ func NewCreateRequestBody(p *article.CreatePayload) *CreateRequestBody {
 func NewGetResultOK(body *GetResponseBody) *article.GetResult {
 	v := &article.GetResult{}
 	v.Article = unmarshalArticleDetailResponseBodyToArticleArticleDetail(body.Article)
+
+	return v
+}
+
+// NewGetArticleGetArticleBadRequest builds a article service get endpoint
+// ArticleGetArticleBadRequest error.
+func NewGetArticleGetArticleBadRequest(body *GetArticleGetArticleBadRequestResponseBody) *article.ArticleGetArticleBadRequest {
+	v := &article.ArticleGetArticleBadRequest{
+		Code: *body.Code,
+	}
 
 	return v
 }
@@ -142,6 +159,20 @@ func ValidateFavoriteResponseBody(body *FavoriteResponseBody) (err error) {
 	if body.Article != nil {
 		if err2 := ValidateArticleDetailResponseBody(body.Article); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateGetArticleGetArticleBadRequestResponseBody runs the validations
+// defined on get_ArticleGetArticleBadRequest_response_body
+func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArticleBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
 		}
 	}
 	return

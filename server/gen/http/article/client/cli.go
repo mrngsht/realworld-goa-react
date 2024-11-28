@@ -42,7 +42,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Iste fugit eos et fugiat laudantium.\",\n      \"description\": \"Ipsam laborum expedita.\",\n      \"tagList\": [\n         \"Inventore earum alias.\",\n         \"Facere corrupti est maxime qui.\"\n      ],\n      \"title\": \"mqz\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Et pariatur inventore earum alias eius.\",\n      \"description\": \"Expedita ipsa iste fugit eos et fugiat.\",\n      \"tagList\": [\n         \"Est maxime qui est blanditiis reprehenderit.\",\n         \"Quis officiis.\",\n         \"Quia illo porro itaque odit ex velit.\",\n         \"Aliquid voluptatem adipisci magnam placeat.\"\n      ],\n      \"title\": \"zwj\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))

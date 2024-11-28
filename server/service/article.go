@@ -6,8 +6,11 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
+	"github.com/mrngsht/realworld-goa-react/design"
+	"github.com/mrngsht/realworld-goa-react/domain/article"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
 	"github.com/mrngsht/realworld-goa-react/myctx"
+	"github.com/mrngsht/realworld-goa-react/myerr"
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 	"github.com/mrngsht/realworld-goa-react/mytime"
@@ -23,8 +26,84 @@ func NewArticle(rdb myrdb.DB) *Article {
 
 var _ goa.Service = &Article{}
 
-func (s *Article) Get(context.Context, *goa.GetPayload) (res *goa.GetResult, err error) {
-	return nil, nil
+func (s *Article) Get(ctx context.Context, payload *goa.GetPayload) (res *goa.GetResult, err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleGetArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userID := myctx.MayGetAuthenticatedUserID(ctx)
+
+	db := s.db
+
+	a, err := sqlcgen.Q.GetArticleContentByArticleID(ctx, db, uuid.MustParse(payload.ArticleID))
+	if err != nil {
+		if myrdb.IsErrNoRows(err) {
+			return nil, article.ErrArticleNotFound
+		}
+		return nil, errors.WithStack(err)
+	}
+
+	author, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, a.AuthorUserID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	stats, err := sqlcgen.Q.GetArticleStatsByArticleID(ctx, db, a.ArticleID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	tags, err := sqlcgen.Q.ListArticleTagByArticleID(ctx, db, a.ArticleID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	favorited := false
+	authorFollowing := false
+	if userID != nil {
+		favorited, err = sqlcgen.Q.IsArticleFavoritedByArticleIDAndUserID(ctx, db, sqlcgen.IsArticleFavoritedByArticleIDAndUserIDParams{
+			ArticleID: a.ArticleID,
+			UserID:    *userID,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		authorFollowing, err = sqlcgen.Q.IsUserFollowing(ctx, db, sqlcgen.IsUserFollowingParams{
+			UserID:         *userID,
+			FollowedUserID: a.AuthorUserID,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return &goa.GetResult{
+		Article: &goa.ArticleDetail{
+			ArticleID:      a.ArticleID.String(),
+			Title:          a.Title,
+			Description:    a.Description,
+			Body:           a.Body,
+			TagList:        tags,
+			CreatedAt:      a.CreatedAt.String(),
+			UpdatedAt:      a.UpdatedAt.String(),
+			Favorited:      favorited,
+			FavoritesCount: uint(stats.FavoritesCount),
+			Author: &goa.Profile{
+				Username:  author.Username,
+				Bio:       author.Bio,
+				Image:     author.ImageUrl,
+				Following: authorFollowing,
+			},
+		},
+	}, nil
 }
 
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
@@ -130,13 +209,13 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 			Author: &goa.Profile{
 				Username:  profile.Username,
 				Bio:       profile.Bio,
-				Image:     profile.Bio,
+				Image:     profile.ImageUrl,
 				Following: false,
 			},
 		},
 	}, nil
 }
 
-func (s *Article) Favorite(context.Context, *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
+func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
 	return nil, nil
 }

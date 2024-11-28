@@ -34,11 +34,11 @@ user (login|register|get-current|update)
 func UsageExamples() string {
 	return os.Args[0] + ` article get --article-id "e64a88c2-8d04-4dbb-8a0a-5ea760bb5c4d"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "cT5f"
+      "username": "9ae"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "nikolas.white@jakubowski.net",
-      "password": "4t2"
+      "email": "raheem@gibson.biz",
+      "password": "5kh"
    }'` + "\n" +
 		""
 }
@@ -276,13 +276,15 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Iste fugit eos et fugiat laudantium.",
-      "description": "Ipsam laborum expedita.",
+      "body": "Et pariatur inventore earum alias eius.",
+      "description": "Expedita ipsa iste fugit eos et fugiat.",
       "tagList": [
-         "Inventore earum alias.",
-         "Facere corrupti est maxime qui."
+         "Est maxime qui est blanditiis reprehenderit.",
+         "Quis officiis.",
+         "Quia illo porro itaque odit ex velit.",
+         "Aliquid voluptatem adipisci magnam placeat."
       ],
-      "title": "mqz"
+      "title": "zwj"
    }'
 `, os.Args[0])
 }
@@ -294,7 +296,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "0646a0f7-46b0-42d0-ad99-d4bd8611a088"
+    %[1]s article favorite --article-id "022ba28c-0b29-4485-9ec7-54132db7eda5"
 `, os.Args[0])
 }
 
@@ -320,7 +322,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "cT5f"
+      "username": "9ae"
    }'
 `, os.Args[0])
 }
@@ -333,7 +335,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "3Vfj"
+      "username": "W_Pu6"
    }'
 `, os.Args[0])
 }
@@ -362,8 +364,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "nikolas.white@jakubowski.net",
-      "password": "4t2"
+      "email": "raheem@gibson.biz",
+      "password": "5kh"
    }'
 `, os.Args[0])
 }
@@ -376,9 +378,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "chance@bruen.net",
-      "password": "0lu",
-      "username": "kKFdTP"
+      "email": "joey@douglasadams.net",
+      "password": "zh6",
+      "username": "xLXhj"
    }'
 `, os.Args[0])
 }
@@ -401,11 +403,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "riv",
-      "email": "kraig@mccullough.com",
-      "image": "https://ql",
-      "password": "7li",
-      "username": "Bht"
+      "bio": "gxk",
+      "email": "nicolette_powlowski@koch.info",
+      "image": "https://jn",
+      "password": "hkn",
+      "username": "i4e"
    }'
 `, os.Args[0])
 }

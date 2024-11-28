@@ -46,6 +46,9 @@ func (c *Client) BuildGetRequest(ctx context.Context, v any) (*http.Request, err
 // DecodeGetResponse returns a decoder for responses returned by the article
 // get endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeGetResponse may return the following errors:
+//   - "ArticleGetArticleBadRequest" (type *article.ArticleGetArticleBadRequest): http.StatusBadRequest
+//   - error: internal error
 func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -76,6 +79,20 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			}
 			res := NewGetResultOK(&body)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body GetArticleGetArticleBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "get", err)
+			}
+			err = ValidateGetArticleGetArticleBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "get", err)
+			}
+			return nil, NewGetArticleGetArticleBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("article", "get", resp.StatusCode, string(body))

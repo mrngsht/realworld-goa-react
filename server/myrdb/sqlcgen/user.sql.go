@@ -272,6 +272,26 @@ func (q *Queries) InsertUserProfileMutation(ctx context.Context, db DBTX, arg In
 	return err
 }
 
+const isUserFollowing = `-- name: IsUserFollowing :one
+SELECT EXISTS (
+  SELECT 1
+  FROM user_follow_ 
+  WHERE user_id_ = $1 AND followed_user_id_ = $2
+)
+`
+
+type IsUserFollowingParams struct {
+	UserID         uuid.UUID
+	FollowedUserID uuid.UUID
+}
+
+func (q *Queries) IsUserFollowing(ctx context.Context, db DBTX, arg IsUserFollowingParams) (bool, error) {
+	row := db.QueryRow(ctx, isUserFollowing, arg.UserID, arg.FollowedUserID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const updateUserAuthPasswordHash = `-- name: UpdateUserAuthPasswordHash :exec
 UPDATE user_auth_password_
 SET updated_at_ = $2, password_hash_ = $3

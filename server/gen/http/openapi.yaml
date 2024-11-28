@@ -33,6 +33,12 @@ paths:
                         $ref: '#/definitions/ArticleGetResponseBody'
                         required:
                             - article
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/ArticleGetArticleBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/article/{articleId}/favorite:
@@ -244,31 +250,33 @@ definitions:
         properties:
             body:
                 type: string
-                example: Rem quia ex et eos et ut.
+                example: Rerum amet nihil.
             description:
                 type: string
-                example: Dolorum ullam voluptatem ut ea doloribus et.
+                example: Sit ab veritatis optio.
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Fugit optio.
+                    example: Eos libero aut.
                 example:
-                    - Sunt sunt quas sit ab.
-                    - Optio pariatur.
-                    - Amet nihil.
+                    - Ipsam quibusdam.
+                    - Et quidem voluptatem ut totam sed rerum.
+                    - Tempore est ipsum labore rerum similique voluptas.
+                    - Hic minima quas sapiente reprehenderit sed autem.
             title:
                 type: string
-                example: a2h
+                example: da7
                 maxLength: 128
         example:
-            body: Possimus et quidem voluptatem ut.
-            description: Nihil ipsam.
+            body: Alias fuga.
+            description: Blanditiis eligendi qui tenetur asperiores facilis.
             tagList:
-                - Rerum impedit tempore est.
-                - Labore rerum similique voluptas molestiae.
-                - Minima quas sapiente reprehenderit sed autem id.
-            title: 23i
+                - Velit quis assumenda est deserunt facere.
+                - Quia sunt.
+                - Voluptas sed et laborum alias debitis enim.
+                - Consequuntur dolor doloribus et blanditiis non optio.
+            title: tk5
         required:
             - title
             - description
@@ -308,61 +316,63 @@ definitions:
         properties:
             articleId:
                 type: string
-                example: 3d46060c-40cb-463c-8496-e65c560668a7
+                example: d1aadedf-91c4-426f-acea-f231ad3bcd63
                 format: uuid
             author:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Enim doloribus possimus fuga eaque.
+                example: Aut quae.
             createdAt:
                 type: string
-                example: "2011-11-17T09:27:52Z"
+                example: "2014-08-01T11:05:33Z"
                 format: date-time
             description:
                 type: string
-                example: Hic aut recusandae eum assumenda rem.
+                example: Qui quia et odit omnis non.
             favorited:
                 type: boolean
-                example: true
+                example: false
             favoritesCount:
                 type: integer
-                example: 2330980129187629129
+                example: 10914977178885060216
                 format: int64
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Unde dolorem debitis.
+                    example: Ducimus fugit est qui ut.
                 example:
-                    - Mollitia maxime in repellendus non.
-                    - Qui quia et odit omnis non.
+                    - Optio quia sint sequi ut.
+                    - Ea mollitia facere ut inventore voluptatem.
+                    - A perferendis quo pariatur nulla.
+                    - Doloribus nostrum ullam autem libero molestiae.
             title:
                 type: string
-                example: Magnam debitis qui aut.
+                example: Porro perspiciatis mollitia maxime in repellendus non.
             updatedAt:
                 type: string
-                example: "1987-04-17T23:34:54Z"
+                example: "1976-02-29T20:46:09Z"
                 format: date-time
         example:
-            articleId: 83802798-bbd6-413d-a966-32e131c6ceb7
+            articleId: ed823ba7-0b44-4a9a-956d-13a3c1c69c52
             author:
                 bio: Voluptatibus repellendus nihil.
                 following: true
                 image: Consectetur pariatur reprehenderit.
                 username: Laudantium ipsam mollitia est deleniti nemo.
-            body: Possimus at quidem est quo tempore aut.
-            createdAt: "1978-03-07T06:34:17Z"
-            description: Eum nulla qui qui et vel.
-            favorited: false
-            favoritesCount: 16666249480485122909
+            body: Aut dolores et veniam.
+            createdAt: "2010-10-31T20:31:10Z"
+            description: Rerum beatae.
+            favorited: true
+            favoritesCount: 6541229258948543589
             tagList:
-                - Qui in tempore nobis ut mollitia harum.
-                - Voluptatem a et quidem culpa vero.
-                - Rerum beatae.
-                - Aut dolores et veniam.
-            title: Excepturi dolor quae eligendi incidunt quis et.
-            updatedAt: "1998-10-23T10:14:54Z"
+                - Autem et sit in repellat.
+                - Quaerat deserunt est est minus dolor libero.
+                - Excepturi praesentium.
+                - Ipsa eum ea.
+            title: Voluptatem a et quidem culpa vero.
+            updatedAt: "1993-05-21T09:54:33Z"
         required:
             - articleId
             - title
@@ -402,6 +412,20 @@ definitions:
                 updatedAt: "2006-11-16T05:09:33Z"
         required:
             - article
+    ArticleGetArticleBadRequest:
+        title: ArticleGetArticleBadRequest
+        type: object
+        properties:
+            code:
+                type: string
+                example: Unspecified
+                enum:
+                    - Unspecified
+                    - ArticleNotFound
+        example:
+            code: ArticleNotFound
+        required:
+            - code
     ArticleGetResponseBody:
         title: ArticleGetResponseBody
         type: object
@@ -436,21 +460,21 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Et sint debitis nihil atque.
+                example: Facilis eligendi placeat occaecati et.
             following:
                 type: boolean
-                example: true
+                example: false
             image:
                 type: string
-                example: Suscipit sint aperiam et aut inventore fugiat.
+                example: Non excepturi et.
             username:
                 type: string
-                example: Fugit labore corporis omnis ut.
+                example: Nostrum et asperiores pariatur et molestiae dolore.
         example:
-            bio: Beatae et consequuntur.
+            bio: Non quam.
             following: true
-            image: Vel dicta dolorem nostrum.
-            username: Et vel id quisquam vero minima voluptatem.
+            image: Cumque id animi nesciunt inventore.
+            username: Necessitatibus molestiae aut in.
         required:
             - username
             - bio
@@ -462,14 +486,14 @@ definitions:
         properties:
             code:
                 type: string
-                example: UserNotFound
+                example: UserAlreadyFollowing
                 enum:
                     - Unspecified
                     - UserNotFound
                     - UserAlreadyFollowing
                     - CannotFollowYourself
         example:
-            code: Unspecified
+            code: CannotFollowYourself
         required:
             - code
     ProfileFollowUserRequestBody:
@@ -478,10 +502,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: wXl
+                example: Zozt
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: PveCi
+            username: did
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -504,13 +528,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: UserNotFollowing
                 enum:
                     - Unspecified
                     - UserNotFound
                     - UserNotFollowing
         example:
-            code: UserNotFound
+            code: Unspecified
         required:
             - code
     ProfileUnfollowUserRequestBody:
@@ -519,10 +543,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: 75k
+                example: enb
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: tCUh
+            username: dB1mu
         required:
             - username
     ProfileUnfollowUserResponseBody:
@@ -545,25 +569,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Optio placeat voluptas odio.
+                example: Tempore aut debitis amet id perferendis.
             email:
                 type: string
-                example: Et laborum alias debitis.
+                example: Repellat error eaque.
             image:
                 type: string
-                example: Reiciendis eum eaque quae voluptate porro.
+                example: Nihil tempora consequatur dolorem omnis eos.
             token:
                 type: string
-                example: Animi consequuntur dolor.
+                example: Veritatis voluptates exercitationem architecto vitae recusandae dolorem.
             username:
                 type: string
-                example: Et blanditiis.
+                example: Illo ea illum.
         example:
-            bio: Veritatis voluptates exercitationem architecto vitae recusandae dolorem.
-            email: Et maxime qui soluta eaque vero.
-            image: Illo ea illum.
-            token: Non nobis maiores nam qui ad voluptates.
-            username: Rerum repellat error eaque.
+            bio: Consequatur eaque totam cum et repellat.
+            email: Est qui odio nostrum cum rerum.
+            image: Earum quasi quam ducimus voluptatibus cum assumenda.
+            token: Quia eius commodi et sit.
+            username: Officia perferendis tempore et rerum.
         required:
             - email
             - token
@@ -578,11 +602,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Veniam voluptatem quis.
-                email: Culpa nobis temporibus voluptas.
-                image: Quas quis.
-                token: Quia omnis magnam velit distinctio soluta.
-                username: Quia odit excepturi possimus molestiae laudantium.
+                bio: Error incidunt iure optio.
+                email: Quis occaecati quas quis.
+                image: Et autem voluptates harum.
+                token: Et provident iste.
+                username: Sed ullam ea provident voluptates laborum hic.
         required:
             - user
     UserLoginBadRequest:
@@ -591,13 +615,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: EmailNotFound
+                example: PasswordIsIncorrect
                 enum:
                     - Unspecified
                     - EmailNotFound
                     - PasswordIsIncorrect
         example:
-            code: EmailNotFound
+            code: Unspecified
         required:
             - code
     UserLoginRequestBody:
@@ -606,16 +630,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: talon@zboncakspencer.biz
+                example: aurelia.ferry@mertzkuhn.org
                 format: email
             password:
                 type: string
-                example: tyi
+                example: kqd
                 minLength: 6
                 maxLength: 128
         example:
-            email: norberto.bode@bashirian.net
-            password: pl0
+            email: clark@hackett.biz
+            password: xkf
         required:
             - email
             - password
@@ -627,11 +651,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Veniam voluptatem quis.
-                email: Culpa nobis temporibus voluptas.
-                image: Quas quis.
-                token: Quia omnis magnam velit distinctio soluta.
-                username: Quia odit excepturi possimus molestiae laudantium.
+                bio: Error incidunt iure optio.
+                email: Quis occaecati quas quis.
+                image: Et autem voluptates harum.
+                token: Et provident iste.
+                username: Sed ullam ea provident voluptates laborum hic.
         required:
             - user
     UserRegisterBadRequest:
@@ -640,13 +664,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: UsernameAlreadyUsed
+                example: EmailAlreadyUsed
                 enum:
                     - Unspecified
                     - UsernameAlreadyUsed
                     - EmailAlreadyUsed
         example:
-            code: UsernameAlreadyUsed
+            code: EmailAlreadyUsed
         required:
             - code
     UserRegisterRequestBody:
@@ -655,21 +679,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: kaleb_little@vonbashirian.org
+                example: marquis@grant.com
                 format: email
             password:
                 type: string
-                example: blp
+                example: "385"
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: DU3
+                example: MaL
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: daisha@mullerhills.name
-            password: 2xj
-            username: BJdUf
+            email: leda@doyle.info
+            password: qh0
+            username: 1Tb
         required:
             - username
             - email
@@ -682,11 +706,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Veniam voluptatem quis.
-                email: Culpa nobis temporibus voluptas.
-                image: Quas quis.
-                token: Quia omnis magnam velit distinctio soluta.
-                username: Quia odit excepturi possimus molestiae laudantium.
+                bio: Error incidunt iure optio.
+                email: Quis occaecati quas quis.
+                image: Et autem voluptates harum.
+                token: Et provident iste.
+                username: Sed ullam ea provident voluptates laborum hic.
         required:
             - user
     UserUpdateRequestBody:
@@ -695,31 +719,31 @@ definitions:
         properties:
             bio:
                 type: string
-                example: f52
+                example: nmh
                 maxLength: 4096
             email:
                 type: string
-                example: kenna@mcclure.org
+                example: amie.pouros@gerhold.com
                 format: email
             image:
                 type: string
-                example: http://g9
+                example: http://79
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: dej
+                example: fah
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: vZQb
+                example: HUZ
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: hcz
-            email: dean.predovic@hueljohnson.org
-            image: https://9v
-            password: qbc
-            username: teOQ
+            bio: ry8
+            email: nettie@buckridge.name
+            image: http://iw
+            password: 7yf
+            username: a732M
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -728,10 +752,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Veniam voluptatem quis.
-                email: Culpa nobis temporibus voluptas.
-                image: Quas quis.
-                token: Quia omnis magnam velit distinctio soluta.
-                username: Quia odit excepturi possimus molestiae laudantium.
+                bio: Error incidunt iure optio.
+                email: Quis occaecati quas quis.
+                image: Et autem voluptates harum.
+                token: Et provident iste.
+                username: Sed ullam ea provident voluptates laborum hic.
         required:
             - user
