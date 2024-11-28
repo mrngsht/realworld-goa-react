@@ -20,3 +20,8 @@ func GetArticlePath(articleID string) string {
 func CreateArticlePath() string {
 	return "/api/article/create"
 }
+
+// FavoriteArticlePath returns the URL path to the article service favorite HTTP endpoint.
+func FavoriteArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/favorite", articleID)
+}

@@ -15,15 +15,17 @@ import (
 
 // Client is the "article" service client.
 type Client struct {
-	GetEndpoint    goa.Endpoint
-	CreateEndpoint goa.Endpoint
+	GetEndpoint      goa.Endpoint
+	CreateEndpoint   goa.Endpoint
+	FavoriteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, create goa.Endpoint) *Client {
+func NewClient(get, create, favorite goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint:    get,
-		CreateEndpoint: create,
+		GetEndpoint:      get,
+		CreateEndpoint:   create,
+		FavoriteEndpoint: favorite,
 	}
 }
 
@@ -45,4 +47,14 @@ func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *CreateResul
 		return
 	}
 	return ires.(*CreateResult), nil
+}
+
+// Favorite calls the "favorite" endpoint of the "article" service.
+func (c *Client) Favorite(ctx context.Context, p *FavoritePayload) (res *FavoriteResult, err error) {
+	var ires any
+	ires, err = c.FavoriteEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*FavoriteResult), nil
 }

@@ -92,6 +92,39 @@ func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 	}
 }
 
+// EncodeFavoriteResponse returns an encoder for responses returned by the
+// article favorite endpoint.
+func EncodeFavoriteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*article.FavoriteResult)
+		enc := encoder(ctx, w)
+		body := NewFavoriteResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeFavoriteRequest returns a decoder for requests sent to the article
+// favorite endpoint.
+func DecodeFavoriteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			articleID string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		articleID = params["articleId"]
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+		payload := NewFavoritePayload(articleID)
+
+		return payload, nil
+	}
+}
+
 // marshalArticleArticleDetailToArticleDetailResponseBody builds a value of
 // type *ArticleDetailResponseBody from a value of type *article.ArticleDetail.
 func marshalArticleArticleDetailToArticleDetailResponseBody(v *article.ArticleDetail) *ArticleDetailResponseBody {

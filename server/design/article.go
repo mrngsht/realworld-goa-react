@@ -45,6 +45,25 @@ var _ = Service("article", func() {
 			)
 		})
 	})
+
+	Method("favorite", func() {
+		HTTP(func() {
+			POST("article/{articleId}/favorite")
+			Response(StatusOK)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+			)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("article", type_ArticleDetail),
+			)
+		})
+	})
 })
 
 var (

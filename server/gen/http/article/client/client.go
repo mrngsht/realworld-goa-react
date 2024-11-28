@@ -23,6 +23,10 @@ type Client struct {
 	// Create Doer is the HTTP client used to make requests to the create endpoint.
 	CreateDoer goahttp.Doer
 
+	// Favorite Doer is the HTTP client used to make requests to the favorite
+	// endpoint.
+	FavoriteDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -45,6 +49,7 @@ func NewClient(
 	return &Client{
 		GetDoer:             doer,
 		CreateDoer:          doer,
+		FavoriteDoer:        doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -91,6 +96,25 @@ func (c *Client) Create() goa.Endpoint {
 		resp, err := c.CreateDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "create", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Favorite returns an endpoint that makes HTTP requests to the article service
+// favorite server.
+func (c *Client) Favorite() goa.Endpoint {
+	var (
+		decodeResponse = DecodeFavoriteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildFavoriteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.FavoriteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "favorite", err)
 		}
 		return decodeResponse(resp)
 	}

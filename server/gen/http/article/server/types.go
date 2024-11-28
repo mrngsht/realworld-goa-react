@@ -35,6 +35,12 @@ type CreateResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
 }
 
+// FavoriteResponseBody is the type of the "article" service "favorite"
+// endpoint HTTP response body.
+type FavoriteResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
+}
+
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
 	ArticleID      string               `form:"articleId" json:"articleId" xml:"articleId"`
@@ -77,6 +83,16 @@ func NewCreateResponseBody(res *article.CreateResult) *CreateResponseBody {
 	return body
 }
 
+// NewFavoriteResponseBody builds the HTTP response body from the result of the
+// "favorite" endpoint of the "article" service.
+func NewFavoriteResponseBody(res *article.FavoriteResult) *FavoriteResponseBody {
+	body := &FavoriteResponseBody{}
+	if res.Article != nil {
+		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
+	}
+	return body
+}
+
 // NewGetPayload builds a article service get endpoint payload.
 func NewGetPayload(articleID string) *article.GetPayload {
 	v := &article.GetPayload{}
@@ -96,6 +112,14 @@ func NewCreatePayload(body *CreateRequestBody) *article.CreatePayload {
 	for i, val := range body.TagList {
 		v.TagList[i] = val
 	}
+
+	return v
+}
+
+// NewFavoritePayload builds a article service favorite endpoint payload.
+func NewFavoritePayload(articleID string) *article.FavoritePayload {
+	v := &article.FavoritePayload{}
+	v.ArticleID = articleID
 
 	return v
 }

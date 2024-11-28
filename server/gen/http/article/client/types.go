@@ -33,6 +33,12 @@ type CreateResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
 }
 
+// FavoriteResponseBody is the type of the "article" service "favorite"
+// endpoint HTTP response body.
+type FavoriteResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
+}
+
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
 	ArticleID      *string              `form:"articleId,omitempty" json:"articleId,omitempty" xml:"articleId,omitempty"`
@@ -92,6 +98,15 @@ func NewCreateResultOK(body *CreateResponseBody) *article.CreateResult {
 	return v
 }
 
+// NewFavoriteResultOK builds a "article" service "favorite" endpoint result
+// from a HTTP "OK" response.
+func NewFavoriteResultOK(body *FavoriteResponseBody) *article.FavoriteResult {
+	v := &article.FavoriteResult{}
+	v.Article = unmarshalArticleDetailResponseBodyToArticleArticleDetail(body.Article)
+
+	return v
+}
+
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article == nil {
@@ -107,6 +122,20 @@ func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 
 // ValidateCreateResponseBody runs the validations defined on CreateResponseBody
 func ValidateCreateResponseBody(body *CreateResponseBody) (err error) {
+	if body.Article == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("article", "body"))
+	}
+	if body.Article != nil {
+		if err2 := ValidateArticleDetailResponseBody(body.Article); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateFavoriteResponseBody runs the validations defined on
+// FavoriteResponseBody
+func ValidateFavoriteResponseBody(body *FavoriteResponseBody) (err error) {
 	if body.Article == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("article", "body"))
 	}

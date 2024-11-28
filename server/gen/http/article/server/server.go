@@ -18,9 +18,10 @@ import (
 
 // Server lists the article service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Get    http.Handler
-	Create http.Handler
+	Mounts   []*MountPoint
+	Get      http.Handler
+	Create   http.Handler
+	Favorite http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -52,9 +53,11 @@ func New(
 		Mounts: []*MountPoint{
 			{"Get", "GET", "/api/article/{articleId}"},
 			{"Create", "POST", "/api/article/create"},
+			{"Favorite", "POST", "/api/article/{articleId}/favorite"},
 		},
-		Get:    NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		Create: NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
+		Get:      NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Create:   NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
+		Favorite: NewFavoriteHandler(e.Favorite, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -65,6 +68,7 @@ func (s *Server) Service() string { return "article" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.Create = m(s.Create)
+	s.Favorite = m(s.Favorite)
 }
 
 // MethodNames returns the methods served.
@@ -74,6 +78,7 @@ func (s *Server) MethodNames() []string { return article.MethodNames[:] }
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountCreateHandler(mux, h.Create)
+	MountFavoriteHandler(mux, h.Favorite)
 }
 
 // Mount configures the mux to serve the article endpoints.
@@ -162,6 +167,57 @@ func NewCreateHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "create")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountFavoriteHandler configures the mux to serve the "article" service
+// "favorite" endpoint.
+func MountFavoriteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/article/{articleId}/favorite", f)
+}
+
+// NewFavoriteHandler creates a HTTP handler which loads the HTTP request and
+// calls the "article" service "favorite" endpoint.
+func NewFavoriteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeFavoriteRequest(mux, decoder)
+		encodeResponse = EncodeFavoriteResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "favorite")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

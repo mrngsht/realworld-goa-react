@@ -154,6 +154,71 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildFavoriteRequest instantiates a HTTP request object with method and path
+// set to call the "article" service "favorite" endpoint
+func (c *Client) BuildFavoriteRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.FavoritePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "favorite", "*article.FavoritePayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: FavoriteArticlePath(articleID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "favorite", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeFavoriteResponse returns a decoder for responses returned by the
+// article favorite endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+func DecodeFavoriteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body FavoriteResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "favorite", err)
+			}
+			err = ValidateFavoriteResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "favorite", err)
+			}
+			res := NewFavoriteResultOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "favorite", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalArticleDetailResponseBodyToArticleArticleDetail builds a value of
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {

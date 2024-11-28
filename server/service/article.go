@@ -136,3 +136,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 		},
 	}, nil
 }
+
+func (s *Article) Favorite(context.Context, *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
+	return nil, nil
+}

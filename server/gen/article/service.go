@@ -17,6 +17,8 @@ type Service interface {
 	Get(context.Context, *GetPayload) (res *GetResult, err error)
 	// Create implements create.
 	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
+	// Favorite implements favorite.
+	Favorite(context.Context, *FavoritePayload) (res *FavoriteResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -33,7 +35,7 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"get", "create"}
+var MethodNames = [3]string{"get", "create", "favorite"}
 
 type ArticleDetail struct {
 	ArticleID      string
@@ -58,6 +60,16 @@ type CreatePayload struct {
 
 // CreateResult is the result type of the article service create method.
 type CreateResult struct {
+	Article *ArticleDetail
+}
+
+// FavoritePayload is the payload type of the article service favorite method.
+type FavoritePayload struct {
+	ArticleID string
+}
+
+// FavoriteResult is the result type of the article service favorite method.
+type FavoriteResult struct {
 	Article *ArticleDetail
 }
 
