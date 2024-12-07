@@ -28,6 +28,16 @@ INSERT INTO article_stats_
 (created_at_, updated_at_, article_id_, favorites_count_)
 VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
 
+-- name: InsertArticleFavorite :exec
+INSERT INTO article_favorite_
+(created_at_, article_id_, user_id_)
+VALUES ($1, $2, $3);
+
+-- name: InsertArticleFavoriteMutation :exec
+INSERT INTO article_favorite_mutation_
+(created_at_, article_id_, user_id_, type_)
+VALUES ($1, $2, $3, $4);
+
 -- name: GetArticleContentByArticleID :one
 SELECT 
   created_at_,

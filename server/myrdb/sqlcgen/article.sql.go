@@ -132,6 +132,46 @@ func (q *Queries) InsertArticleContentMutation(ctx context.Context, db DBTX, arg
 	return err
 }
 
+const insertArticleFavorite = `-- name: InsertArticleFavorite :exec
+INSERT INTO article_favorite_
+(created_at_, article_id_, user_id_)
+VALUES ($1, $2, $3)
+`
+
+type InsertArticleFavoriteParams struct {
+	CreatedAt time.Time
+	ArticleID uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) InsertArticleFavorite(ctx context.Context, db DBTX, arg InsertArticleFavoriteParams) error {
+	_, err := db.Exec(ctx, insertArticleFavorite, arg.CreatedAt, arg.ArticleID, arg.UserID)
+	return err
+}
+
+const insertArticleFavoriteMutation = `-- name: InsertArticleFavoriteMutation :exec
+INSERT INTO article_favorite_mutation_
+(created_at_, article_id_, user_id_, type_)
+VALUES ($1, $2, $3, $4)
+`
+
+type InsertArticleFavoriteMutationParams struct {
+	CreatedAt time.Time
+	ArticleID uuid.UUID
+	UserID    uuid.UUID
+	Type      ArticleFavoriteMutationType
+}
+
+func (q *Queries) InsertArticleFavoriteMutation(ctx context.Context, db DBTX, arg InsertArticleFavoriteMutationParams) error {
+	_, err := db.Exec(ctx, insertArticleFavoriteMutation,
+		arg.CreatedAt,
+		arg.ArticleID,
+		arg.UserID,
+		arg.Type,
+	)
+	return err
+}
+
 const insertArticleStats = `-- name: InsertArticleStats :exec
 INSERT INTO article_stats_
 (created_at_, updated_at_, article_id_, favorites_count_)
