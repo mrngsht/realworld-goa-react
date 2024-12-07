@@ -50,6 +50,10 @@ type ArticleDetail struct {
 	Author         *Profile
 }
 
+type ArticleFavoriteArticleBadRequest struct {
+	Code string
+}
+
 type ArticleGetArticleBadRequest struct {
 	Code string
 }
@@ -92,6 +96,23 @@ type Profile struct {
 	Bio       string
 	Image     string
 	Following bool
+}
+
+// Error returns an error description.
+func (e *ArticleFavoriteArticleBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleFavoriteArticleBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleFavoriteArticleBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleFavoriteArticleBadRequest".
+func (e *ArticleFavoriteArticleBadRequest) GoaErrorName() string {
+	return "ArticleFavoriteArticleBadRequest"
 }
 
 // Error returns an error description.

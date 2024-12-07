@@ -199,6 +199,9 @@ func (c *Client) BuildFavoriteRequest(ctx context.Context, v any) (*http.Request
 // DecodeFavoriteResponse returns a decoder for responses returned by the
 // article favorite endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeFavoriteResponse may return the following errors:
+//   - "ArticleFavoriteArticleBadRequest" (type *article.ArticleFavoriteArticleBadRequest): http.StatusBadRequest
+//   - error: internal error
 func DecodeFavoriteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -229,6 +232,20 @@ func DecodeFavoriteResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			}
 			res := NewFavoriteResultOK(&body)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body FavoriteArticleFavoriteArticleBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "favorite", err)
+			}
+			err = ValidateFavoriteArticleFavoriteArticleBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "favorite", err)
+			}
+			return nil, NewFavoriteArticleFavoriteArticleBadRequest(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("article", "favorite", resp.StatusCode, string(body))

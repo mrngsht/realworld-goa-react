@@ -34,7 +34,7 @@ user (login|register|get-current|update)
 func UsageExamples() string {
 	return os.Args[0] + ` article get --article-id "e64a88c2-8d04-4dbb-8a0a-5ea760bb5c4d"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "9ae"
+      "username": "emeW"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
       "email": "raheem@gibson.biz",
@@ -322,7 +322,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "9ae"
+      "username": "emeW"
    }'
 `, os.Args[0])
 }
@@ -335,7 +335,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "W_Pu6"
+      "username": "u46"
    }'
 `, os.Args[0])
 }

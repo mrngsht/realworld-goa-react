@@ -98,6 +98,14 @@ paths:
                                         - Possimus qui ad cum.
                                     title: Dolor nesciunt.
                                     updatedAt: "2006-11-16T05:09:33Z"
+                "400":
+                    description: 'ArticleFavoriteArticleBadRequest: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleFavoriteArticleBadRequest'
+                            example:
+                                code: Unspecified
     /api/article/create:
         post:
             tags:
@@ -159,7 +167,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: 9ae
+                            username: emeW
             responses:
                 "200":
                     description: OK response.
@@ -180,7 +188,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ProfileFollowUserBadRequest'
                             example:
-                                code: Unspecified
+                                code: UserAlreadyFollowing
     /api/profile/unfollow_user:
         post:
             tags:
@@ -194,7 +202,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: W_Pu6
+                            username: u46
             responses:
                 "200":
                     description: OK response.
@@ -415,6 +423,19 @@ components:
                 - favorited
                 - favoritesCount
                 - author
+        ArticleFavoriteArticleBadRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                    example: ArticleNotFound
+                    enum:
+                        - Unspecified
+                        - ArticleNotFound
+            example:
+                code: ArticleNotFound
+            required:
+                - code
         ArticleGetArticleBadRequest:
             type: object
             properties:
@@ -550,7 +571,7 @@ components:
             properties:
                 bio:
                     type: string
-                    example: Consequatur laboriosam.
+                    example: Ratione consequatur laboriosam.
                 following:
                     type: boolean
                     example: false
@@ -559,7 +580,7 @@ components:
                     example: Eum et praesentium quia maxime quia dolorem.
                 username:
                     type: string
-                    example: Expedita omnis nesciunt reiciendis voluptates.
+                    example: Nesciunt reiciendis.
             example:
                 bio: Expedita animi id ut.
                 following: false

@@ -53,6 +53,9 @@ func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *CreateResul
 }
 
 // Favorite calls the "favorite" endpoint of the "article" service.
+// Favorite may return the following errors:
+//   - "ArticleFavoriteArticleBadRequest" (type *ArticleFavoriteArticleBadRequest)
+//   - error: internal error
 func (c *Client) Favorite(ctx context.Context, p *FavoritePayload) (res *FavoriteResult, err error) {
 	var ires any
 	ires, err = c.FavoriteEndpoint(ctx, p)

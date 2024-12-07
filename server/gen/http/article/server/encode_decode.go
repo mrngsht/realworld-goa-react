@@ -154,6 +154,35 @@ func DecodeFavoriteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 	}
 }
 
+// EncodeFavoriteError returns an encoder for errors returned by the favorite
+// article endpoint.
+func EncodeFavoriteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "ArticleFavoriteArticleBadRequest":
+			var res *article.ArticleFavoriteArticleBadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewFavoriteArticleFavoriteArticleBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalArticleArticleDetailToArticleDetailResponseBody builds a value of
 // type *ArticleDetailResponseBody from a value of type *article.ArticleDetail.
 func marshalArticleArticleDetailToArticleDetailResponseBody(v *article.ArticleDetail) *ArticleDetailResponseBody {

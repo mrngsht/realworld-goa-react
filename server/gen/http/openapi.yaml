@@ -60,6 +60,12 @@ paths:
                         $ref: '#/definitions/ArticleFavoriteResponseBody'
                         required:
                             - article
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/ArticleFavoriteArticleBadRequest'
+                        required:
+                            - code
             schemes:
                 - http
     /api/article/create:
@@ -384,6 +390,20 @@ definitions:
             - favorited
             - favoritesCount
             - author
+    ArticleFavoriteArticleBadRequest:
+        title: ArticleFavoriteArticleBadRequest
+        type: object
+        properties:
+            code:
+                type: string
+                example: Unspecified
+                enum:
+                    - Unspecified
+                    - ArticleNotFound
+        example:
+            code: ArticleNotFound
+        required:
+            - code
     ArticleFavoriteResponseBody:
         title: ArticleFavoriteResponseBody
         type: object
@@ -486,7 +506,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: UserAlreadyFollowing
+                example: CannotFollowYourself
                 enum:
                     - Unspecified
                     - UserNotFound
@@ -502,7 +522,7 @@ definitions:
         properties:
             username:
                 type: string
-                example: Zozt
+                example: zst
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
             username: did

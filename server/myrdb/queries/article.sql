@@ -28,6 +28,21 @@ INSERT INTO article_stats_
 (created_at_, updated_at_, article_id_, favorites_count_)
 VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2);
 
+-- name: InsertArticleFavorite :exec
+INSERT INTO article_favorite_
+(created_at_, article_id_, user_id_)
+VALUES ($1, $2, $3);
+
+-- name: InsertArticleFavoriteMutation :exec
+INSERT INTO article_favorite_mutation_
+(created_at_, article_id_, user_id_, type_)
+VALUES ($1, $2, $3, $4);
+
+-- name: UpdateArticleStatsFavoritesCount :exec
+UPDATE article_stats_
+SET favorites_count_ = $1
+WHERE article_id_ = $2;
+
 -- name: GetArticleContentByArticleID :one
 SELECT 
   created_at_,
@@ -49,6 +64,15 @@ FROM article_stats_
 WHERE article_id_ = $1
 LIMIT 1;
 
+-- name: GetArticleStatsByArticleIDForUpdate :one
+SELECT 
+  article_id_,
+  favorites_count_
+FROM article_stats_ 
+WHERE article_id_ = $1
+LIMIT 1
+FOR UPDATE;
+
 -- name: ListArticleTagByArticleID :many
 SELECT 
   tag_
@@ -62,3 +86,4 @@ SELECT EXISTS (
   FROM article_favorite_ 
   WHERE article_id_ = $1 AND user_id_ = $2
 );
+

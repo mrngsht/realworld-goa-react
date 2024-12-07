@@ -48,6 +48,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
+// FavoriteArticleFavoriteArticleBadRequestResponseBody is the type of the
+// "article" service "favorite" endpoint HTTP response body for the
+// "ArticleFavoriteArticleBadRequest" error.
+type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
 	ArticleID      string               `form:"articleId" json:"articleId" xml:"articleId"`
@@ -104,6 +111,16 @@ func NewFavoriteResponseBody(res *article.FavoriteResult) *FavoriteResponseBody 
 // from the result of the "get" endpoint of the "article" service.
 func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticleBadRequest) *GetArticleGetArticleBadRequestResponseBody {
 	body := &GetArticleGetArticleBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
+// NewFavoriteArticleFavoriteArticleBadRequestResponseBody builds the HTTP
+// response body from the result of the "favorite" endpoint of the "article"
+// service.
+func NewFavoriteArticleFavoriteArticleBadRequestResponseBody(res *article.ArticleFavoriteArticleBadRequest) *FavoriteArticleFavoriteArticleBadRequestResponseBody {
+	body := &FavoriteArticleFavoriteArticleBadRequestResponseBody{
 		Code: res.Code,
 	}
 	return body

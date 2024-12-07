@@ -36,74 +36,14 @@ func (s *Article) Get(ctx context.Context, payload *goa.GetPayload) (res *goa.Ge
 		}
 	}()
 
-	userID := myctx.MayGetAuthenticatedUserID(ctx)
+	userIDOptional := myctx.MayGetAuthenticatedUserID(ctx)
 
-	db := s.db
-
-	a, err := sqlcgen.Q.GetArticleContentByArticleID(ctx, db, uuid.MustParse(payload.ArticleID))
-	if err != nil {
-		if myrdb.IsErrNoRows(err) {
-			return nil, article.ErrArticleNotFound
-		}
-		return nil, errors.WithStack(err)
-	}
-
-	author, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, a.AuthorUserID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	stats, err := sqlcgen.Q.GetArticleStatsByArticleID(ctx, db, a.ArticleID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	tags, err := sqlcgen.Q.ListArticleTagByArticleID(ctx, db, a.ArticleID)
+	detail, err := s.getArticleDetail(ctx, uuid.MustParse(payload.ArticleID), userIDOptional)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	favorited := false
-	authorFollowing := false
-	if userID != nil {
-		favorited, err = sqlcgen.Q.IsArticleFavoritedByArticleIDAndUserID(ctx, db, sqlcgen.IsArticleFavoritedByArticleIDAndUserIDParams{
-			ArticleID: a.ArticleID,
-			UserID:    *userID,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		authorFollowing, err = sqlcgen.Q.IsUserFollowing(ctx, db, sqlcgen.IsUserFollowingParams{
-			UserID:         *userID,
-			FollowedUserID: a.AuthorUserID,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-	}
-
-	return &goa.GetResult{
-		Article: &goa.ArticleDetail{
-			ArticleID:      a.ArticleID.String(),
-			Title:          a.Title,
-			Description:    a.Description,
-			Body:           a.Body,
-			TagList:        tags,
-			CreatedAt:      a.CreatedAt.String(),
-			UpdatedAt:      a.UpdatedAt.String(),
-			Favorited:      favorited,
-			FavoritesCount: uint(stats.FavoritesCount),
-			Author: &goa.Profile{
-				Username:  author.Username,
-				Bio:       author.Bio,
-				Image:     author.ImageUrl,
-				Following: authorFollowing,
-			},
-		},
-	}, nil
+	return &goa.GetResult{Article: detail}, nil
 }
 
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
@@ -217,5 +157,138 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 }
 
 func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
-	return nil, nil
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleFavoriteArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	db := s.db
+	articleID := uuid.MustParse(payload.ArticleID)
+
+	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if !detail.Favorited {
+		now := mytime.Now(ctx)
+		if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+			db := txdb
+
+			if err := sqlcgen.Q.InsertArticleFavorite(ctx, db, sqlcgen.InsertArticleFavoriteParams{
+				CreatedAt: now,
+				ArticleID: articleID,
+				UserID:    userID,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			if err := sqlcgen.Q.InsertArticleFavoriteMutation(ctx, db, sqlcgen.InsertArticleFavoriteMutationParams{
+				CreatedAt: now,
+				ArticleID: articleID,
+				UserID:    userID,
+				Type:      sqlcgen.ArticleFavoriteMutationTypeFavorite,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			stats, err := sqlcgen.Q.GetArticleStatsByArticleIDForUpdate(ctx, db, articleID)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			favoriteCount := stats.FavoritesCount + 1
+
+			if err := sqlcgen.Q.UpdateArticleStatsFavoritesCount(ctx, db, sqlcgen.UpdateArticleStatsFavoritesCountParams{
+				FavoritesCount: favoriteCount,
+				ArticleID:      articleID,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			detail.Favorited = true
+			detail.FavoritesCount = uint(favoriteCount)
+
+			return nil
+		}); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return &goa.FavoriteResult{Article: detail}, nil
+}
+
+func (s *Article) getArticleDetail(ctx context.Context, articleID uuid.UUID, requestUserIDOptional *uuid.UUID) (res *goa.ArticleDetail, err error) {
+	db := s.db
+
+	a, err := sqlcgen.Q.GetArticleContentByArticleID(ctx, db, articleID)
+	if err != nil {
+		if myrdb.IsErrNoRows(err) {
+			return nil, article.ErrArticleNotFound
+		}
+		return nil, errors.WithStack(err)
+	}
+
+	author, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, a.AuthorUserID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	stats, err := sqlcgen.Q.GetArticleStatsByArticleID(ctx, db, a.ArticleID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	tags, err := sqlcgen.Q.ListArticleTagByArticleID(ctx, db, a.ArticleID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	favorited := false
+	authorFollowing := false
+	if requestUserIDOptional != nil {
+		favorited, err = sqlcgen.Q.IsArticleFavoritedByArticleIDAndUserID(ctx, db, sqlcgen.IsArticleFavoritedByArticleIDAndUserIDParams{
+			ArticleID: a.ArticleID,
+			UserID:    *requestUserIDOptional,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		authorFollowing, err = sqlcgen.Q.IsUserFollowing(ctx, db, sqlcgen.IsUserFollowingParams{
+			UserID:         *requestUserIDOptional,
+			FollowedUserID: a.AuthorUserID,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return &goa.ArticleDetail{
+		ArticleID:      a.ArticleID.String(),
+		Title:          a.Title,
+		Description:    a.Description,
+		Body:           a.Body,
+		TagList:        tags,
+		CreatedAt:      a.CreatedAt.String(),
+		UpdatedAt:      a.UpdatedAt.String(),
+		Favorited:      favorited,
+		FavoritesCount: uint(stats.FavoritesCount),
+		Author: &goa.Profile{
+			Username:  author.Username,
+			Bio:       author.Bio,
+			Image:     author.ImageUrl,
+			Following: authorFollowing,
+		},
+	}, nil
 }

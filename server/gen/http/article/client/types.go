@@ -46,6 +46,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
+// FavoriteArticleFavoriteArticleBadRequestResponseBody is the type of the
+// "article" service "favorite" endpoint HTTP response body for the
+// "ArticleFavoriteArticleBadRequest" error.
+type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
 // ArticleDetailResponseBody is used to define fields on response body types.
 type ArticleDetailResponseBody struct {
 	ArticleID      *string              `form:"articleId,omitempty" json:"articleId,omitempty" xml:"articleId,omitempty"`
@@ -124,6 +131,16 @@ func NewFavoriteResultOK(body *FavoriteResponseBody) *article.FavoriteResult {
 	return v
 }
 
+// NewFavoriteArticleFavoriteArticleBadRequest builds a article service
+// favorite endpoint ArticleFavoriteArticleBadRequest error.
+func NewFavoriteArticleFavoriteArticleBadRequest(body *FavoriteArticleFavoriteArticleBadRequestResponseBody) *article.ArticleFavoriteArticleBadRequest {
+	v := &article.ArticleFavoriteArticleBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article == nil {
@@ -167,6 +184,21 @@ func ValidateFavoriteResponseBody(body *FavoriteResponseBody) (err error) {
 // ValidateGetArticleGetArticleBadRequestResponseBody runs the validations
 // defined on get_ArticleGetArticleBadRequest_response_body
 func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArticleBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		}
+	}
+	return
+}
+
+// ValidateFavoriteArticleFavoriteArticleBadRequestResponseBody runs the
+// validations defined on
+// favorite_ArticleFavoriteArticleBadRequest_response_body
+func ValidateFavoriteArticleFavoriteArticleBadRequestResponseBody(body *FavoriteArticleFavoriteArticleBadRequestResponseBody) (err error) {
 	if body.Code == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
