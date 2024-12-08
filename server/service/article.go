@@ -192,12 +192,15 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 				return errors.WithStack(err)
 			}
 
+			// TODO: update stats in a concurrently safe mannaer
+
 			return nil
 		}); err != nil {
 			return nil, errors.WithStack(err)
 		}
 
 		detail.Favorited = true
+		detail.FavoritesCount += 1 // possibly not exact, but allow it
 	}
 
 	return &goa.FavoriteResult{Article: detail}, nil
