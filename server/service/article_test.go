@@ -28,6 +28,7 @@ func TestArticle_Get(t *testing.T) {
 	t.Run("succeed", func(t *testing.T) {
 		author := servicetest.CreateUser(t, ctx, db)
 		viewer := servicetest.CreateUser(t, ctx, db)
+		other := servicetest.CreateUser(t, ctx, db)
 
 		createdAt := mytime.Now(ctx)
 		ctx := mytimetest.WithFixedNow(t, ctx, createdAt)
@@ -41,14 +42,15 @@ func TestArticle_Get(t *testing.T) {
 		}
 		createRes, err := svc.Create(ctx, payload)
 		require.NoError(t, err)
+		articleID := createRes.Article.ArticleID
 
 		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
-		res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: createRes.Article.ArticleID}) // Act
+		res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: articleID}) // Act
 		require.NoError(t, err)
 
 		createdAtOnDB := mytimetest.TruncateTimeForDB(createdAt)
 
-		assert.NotEmpty(t, res.Article.ArticleID)
+		assert.Equal(t, articleID, res.Article.ArticleID)
 		assert.Equal(t, payload.Title, res.Article.Title)
 		assert.Equal(t, payload.Description, res.Article.Description)
 		assert.Equal(t, payload.Body, res.Article.Body)
@@ -62,10 +64,28 @@ func TestArticle_Get(t *testing.T) {
 		assert.Equal(t, author.ImageUrl, res.Article.Author.Image)
 		assert.Equal(t, false, res.Article.Author.Following)
 
-		t.Run("when user favorited", func(t *testing.T) {
-			// TODO:
-			t.Run("also when another user favorited", func(t *testing.T) {
-				// TODO:
+		t.Run("when the other user favorited", func(t *testing.T) {
+			ctx := servicetest.SetAuthenticatedUser(t, ctx, db, other.Username)
+			_, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID})
+			require.NoError(t, err)
+
+			ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+			res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: articleID}) // Act
+			require.NoError(t, err)
+
+			assert.Equal(t, false, res.Article.Favorited)
+			assert.Equal(t, uint(1), res.Article.FavoritesCount)
+
+			t.Run("also when user itself favorited", func(t *testing.T) {
+				ctx := servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+				_, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID})
+				require.NoError(t, err)
+
+				res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: articleID}) // Act
+				require.NoError(t, err)
+
+				assert.Equal(t, true, res.Article.Favorited)
+				assert.Equal(t, uint(2), res.Article.FavoritesCount)
 			})
 		})
 
@@ -77,7 +97,7 @@ func TestArticle_Get(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: createRes.Article.ArticleID}) // Act
+			res, err := svc.Get(ctx, &goa.GetPayload{ArticleID: articleID}) // Act
 			require.NoError(t, err)
 
 			assert.Equal(t, true, res.Article.Author.Following)
