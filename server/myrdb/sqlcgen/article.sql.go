@@ -12,6 +12,21 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteArticleFavorite = `-- name: DeleteArticleFavorite :exec
+DELETE FROM article_favorite_
+WHERE article_id_ = $1 AND user_id_ = $2
+`
+
+type DeleteArticleFavoriteParams struct {
+	ArticleID uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) DeleteArticleFavorite(ctx context.Context, db DBTX, arg DeleteArticleFavoriteParams) error {
+	_, err := db.Exec(ctx, deleteArticleFavorite, arg.ArticleID, arg.UserID)
+	return err
+}
+
 const getArticleContentByArticleID = `-- name: GetArticleContentByArticleID :one
 SELECT 
   created_at_,

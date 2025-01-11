@@ -19,6 +19,8 @@ type Service interface {
 	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
 	// Favorite implements favorite.
 	Favorite(context.Context, *FavoritePayload) (res *FavoriteResult, err error)
+	// Unfavorite implements unfavorite.
+	Unfavorite(context.Context, *UnfavoritePayload) (res *UnfavoriteResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -35,7 +37,7 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"get", "create", "favorite"}
+var MethodNames = [4]string{"get", "create", "favorite", "unfavorite"}
 
 type ArticleDetail struct {
 	ArticleID      string
@@ -55,6 +57,10 @@ type ArticleFavoriteArticleBadRequest struct {
 }
 
 type ArticleGetArticleBadRequest struct {
+	Code string
+}
+
+type ArticleUnfavoriteArticleBadRequest struct {
 	Code string
 }
 
@@ -98,6 +104,17 @@ type Profile struct {
 	Following bool
 }
 
+// UnfavoritePayload is the payload type of the article service unfavorite
+// method.
+type UnfavoritePayload struct {
+	ArticleID string
+}
+
+// UnfavoriteResult is the result type of the article service unfavorite method.
+type UnfavoriteResult struct {
+	Article *ArticleDetail
+}
+
 // Error returns an error description.
 func (e *ArticleFavoriteArticleBadRequest) Error() string {
 	return ""
@@ -130,4 +147,21 @@ func (e *ArticleGetArticleBadRequest) ErrorName() string {
 // GoaErrorName returns "ArticleGetArticleBadRequest".
 func (e *ArticleGetArticleBadRequest) GoaErrorName() string {
 	return "ArticleGetArticleBadRequest"
+}
+
+// Error returns an error description.
+func (e *ArticleUnfavoriteArticleBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleUnfavoriteArticleBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleUnfavoriteArticleBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleUnfavoriteArticleBadRequest".
+func (e *ArticleUnfavoriteArticleBadRequest) GoaErrorName() string {
+	return "ArticleUnfavoriteArticleBadRequest"
 }

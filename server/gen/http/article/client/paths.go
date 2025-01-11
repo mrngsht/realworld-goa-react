@@ -25,3 +25,8 @@ func CreateArticlePath() string {
 func FavoriteArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/favorite", articleID)
 }
+
+// UnfavoriteArticlePath returns the URL path to the article service unfavorite HTTP endpoint.
+func UnfavoriteArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/unfavorite", articleID)
+}

@@ -15,17 +15,19 @@ import (
 
 // Endpoints wraps the "article" service endpoints.
 type Endpoints struct {
-	Get      goa.Endpoint
-	Create   goa.Endpoint
-	Favorite goa.Endpoint
+	Get        goa.Endpoint
+	Create     goa.Endpoint
+	Favorite   goa.Endpoint
+	Unfavorite goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "article" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Get:      NewGetEndpoint(s),
-		Create:   NewCreateEndpoint(s),
-		Favorite: NewFavoriteEndpoint(s),
+		Get:        NewGetEndpoint(s),
+		Create:     NewCreateEndpoint(s),
+		Favorite:   NewFavoriteEndpoint(s),
+		Unfavorite: NewUnfavoriteEndpoint(s),
 	}
 }
 
@@ -34,6 +36,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.Create = m(e.Create)
 	e.Favorite = m(e.Favorite)
+	e.Unfavorite = m(e.Unfavorite)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -60,5 +63,14 @@ func NewFavoriteEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*FavoritePayload)
 		return s.Favorite(ctx, p)
+	}
+}
+
+// NewUnfavoriteEndpoint returns an endpoint function that calls the method
+// "unfavorite" of service "article".
+func NewUnfavoriteEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UnfavoritePayload)
+		return s.Unfavorite(ctx, p)
 	}
 }

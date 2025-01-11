@@ -27,6 +27,10 @@ type Client struct {
 	// endpoint.
 	FavoriteDoer goahttp.Doer
 
+	// Unfavorite Doer is the HTTP client used to make requests to the unfavorite
+	// endpoint.
+	UnfavoriteDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -50,6 +54,7 @@ func NewClient(
 		GetDoer:             doer,
 		CreateDoer:          doer,
 		FavoriteDoer:        doer,
+		UnfavoriteDoer:      doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -115,6 +120,25 @@ func (c *Client) Favorite() goa.Endpoint {
 		resp, err := c.FavoriteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "favorite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Unfavorite returns an endpoint that makes HTTP requests to the article
+// service unfavorite server.
+func (c *Client) Unfavorite() goa.Endpoint {
+	var (
+		decodeResponse = DecodeUnfavoriteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUnfavoriteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UnfavoriteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "unfavorite", err)
 		}
 		return decodeResponse(resp)
 	}

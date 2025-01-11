@@ -41,6 +41,12 @@ type FavoriteResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
 }
 
+// UnfavoriteResponseBody is the type of the "article" service "unfavorite"
+// endpoint HTTP response body.
+type UnfavoriteResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -52,6 +58,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 // "article" service "favorite" endpoint HTTP response body for the
 // "ArticleFavoriteArticleBadRequest" error.
 type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody is the type of the
+// "article" service "unfavorite" endpoint HTTP response body for the
+// "ArticleUnfavoriteArticleBadRequest" error.
+type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -107,6 +120,16 @@ func NewFavoriteResponseBody(res *article.FavoriteResult) *FavoriteResponseBody 
 	return body
 }
 
+// NewUnfavoriteResponseBody builds the HTTP response body from the result of
+// the "unfavorite" endpoint of the "article" service.
+func NewUnfavoriteResponseBody(res *article.UnfavoriteResult) *UnfavoriteResponseBody {
+	body := &UnfavoriteResponseBody{}
+	if res.Article != nil {
+		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
+	}
+	return body
+}
+
 // NewGetArticleGetArticleBadRequestResponseBody builds the HTTP response body
 // from the result of the "get" endpoint of the "article" service.
 func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticleBadRequest) *GetArticleGetArticleBadRequestResponseBody {
@@ -121,6 +144,16 @@ func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticl
 // service.
 func NewFavoriteArticleFavoriteArticleBadRequestResponseBody(res *article.ArticleFavoriteArticleBadRequest) *FavoriteArticleFavoriteArticleBadRequestResponseBody {
 	body := &FavoriteArticleFavoriteArticleBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
+// NewUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody builds the HTTP
+// response body from the result of the "unfavorite" endpoint of the "article"
+// service.
+func NewUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(res *article.ArticleUnfavoriteArticleBadRequest) *UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody {
+	body := &UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody{
 		Code: res.Code,
 	}
 	return body
@@ -152,6 +185,14 @@ func NewCreatePayload(body *CreateRequestBody) *article.CreatePayload {
 // NewFavoritePayload builds a article service favorite endpoint payload.
 func NewFavoritePayload(articleID string) *article.FavoritePayload {
 	v := &article.FavoritePayload{}
+	v.ArticleID = articleID
+
+	return v
+}
+
+// NewUnfavoritePayload builds a article service unfavorite endpoint payload.
+func NewUnfavoritePayload(articleID string) *article.UnfavoritePayload {
+	v := &article.UnfavoritePayload{}
 	v.ArticleID = articleID
 
 	return v

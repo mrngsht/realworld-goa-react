@@ -15,17 +15,19 @@ import (
 
 // Client is the "article" service client.
 type Client struct {
-	GetEndpoint      goa.Endpoint
-	CreateEndpoint   goa.Endpoint
-	FavoriteEndpoint goa.Endpoint
+	GetEndpoint        goa.Endpoint
+	CreateEndpoint     goa.Endpoint
+	FavoriteEndpoint   goa.Endpoint
+	UnfavoriteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, create, favorite goa.Endpoint) *Client {
+func NewClient(get, create, favorite, unfavorite goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint:      get,
-		CreateEndpoint:   create,
-		FavoriteEndpoint: favorite,
+		GetEndpoint:        get,
+		CreateEndpoint:     create,
+		FavoriteEndpoint:   favorite,
+		UnfavoriteEndpoint: unfavorite,
 	}
 }
 
@@ -63,4 +65,17 @@ func (c *Client) Favorite(ctx context.Context, p *FavoritePayload) (res *Favorit
 		return
 	}
 	return ires.(*FavoriteResult), nil
+}
+
+// Unfavorite calls the "unfavorite" endpoint of the "article" service.
+// Unfavorite may return the following errors:
+//   - "ArticleUnfavoriteArticleBadRequest" (type *ArticleUnfavoriteArticleBadRequest)
+//   - error: internal error
+func (c *Client) Unfavorite(ctx context.Context, p *UnfavoritePayload) (res *UnfavoriteResult, err error) {
+	var ires any
+	ires, err = c.UnfavoriteEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*UnfavoriteResult), nil
 }

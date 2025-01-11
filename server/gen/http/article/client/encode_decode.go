@@ -253,6 +253,88 @@ func DecodeFavoriteResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// BuildUnfavoriteRequest instantiates a HTTP request object with method and
+// path set to call the "article" service "unfavorite" endpoint
+func (c *Client) BuildUnfavoriteRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.UnfavoritePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "unfavorite", "*article.UnfavoritePayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UnfavoriteArticlePath(articleID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "unfavorite", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeUnfavoriteResponse returns a decoder for responses returned by the
+// article unfavorite endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeUnfavoriteResponse may return the following errors:
+//   - "ArticleUnfavoriteArticleBadRequest" (type *article.ArticleUnfavoriteArticleBadRequest): http.StatusBadRequest
+//   - error: internal error
+func DecodeUnfavoriteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UnfavoriteResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "unfavorite", err)
+			}
+			err = ValidateUnfavoriteResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "unfavorite", err)
+			}
+			res := NewUnfavoriteResultOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "unfavorite", err)
+			}
+			err = ValidateUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "unfavorite", err)
+			}
+			return nil, NewUnfavoriteArticleUnfavoriteArticleBadRequest(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "unfavorite", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalArticleDetailResponseBodyToArticleArticleDetail builds a value of
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {

@@ -42,7 +42,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Et pariatur inventore earum alias eius.\",\n      \"description\": \"Expedita ipsa iste fugit eos et fugiat.\",\n      \"tagList\": [\n         \"Est maxime qui est blanditiis reprehenderit.\",\n         \"Quis officiis.\",\n         \"Quia illo porro itaque odit ex velit.\",\n         \"Aliquid voluptatem adipisci magnam placeat.\"\n      ],\n      \"title\": \"zwj\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quis sunt consequuntur.\",\n      \"description\": \"Quod repellat beatae.\",\n      \"tagList\": [\n         \"Sunt et debitis et facere.\",\n         \"Recusandae ab distinctio qui ratione earum.\",\n         \"Nihil ab ipsa autem dolore nisi aut.\"\n      ],\n      \"title\": \"9f3\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -84,6 +84,24 @@ func BuildFavoritePayload(articleFavoriteArticleID string) (*article.FavoritePay
 		}
 	}
 	v := &article.FavoritePayload{}
+	v.ArticleID = articleID
+
+	return v, nil
+}
+
+// BuildUnfavoritePayload builds the payload for the article unfavorite
+// endpoint from CLI flags.
+func BuildUnfavoritePayload(articleUnfavoriteArticleID string) (*article.UnfavoritePayload, error) {
+	var err error
+	var articleID string
+	{
+		articleID = articleUnfavoriteArticleID
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &article.UnfavoritePayload{}
 	v.ArticleID = articleID
 
 	return v, nil

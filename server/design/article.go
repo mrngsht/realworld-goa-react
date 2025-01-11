@@ -70,6 +70,28 @@ var _ = Service("article", func() {
 
 		Error(errType_ArticleFavoriteArticleBadRequest.Name(), errType_ArticleFavoriteArticleBadRequest)
 	})
+
+	Method("unfavorite", func() {
+		HTTP(func() {
+			POST("article/{articleId}/unfavorite")
+			Response(StatusOK)
+			Response(errType_ArticleUnfavoriteArticleBadRequest.Name(), StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+			)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("article", type_ArticleDetail),
+			)
+		})
+
+		Error(errType_ArticleUnfavoriteArticleBadRequest.Name(), errType_ArticleUnfavoriteArticleBadRequest)
+	})
 })
 
 var (
@@ -109,6 +131,9 @@ var (
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 	errType_ArticleFavoriteArticleBadRequest = myErrorType("ArticleFavoriteArticleBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+	}, nil)
+	errType_ArticleUnfavoriteArticleBadRequest = myErrorType("ArticleUnfavoriteArticleBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 )

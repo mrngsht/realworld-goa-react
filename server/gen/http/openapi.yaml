@@ -68,6 +68,33 @@ paths:
                             - code
             schemes:
                 - http
+    /api/article/{articleId}/unfavorite:
+        post:
+            tags:
+                - article
+            summary: unfavorite article
+            operationId: article#unfavorite
+            parameters:
+                - name: articleId
+                  in: path
+                  required: true
+                  type: string
+                  format: uuid
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/ArticleUnfavoriteResponseBody'
+                        required:
+                            - article
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/ArticleUnfavoriteArticleBadRequest'
+                        required:
+                            - code
+            schemes:
+                - http
     /api/article/create:
         post:
             tags:
@@ -256,33 +283,30 @@ definitions:
         properties:
             body:
                 type: string
-                example: Rerum amet nihil.
+                example: Consequatur dolorem omnis eos.
             description:
                 type: string
-                example: Sit ab veritatis optio.
+                example: Voluptas nihil.
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Eos libero aut.
+                    example: Est qui odio nostrum cum rerum.
                 example:
-                    - Ipsam quibusdam.
-                    - Et quidem voluptatem ut totam sed rerum.
-                    - Tempore est ipsum labore rerum similique voluptas.
-                    - Hic minima quas sapiente reprehenderit sed autem.
+                    - Eius commodi.
+                    - Sit cum officia perferendis tempore.
+                    - Rerum esse consequatur eaque totam cum et.
             title:
                 type: string
-                example: da7
+                example: em8
                 maxLength: 128
         example:
-            body: Alias fuga.
-            description: Blanditiis eligendi qui tenetur asperiores facilis.
+            body: Velit eius cupiditate consequatur autem.
+            description: Ducimus voluptatibus cum assumenda.
             tagList:
-                - Velit quis assumenda est deserunt facere.
-                - Quia sunt.
-                - Voluptas sed et laborum alias debitis enim.
-                - Consequuntur dolor doloribus et blanditiis non optio.
-            title: tk5
+                - Vero fuga quisquam ut dolorem corporis.
+                - Placeat consectetur natus non mollitia ut.
+            title: eza
         required:
             - title
             - description
@@ -296,24 +320,23 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: 548ac0ea-ce3b-4f6a-88b8-e9ab35c32cf7
+                articleId: e87538e6-1933-4d16-8e19-135eb87bfffb
                 author:
-                    bio: Voluptatibus repellendus nihil.
+                    bio: Itaque odit ex velit nihil aliquid.
                     following: true
-                    image: Consectetur pariatur reprehenderit.
-                    username: Laudantium ipsam mollitia est deleniti nemo.
-                body: Ab id libero natus quia sapiente.
-                createdAt: "1978-12-02T15:02:01Z"
-                description: Amet autem est voluptate dignissimos molestiae.
-                favorited: false
-                favoritesCount: 7134760473468781600
+                    image: Adipisci magnam placeat.
+                    username: Officiis tempore quia illo.
+                body: Quas officiis ducimus et.
+                createdAt: "2003-02-27T13:43:41Z"
+                description: Animi beatae accusamus et ut autem.
+                favorited: true
+                favoritesCount: 7305528292700064403
                 tagList:
-                    - Voluptates fuga ipsum.
-                    - Tenetur non impedit eaque.
-                    - Adipisci nostrum quae aut nihil voluptatibus nisi.
-                    - Possimus qui ad cum.
-                title: Dolor nesciunt.
-                updatedAt: "2006-11-16T05:09:33Z"
+                    - Qui nostrum dolorum dicta voluptatem.
+                    - Sint et doloremque eligendi.
+                    - Excepturi nisi rem est.
+                title: Incidunt laudantium ratione.
+                updatedAt: "2006-07-26T10:45:21Z"
         required:
             - article
     ArticleDetail:
@@ -322,63 +345,60 @@ definitions:
         properties:
             articleId:
                 type: string
-                example: d1aadedf-91c4-426f-acea-f231ad3bcd63
+                example: 6a15799e-4f40-412f-975b-8b9579203a32
                 format: uuid
             author:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Aut quae.
+                example: Beatae et consequuntur.
             createdAt:
                 type: string
-                example: "2014-08-01T11:05:33Z"
+                example: "2012-07-13T01:19:49Z"
                 format: date-time
             description:
                 type: string
-                example: Qui quia et odit omnis non.
+                example: Minima voluptatem.
             favorited:
                 type: boolean
                 example: false
             favoritesCount:
                 type: integer
-                example: 10914977178885060216
+                example: 4503254347775951162
                 format: int64
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Ducimus fugit est qui ut.
+                    example: Vel dicta dolorem nostrum.
                 example:
-                    - Optio quia sint sequi ut.
-                    - Ea mollitia facere ut inventore voluptatem.
-                    - A perferendis quo pariatur nulla.
-                    - Doloribus nostrum ullam autem libero molestiae.
+                    - Pariatur et molestiae dolore qui facilis.
+                    - Placeat occaecati et.
+                    - Non excepturi et.
             title:
                 type: string
-                example: Porro perspiciatis mollitia maxime in repellendus non.
+                example: Fugiat officia blanditiis et vel id quisquam.
             updatedAt:
                 type: string
-                example: "1976-02-29T20:46:09Z"
+                example: "1976-01-11T13:48:43Z"
                 format: date-time
         example:
-            articleId: ed823ba7-0b44-4a9a-956d-13a3c1c69c52
+            articleId: f0b5cead-3a7f-4ff0-9db3-5ad699694acc
             author:
-                bio: Voluptatibus repellendus nihil.
+                bio: Itaque odit ex velit nihil aliquid.
                 following: true
-                image: Consectetur pariatur reprehenderit.
-                username: Laudantium ipsam mollitia est deleniti nemo.
-            body: Aut dolores et veniam.
-            createdAt: "2010-10-31T20:31:10Z"
-            description: Rerum beatae.
-            favorited: true
-            favoritesCount: 6541229258948543589
+                image: Adipisci magnam placeat.
+                username: Officiis tempore quia illo.
+            body: Rem quia ex et eos et ut.
+            createdAt: "1985-03-24T18:25:03Z"
+            description: Ullam voluptatem ut ea doloribus et.
+            favorited: false
+            favoritesCount: 15551018322261931563
             tagList:
-                - Autem et sit in repellat.
-                - Quaerat deserunt est est minus dolor libero.
-                - Excepturi praesentium.
-                - Ipsa eum ea.
-            title: Voluptatem a et quidem culpa vero.
-            updatedAt: "1993-05-21T09:54:33Z"
+                - Optio harum sit sunt sunt quas.
+                - Ab veritatis optio.
+            title: Asperiores autem et.
+            updatedAt: "1970-12-15T04:09:46Z"
         required:
             - articleId
             - title
@@ -396,7 +416,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: ArticleNotFound
                 enum:
                     - Unspecified
                     - ArticleNotFound
@@ -412,24 +432,23 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: 548ac0ea-ce3b-4f6a-88b8-e9ab35c32cf7
+                articleId: e87538e6-1933-4d16-8e19-135eb87bfffb
                 author:
-                    bio: Voluptatibus repellendus nihil.
+                    bio: Itaque odit ex velit nihil aliquid.
                     following: true
-                    image: Consectetur pariatur reprehenderit.
-                    username: Laudantium ipsam mollitia est deleniti nemo.
-                body: Ab id libero natus quia sapiente.
-                createdAt: "1978-12-02T15:02:01Z"
-                description: Amet autem est voluptate dignissimos molestiae.
-                favorited: false
-                favoritesCount: 7134760473468781600
+                    image: Adipisci magnam placeat.
+                    username: Officiis tempore quia illo.
+                body: Quas officiis ducimus et.
+                createdAt: "2003-02-27T13:43:41Z"
+                description: Animi beatae accusamus et ut autem.
+                favorited: true
+                favoritesCount: 7305528292700064403
                 tagList:
-                    - Voluptates fuga ipsum.
-                    - Tenetur non impedit eaque.
-                    - Adipisci nostrum quae aut nihil voluptatibus nisi.
-                    - Possimus qui ad cum.
-                title: Dolor nesciunt.
-                updatedAt: "2006-11-16T05:09:33Z"
+                    - Qui nostrum dolorum dicta voluptatem.
+                    - Sint et doloremque eligendi.
+                    - Excepturi nisi rem est.
+                title: Incidunt laudantium ratione.
+                updatedAt: "2006-07-26T10:45:21Z"
         required:
             - article
     ArticleGetArticleBadRequest:
@@ -438,7 +457,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: ArticleNotFound
                 enum:
                     - Unspecified
                     - ArticleNotFound
@@ -454,24 +473,64 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: 548ac0ea-ce3b-4f6a-88b8-e9ab35c32cf7
+                articleId: e87538e6-1933-4d16-8e19-135eb87bfffb
                 author:
-                    bio: Voluptatibus repellendus nihil.
+                    bio: Itaque odit ex velit nihil aliquid.
                     following: true
-                    image: Consectetur pariatur reprehenderit.
-                    username: Laudantium ipsam mollitia est deleniti nemo.
-                body: Ab id libero natus quia sapiente.
-                createdAt: "1978-12-02T15:02:01Z"
-                description: Amet autem est voluptate dignissimos molestiae.
-                favorited: false
-                favoritesCount: 7134760473468781600
+                    image: Adipisci magnam placeat.
+                    username: Officiis tempore quia illo.
+                body: Quas officiis ducimus et.
+                createdAt: "2003-02-27T13:43:41Z"
+                description: Animi beatae accusamus et ut autem.
+                favorited: true
+                favoritesCount: 7305528292700064403
                 tagList:
-                    - Voluptates fuga ipsum.
-                    - Tenetur non impedit eaque.
-                    - Adipisci nostrum quae aut nihil voluptatibus nisi.
-                    - Possimus qui ad cum.
-                title: Dolor nesciunt.
-                updatedAt: "2006-11-16T05:09:33Z"
+                    - Qui nostrum dolorum dicta voluptatem.
+                    - Sint et doloremque eligendi.
+                    - Excepturi nisi rem est.
+                title: Incidunt laudantium ratione.
+                updatedAt: "2006-07-26T10:45:21Z"
+        required:
+            - article
+    ArticleUnfavoriteArticleBadRequest:
+        title: ArticleUnfavoriteArticleBadRequest
+        type: object
+        properties:
+            code:
+                type: string
+                example: Unspecified
+                enum:
+                    - Unspecified
+                    - ArticleNotFound
+        example:
+            code: Unspecified
+        required:
+            - code
+    ArticleUnfavoriteResponseBody:
+        title: ArticleUnfavoriteResponseBody
+        type: object
+        properties:
+            article:
+                $ref: '#/definitions/ArticleDetail'
+        example:
+            article:
+                articleId: e87538e6-1933-4d16-8e19-135eb87bfffb
+                author:
+                    bio: Itaque odit ex velit nihil aliquid.
+                    following: true
+                    image: Adipisci magnam placeat.
+                    username: Officiis tempore quia illo.
+                body: Quas officiis ducimus et.
+                createdAt: "2003-02-27T13:43:41Z"
+                description: Animi beatae accusamus et ut autem.
+                favorited: true
+                favoritesCount: 7305528292700064403
+                tagList:
+                    - Qui nostrum dolorum dicta voluptatem.
+                    - Sint et doloremque eligendi.
+                    - Excepturi nisi rem est.
+                title: Incidunt laudantium ratione.
+                updatedAt: "2006-07-26T10:45:21Z"
         required:
             - article
     Profile:
@@ -480,21 +539,21 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Facilis eligendi placeat occaecati et.
+                example: Praesentium deserunt illo voluptatem aut.
             following:
                 type: boolean
                 example: false
             image:
                 type: string
-                example: Non excepturi et.
+                example: Minima delectus asperiores est rerum quaerat.
             username:
                 type: string
-                example: Nostrum et asperiores pariatur et molestiae dolore.
+                example: Voluptatem quod quia similique.
         example:
-            bio: Non quam.
-            following: true
-            image: Cumque id animi nesciunt inventore.
-            username: Necessitatibus molestiae aut in.
+            bio: Ut excepturi ut et similique.
+            following: false
+            image: Repellat nihil facilis cupiditate.
+            username: Autem sed.
         required:
             - username
             - bio
@@ -513,7 +572,7 @@ definitions:
                     - UserAlreadyFollowing
                     - CannotFollowYourself
         example:
-            code: CannotFollowYourself
+            code: Unspecified
         required:
             - code
     ProfileFollowUserRequestBody:
@@ -522,10 +581,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: zst
+                example: pAr
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: did
+            username: bo3
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -536,10 +595,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Voluptatibus repellendus nihil.
+                bio: Itaque odit ex velit nihil aliquid.
                 following: true
-                image: Consectetur pariatur reprehenderit.
-                username: Laudantium ipsam mollitia est deleniti nemo.
+                image: Adipisci magnam placeat.
+                username: Officiis tempore quia illo.
         required:
             - profile
     ProfileUnfollowUserBadRequest:
@@ -548,7 +607,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: UserNotFollowing
+                example: UserNotFound
                 enum:
                     - Unspecified
                     - UserNotFound
@@ -563,10 +622,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: enb
+                example: Wq1
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: dB1mu
+            username: 944z8
         required:
             - username
     ProfileUnfollowUserResponseBody:
@@ -577,10 +636,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Voluptatibus repellendus nihil.
+                bio: Itaque odit ex velit nihil aliquid.
                 following: true
-                image: Consectetur pariatur reprehenderit.
-                username: Laudantium ipsam mollitia est deleniti nemo.
+                image: Adipisci magnam placeat.
+                username: Officiis tempore quia illo.
         required:
             - profile
     User:
@@ -589,25 +648,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Tempore aut debitis amet id perferendis.
+                example: Odit voluptas.
             email:
                 type: string
-                example: Repellat error eaque.
+                example: Hic consequatur commodi iste vel.
             image:
                 type: string
-                example: Nihil tempora consequatur dolorem omnis eos.
+                example: Doloremque et exercitationem.
             token:
                 type: string
-                example: Veritatis voluptates exercitationem architecto vitae recusandae dolorem.
+                example: Sint deleniti accusantium rem voluptatem neque nostrum.
             username:
                 type: string
-                example: Illo ea illum.
+                example: Porro dolorem ratione aperiam quam consectetur.
         example:
-            bio: Consequatur eaque totam cum et repellat.
-            email: Est qui odio nostrum cum rerum.
-            image: Earum quasi quam ducimus voluptatibus cum assumenda.
-            token: Quia eius commodi et sit.
-            username: Officia perferendis tempore et rerum.
+            bio: Architecto eveniet dolor officia quibusdam illum voluptatibus.
+            email: Modi consequatur ratione.
+            image: Rerum voluptas optio mollitia nihil.
+            token: Cum perspiciatis velit ipsa sunt sit sunt.
+            username: Consequatur dolor dolor.
         required:
             - email
             - token
@@ -622,11 +681,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Error incidunt iure optio.
-                email: Quis occaecati quas quis.
-                image: Et autem voluptates harum.
-                token: Et provident iste.
-                username: Sed ullam ea provident voluptates laborum hic.
+                bio: Reiciendis ab voluptas adipisci non.
+                email: Qui nostrum voluptate.
+                image: Repellat et ut aut.
+                token: Incidunt hic.
+                username: Odio quas architecto voluptas.
         required:
             - user
     UserLoginBadRequest:
@@ -635,13 +694,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: PasswordIsIncorrect
+                example: EmailNotFound
                 enum:
                     - Unspecified
                     - EmailNotFound
                     - PasswordIsIncorrect
         example:
-            code: Unspecified
+            code: EmailNotFound
         required:
             - code
     UserLoginRequestBody:
@@ -650,16 +709,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: aurelia.ferry@mertzkuhn.org
+                example: dessie@prosacco.net
                 format: email
             password:
                 type: string
-                example: kqd
+                example: 6si
                 minLength: 6
                 maxLength: 128
         example:
-            email: clark@hackett.biz
-            password: xkf
+            email: francesca@marquardtcollier.name
+            password: jzr
         required:
             - email
             - password
@@ -671,11 +730,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Error incidunt iure optio.
-                email: Quis occaecati quas quis.
-                image: Et autem voluptates harum.
-                token: Et provident iste.
-                username: Sed ullam ea provident voluptates laborum hic.
+                bio: Reiciendis ab voluptas adipisci non.
+                email: Qui nostrum voluptate.
+                image: Repellat et ut aut.
+                token: Incidunt hic.
+                username: Odio quas architecto voluptas.
         required:
             - user
     UserRegisterBadRequest:
@@ -684,13 +743,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: EmailAlreadyUsed
+                example: Unspecified
                 enum:
                     - Unspecified
                     - UsernameAlreadyUsed
                     - EmailAlreadyUsed
         example:
-            code: EmailAlreadyUsed
+            code: Unspecified
         required:
             - code
     UserRegisterRequestBody:
@@ -699,21 +758,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: marquis@grant.com
+                example: trudie@thiel.net
                 format: email
             password:
                 type: string
-                example: "385"
+                example: q56
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: MaL
+                example: yQK
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: leda@doyle.info
-            password: qh0
-            username: 1Tb
+            email: rosario@lehnerheathcote.org
+            password: vuh
+            username: ayp
         required:
             - username
             - email
@@ -726,11 +785,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Error incidunt iure optio.
-                email: Quis occaecati quas quis.
-                image: Et autem voluptates harum.
-                token: Et provident iste.
-                username: Sed ullam ea provident voluptates laborum hic.
+                bio: Reiciendis ab voluptas adipisci non.
+                email: Qui nostrum voluptate.
+                image: Repellat et ut aut.
+                token: Incidunt hic.
+                username: Odio quas architecto voluptas.
         required:
             - user
     UserUpdateRequestBody:
@@ -739,31 +798,31 @@ definitions:
         properties:
             bio:
                 type: string
-                example: nmh
+                example: o5e
                 maxLength: 4096
             email:
                 type: string
-                example: amie.pouros@gerhold.com
+                example: shane_o'hara@rogahnhayes.net
                 format: email
             image:
                 type: string
-                example: http://79
+                example: http://o
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: fah
+                example: nwl
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: HUZ
+                example: L8Y
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: ry8
-            email: nettie@buckridge.name
-            image: http://iw
-            password: 7yf
-            username: a732M
+            bio: kgy
+            email: kitty@metz.net
+            image: http://k
+            password: j1h
+            username: CD3sx
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -772,10 +831,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Error incidunt iure optio.
-                email: Quis occaecati quas quis.
-                image: Et autem voluptates harum.
-                token: Et provident iste.
-                username: Sed ullam ea provident voluptates laborum hic.
+                bio: Reiciendis ab voluptas adipisci non.
+                email: Qui nostrum voluptate.
+                image: Repellat et ut aut.
+                token: Incidunt hic.
+                username: Odio quas architecto voluptas.
         required:
             - user

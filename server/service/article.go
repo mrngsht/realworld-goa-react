@@ -226,6 +226,75 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 	return &goa.FavoriteResult{Article: detail}, nil
 }
 
+func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload) (res *goa.UnfavoriteResult, err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleUnfavoriteArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	db := s.db
+	articleID := uuid.MustParse(payload.ArticleID)
+
+	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if detail.Favorited {
+		now := mytime.Now(ctx)
+		if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+			db := txdb
+
+			if err := sqlcgen.Q.DeleteArticleFavorite(ctx, db, sqlcgen.DeleteArticleFavoriteParams{
+				ArticleID: articleID,
+				UserID:    userID,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			if err := sqlcgen.Q.InsertArticleFavoriteMutation(ctx, db, sqlcgen.InsertArticleFavoriteMutationParams{
+				CreatedAt: now,
+				ArticleID: articleID,
+				UserID:    userID,
+				Type:      sqlcgen.ArticleFavoriteMutationTypeUnfavorite,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			stats, err := sqlcgen.Q.GetArticleStatsByArticleIDForUpdate(ctx, db, articleID)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			favoriteCount := stats.FavoritesCount - 1
+
+			if err := sqlcgen.Q.UpdateArticleStatsFavoritesCount(ctx, db, sqlcgen.UpdateArticleStatsFavoritesCountParams{
+				FavoritesCount: favoriteCount,
+				ArticleID:      articleID,
+			}); err != nil {
+				return errors.WithStack(err)
+			}
+
+			detail.Favorited = false
+			detail.FavoritesCount = uint(favoriteCount)
+
+			return nil
+		}); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return &goa.UnfavoriteResult{Article: detail}, nil
+}
+
 func (s *Article) getArticleDetail(ctx context.Context, articleID uuid.UUID, requestUserIDOptional *uuid.UUID) (res *goa.ArticleDetail, err error) {
 	db := s.db
 

@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article (get|create|favorite)
+	return `article (get|create|favorite|unfavorite)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,13 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "e64a88c2-8d04-4dbb-8a0a-5ea760bb5c4d"` + "\n" +
+	return os.Args[0] + ` article get --article-id "dd65659e-acf5-4c62-92c5-296381847794"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "emeW"
+      "username": "5Bh"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "raheem@gibson.biz",
-      "password": "5kh"
+      "email": "lorenza_haley@conn.org",
+      "password": "v4p"
    }'` + "\n" +
 		""
 }
@@ -63,6 +63,9 @@ func ParseEndpoint(
 
 		articleFavoriteFlags         = flag.NewFlagSet("favorite", flag.ExitOnError)
 		articleFavoriteArticleIDFlag = articleFavoriteFlags.String("article-id", "REQUIRED", "")
+
+		articleUnfavoriteFlags         = flag.NewFlagSet("unfavorite", flag.ExitOnError)
+		articleUnfavoriteArticleIDFlag = articleUnfavoriteFlags.String("article-id", "REQUIRED", "")
 
 		profileFlags = flag.NewFlagSet("profile", flag.ContinueOnError)
 
@@ -89,6 +92,7 @@ func ParseEndpoint(
 	articleGetFlags.Usage = articleGetUsage
 	articleCreateFlags.Usage = articleCreateUsage
 	articleFavoriteFlags.Usage = articleFavoriteUsage
+	articleUnfavoriteFlags.Usage = articleUnfavoriteUsage
 
 	profileFlags.Usage = profileUsage
 	profileFollowUserFlags.Usage = profileFollowUserUsage
@@ -146,6 +150,9 @@ func ParseEndpoint(
 
 			case "favorite":
 				epf = articleFavoriteFlags
+
+			case "unfavorite":
+				epf = articleUnfavoriteFlags
 
 			}
 
@@ -207,6 +214,9 @@ func ParseEndpoint(
 			case "favorite":
 				endpoint = c.Favorite()
 				data, err = articlec.BuildFavoritePayload(*articleFavoriteArticleIDFlag)
+			case "unfavorite":
+				endpoint = c.Unfavorite()
+				data, err = articlec.BuildUnfavoritePayload(*articleUnfavoriteArticleIDFlag)
 			}
 		case "profile":
 			c := profilec.NewClient(scheme, host, doer, enc, dec, restore)
@@ -252,6 +262,7 @@ COMMAND:
     get: Get implements get.
     create: Create implements create.
     favorite: Favorite implements favorite.
+    unfavorite: Unfavorite implements unfavorite.
 
 Additional help:
     %[1]s article COMMAND --help
@@ -264,7 +275,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "e64a88c2-8d04-4dbb-8a0a-5ea760bb5c4d"
+    %[1]s article get --article-id "dd65659e-acf5-4c62-92c5-296381847794"
 `, os.Args[0])
 }
 
@@ -276,15 +287,14 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Et pariatur inventore earum alias eius.",
-      "description": "Expedita ipsa iste fugit eos et fugiat.",
+      "body": "Quis sunt consequuntur.",
+      "description": "Quod repellat beatae.",
       "tagList": [
-         "Est maxime qui est blanditiis reprehenderit.",
-         "Quis officiis.",
-         "Quia illo porro itaque odit ex velit.",
-         "Aliquid voluptatem adipisci magnam placeat."
+         "Sunt et debitis et facere.",
+         "Recusandae ab distinctio qui ratione earum.",
+         "Nihil ab ipsa autem dolore nisi aut."
       ],
-      "title": "zwj"
+      "title": "9f3"
    }'
 `, os.Args[0])
 }
@@ -296,7 +306,18 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "022ba28c-0b29-4485-9ec7-54132db7eda5"
+    %[1]s article favorite --article-id "d51df7c4-24f5-41ca-84e9-e979d53fbbf3"
+`, os.Args[0])
+}
+
+func articleUnfavoriteUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article unfavorite -article-id STRING
+
+Unfavorite implements unfavorite.
+    -article-id STRING: 
+
+Example:
+    %[1]s article unfavorite --article-id "54f25347-9041-4e5b-bcad-d175ca280aa1"
 `, os.Args[0])
 }
 
@@ -322,7 +343,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "emeW"
+      "username": "5Bh"
    }'
 `, os.Args[0])
 }
@@ -335,7 +356,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "u46"
+      "username": "E3Yf"
    }'
 `, os.Args[0])
 }
@@ -364,8 +385,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "raheem@gibson.biz",
-      "password": "5kh"
+      "email": "lorenza_haley@conn.org",
+      "password": "v4p"
    }'
 `, os.Args[0])
 }
@@ -378,9 +399,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "joey@douglasadams.net",
-      "password": "zh6",
-      "username": "xLXhj"
+      "email": "lillian@muller.com",
+      "password": "pfn",
+      "username": "cMUk"
    }'
 `, os.Args[0])
 }
@@ -403,11 +424,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "gxk",
-      "email": "nicolette_powlowski@koch.info",
-      "image": "https://jn",
-      "password": "hkn",
-      "username": "i4e"
+      "bio": "j2r",
+      "email": "zoey_corwin@deckow.net",
+      "image": "http://u",
+      "password": "ssu",
+      "username": "von"
    }'
 `, os.Args[0])
 }

@@ -39,6 +39,12 @@ type FavoriteResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
 }
 
+// UnfavoriteResponseBody is the type of the "article" service "unfavorite"
+// endpoint HTTP response body.
+type UnfavoriteResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -50,6 +56,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 // "article" service "favorite" endpoint HTTP response body for the
 // "ArticleFavoriteArticleBadRequest" error.
 type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
+// UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody is the type of the
+// "article" service "unfavorite" endpoint HTTP response body for the
+// "ArticleUnfavoriteArticleBadRequest" error.
+type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
@@ -141,6 +154,25 @@ func NewFavoriteArticleFavoriteArticleBadRequest(body *FavoriteArticleFavoriteAr
 	return v
 }
 
+// NewUnfavoriteResultOK builds a "article" service "unfavorite" endpoint
+// result from a HTTP "OK" response.
+func NewUnfavoriteResultOK(body *UnfavoriteResponseBody) *article.UnfavoriteResult {
+	v := &article.UnfavoriteResult{}
+	v.Article = unmarshalArticleDetailResponseBodyToArticleArticleDetail(body.Article)
+
+	return v
+}
+
+// NewUnfavoriteArticleUnfavoriteArticleBadRequest builds a article service
+// unfavorite endpoint ArticleUnfavoriteArticleBadRequest error.
+func NewUnfavoriteArticleUnfavoriteArticleBadRequest(body *UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody) *article.ArticleUnfavoriteArticleBadRequest {
+	v := &article.ArticleUnfavoriteArticleBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article == nil {
@@ -181,6 +213,20 @@ func ValidateFavoriteResponseBody(body *FavoriteResponseBody) (err error) {
 	return
 }
 
+// ValidateUnfavoriteResponseBody runs the validations defined on
+// UnfavoriteResponseBody
+func ValidateUnfavoriteResponseBody(body *UnfavoriteResponseBody) (err error) {
+	if body.Article == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("article", "body"))
+	}
+	if body.Article != nil {
+		if err2 := ValidateArticleDetailResponseBody(body.Article); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
 // ValidateGetArticleGetArticleBadRequestResponseBody runs the validations
 // defined on get_ArticleGetArticleBadRequest_response_body
 func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArticleBadRequestResponseBody) (err error) {
@@ -199,6 +245,21 @@ func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArtic
 // validations defined on
 // favorite_ArticleFavoriteArticleBadRequest_response_body
 func ValidateFavoriteArticleFavoriteArticleBadRequestResponseBody(body *FavoriteArticleFavoriteArticleBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		}
+	}
+	return
+}
+
+// ValidateUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody runs the
+// validations defined on
+// unfavorite_ArticleUnfavoriteArticleBadRequest_response_body
+func ValidateUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(body *UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody) (err error) {
 	if body.Code == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}

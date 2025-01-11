@@ -33,6 +33,10 @@ INSERT INTO article_favorite_
 (created_at_, article_id_, user_id_)
 VALUES ($1, $2, $3);
 
+-- name: DeleteArticleFavorite :exec
+DELETE FROM article_favorite_
+WHERE article_id_ = $1 AND user_id_ = $2;
+
 -- name: InsertArticleFavoriteMutation :exec
 INSERT INTO article_favorite_mutation_
 (created_at_, article_id_, user_id_, type_)
