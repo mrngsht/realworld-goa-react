@@ -12,7 +12,7 @@ import (
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 )
 
-func CreateDB(t *testing.T, ctx context.Context) *testdb {
+func OpenDB(t *testing.T, ctx context.Context) *testdb {
 	t.Helper()
 
 	db, err := myrdb.OpenLocalDB(ctx)

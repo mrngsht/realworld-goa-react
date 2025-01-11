@@ -21,7 +21,7 @@ import (
 
 func TestArticle_Get(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewArticle(db)
 
@@ -120,7 +120,7 @@ func TestArticle_Get(t *testing.T) {
 
 func TestArticle_Create(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewArticle(db)
 
@@ -234,7 +234,7 @@ func TestArticle_Create(t *testing.T) {
 
 func TestArticle_Favoite(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewArticle(db)
 
@@ -302,7 +302,7 @@ func TestArticle_Favoite(t *testing.T) {
 
 func TestArticle_Unfavoite(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewArticle(db)
 

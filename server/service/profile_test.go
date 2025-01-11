@@ -16,7 +16,7 @@ import (
 
 func TestProfile_FollowUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewProfile(db)
 
@@ -130,7 +130,7 @@ func TestProfile_FollowUser(t *testing.T) {
 
 func TestProfile_UnfollowUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewProfile(db)
 

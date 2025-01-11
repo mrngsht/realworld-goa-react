@@ -19,7 +19,7 @@ import (
 
 func TestUser_Login(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewUser(db)
 
@@ -92,7 +92,7 @@ func TestUser_Login(t *testing.T) {
 
 func TestUser_Register(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewUser(db)
 
@@ -208,7 +208,7 @@ func TestUser_Register(t *testing.T) {
 
 func TestUser_GetCurrentUser(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewUser(db)
 
@@ -236,7 +236,7 @@ func TestUser_GetCurrentUser(t *testing.T) {
 
 func TestUser_Update(t *testing.T) {
 	ctx := servicetest.NewContext()
-	db := rdbtest.CreateDB(t, ctx)
+	db := rdbtest.OpenDB(t, ctx)
 
 	svc := service.NewUser(db)
 
