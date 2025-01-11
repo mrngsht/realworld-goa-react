@@ -252,29 +252,17 @@ func TestArticle_Favoite(t *testing.T) {
 
 	t.Run("succeed", func(t *testing.T) {
 		author := servicetest.CreateUser(t, ctx, db)
-		viewer1 := servicetest.CreateUser(t, ctx, db)
-		viewer2 := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
 
 		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
 		articleID := createArticle(t, ctx)
 
-		{
-			ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer1.Username)
-			res, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID}) // Act
-			require.NoError(t, err)
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		res, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
 
-			assert.Equal(t, true, res.Article.Favorited)
-			assert.Equal(t, uint(1), res.Article.FavoritesCount)
-		}
-
-		{
-			ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer2.Username)
-			res, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID}) // Act
-			require.NoError(t, err)
-
-			assert.Equal(t, true, res.Article.Favorited)
-			assert.Equal(t, uint(2), res.Article.FavoritesCount)
-		}
+		assert.Equal(t, true, res.Article.Favorited)
+		assert.Equal(t, uint(1), res.Article.FavoritesCount)
 	})
 
 	t.Run("already favorited", func(t *testing.T) {
@@ -307,6 +295,76 @@ func TestArticle_Favoite(t *testing.T) {
 		require.Error(t, err)
 
 		var badRequest *goa.ArticleFavoriteArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+}
+
+func TestArticle_Unfavoite(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.CreateDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context) string {
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID
+	}
+
+	t.Run("succeed", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		articleID := createArticle(t, ctx)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+
+		{
+			res, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID})
+			require.NoError(t, err)
+
+			require.Equal(t, true, res.Article.Favorited)
+			require.Equal(t, uint(1), res.Article.FavoritesCount)
+		}
+
+		res, err := svc.Unfavorite(ctx, &goa.UnfavoritePayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, false, res.Article.Favorited)
+		assert.Equal(t, uint(0), res.Article.FavoritesCount)
+	})
+
+	t.Run("havn't favorited yet", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		articleID := createArticle(t, ctx)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		res, err := svc.Unfavorite(ctx, &goa.UnfavoritePayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, false, res.Article.Favorited)
+		assert.Equal(t, uint(0), res.Article.FavoritesCount)
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		_, err := svc.Unfavorite(ctx, &goa.UnfavoritePayload{ArticleID: uuid.NewString()}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleUnfavoriteArticleBadRequest
 		require.ErrorAs(t, err, &badRequest)
 		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
 	})
