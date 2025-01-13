@@ -312,8 +312,8 @@ func ValidateUpdateArticleUpdateArticleBadRequestResponseBody(body *UpdateArticl
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
 	if body.Code != nil {
-		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound" || *body.Code == "ForbiddenOperation") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound", "ForbiddenOperation"}))
 		}
 	}
 	return

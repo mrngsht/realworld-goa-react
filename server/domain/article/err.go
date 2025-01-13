@@ -5,5 +5,6 @@ import (
 )
 
 var (
-	ErrArticleNotFound = myerr.NewAppErr("article not found")
+	ErrArticleNotFound        = myerr.NewAppErr("article not found")
+	ErrRequestUserIsNotAuthor = myerr.NewAppErr("request user is not author")
 )

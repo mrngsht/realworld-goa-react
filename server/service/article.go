@@ -38,7 +38,7 @@ func (s *Article) Get(ctx context.Context, payload *goa.GetPayload) (res *goa.Ge
 
 	userIDOptional := myctx.MayGetAuthenticatedUserID(ctx)
 
-	detail, err := s.getArticleDetail(ctx, uuid.MustParse(payload.ArticleID), userIDOptional)
+	detail, err := s.getArticleDetail(ctx, uuid.MustParse(payload.ArticleID), userIDOptional, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -162,6 +162,8 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 			switch apErr {
 			case article.ErrArticleNotFound:
 				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			case article.ErrRequestUserIsNotAuthor:
+				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
 			}
 		}
 	}()
@@ -174,7 +176,7 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 	db := s.db
 
 	articleID := uuid.MustParse(payload.ArticleID)
-	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	detail, err := s.getArticleDetail(ctx, articleID, &userID, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -218,7 +220,7 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 		if err := sqlcgen.Q.InsertArticleContentMutation(ctx, db, sqlcgen.InsertArticleContentMutationParams{
 			CreatedAt:    now,
 			ArticleID:    articleID,
-			Title:        detail.ArticleID,
+			Title:        detail.Title,
 			Description:  detail.Description,
 			Body:         detail.Body,
 			AuthorUserID: userID,
@@ -252,7 +254,7 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 	db := s.db
 	articleID := uuid.MustParse(payload.ArticleID)
 
-	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	detail, err := s.getArticleDetail(ctx, articleID, &userID, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -322,7 +324,7 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 	db := s.db
 	articleID := uuid.MustParse(payload.ArticleID)
 
-	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	detail, err := s.getArticleDetail(ctx, articleID, &userID, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -373,7 +375,12 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 	return &goa.UnfavoriteResult{Article: detail}, nil
 }
 
-func (s *Article) getArticleDetail(ctx context.Context, articleID uuid.UUID, requestUserIDOptional *uuid.UUID) (res *goa.ArticleDetail, err error) {
+func (s *Article) getArticleDetail(
+	ctx context.Context,
+	articleID uuid.UUID,
+	requestUserIDOptional *uuid.UUID,
+	requestUserShouleBeAuthor bool,
+) (res *goa.ArticleDetail, err error) {
 	db := s.db
 
 	a, err := sqlcgen.Q.GetArticleContentByArticleID(ctx, db, articleID)
@@ -382,6 +389,15 @@ func (s *Article) getArticleDetail(ctx context.Context, articleID uuid.UUID, req
 			return nil, article.ErrArticleNotFound
 		}
 		return nil, errors.WithStack(err)
+	}
+
+	if requestUserShouleBeAuthor {
+		if requestUserIDOptional == nil {
+			panic("requestUserIDOptional must be not nil when requestUserShouleBeAuthor is true")
+		}
+		if *requestUserIDOptional != a.AuthorUserID {
+			return nil, article.ErrRequestUserIsNotAuthor
+		}
 	}
 
 	author, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, a.AuthorUserID)

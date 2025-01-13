@@ -157,6 +157,7 @@ var (
 	}, nil)
 	errType_ArticleUpdateArticleBadRequest = myErrorType("ArticleUpdateArticleBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
+		ErrCode_Article_ForbiddenOperation,
 	}, nil)
 	errType_ArticleFavoriteArticleBadRequest = myErrorType("ArticleFavoriteArticleBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
@@ -167,5 +168,6 @@ var (
 )
 
 const (
-	ErrCode_Article_ArticleNotFound = "ArticleNotFound"
+	ErrCode_Article_ArticleNotFound    = "ArticleNotFound"
+	ErrCode_Article_ForbiddenOperation = "ForbiddenOperation"
 )

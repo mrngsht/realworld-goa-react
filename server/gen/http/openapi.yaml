@@ -578,12 +578,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: ForbiddenOperation
                 enum:
                     - Unspecified
                     - ArticleNotFound
+                    - ForbiddenOperation
         example:
-            code: ArticleNotFound
+            code: Unspecified
         required:
             - code
     ArticleUpdateRequestBody:

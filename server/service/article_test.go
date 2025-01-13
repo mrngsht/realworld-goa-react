@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/guregu/null"
 	"github.com/mrngsht/realworld-goa-react/design"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
 	"github.com/mrngsht/realworld-goa-react/gen/profile"
@@ -229,6 +230,173 @@ func TestArticle_Create(t *testing.T) {
 		atms, err := sqlctest.Q.ListArticleTagMutationByArticleID(ctx, db, articleID)
 		require.NoError(t, err)
 		assert.Len(t, atms, 0)
+	})
+}
+
+func TestArticle_Update(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context) (string, *goa.CreatePayload) {
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID, payload
+	}
+
+	t.Run("update all", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+
+		articleID, _ := createArticle(t, ctx)
+
+		updatedAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, updatedAt)
+
+		updatePayload := &goa.UpdatePayload{
+			ArticleID:   articleID,
+			Title:       null.StringFrom("updated_title").Ptr(),
+			Description: null.StringFrom("updated_description").Ptr(),
+			Body:        null.StringFrom("updated_body").Ptr(),
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, *updatePayload.Title, res.Article.Title)
+		assert.Equal(t, *updatePayload.Description, res.Article.Description)
+		assert.Equal(t, *updatePayload.Body, res.Article.Body)
+
+		articleUUID := uuid.MustParse(articleID)
+		updatedAtOnDB := mytimetest.TruncateTimeForDB(updatedAt)
+
+		ac, err := sqlctest.Q.GetArticleContentByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		assert.Equal(t, updatedAtOnDB, ac.UpdatedAt)
+		assert.Equal(t, *updatePayload.Title, ac.Title)
+		assert.Equal(t, *updatePayload.Description, ac.Description)
+		assert.Equal(t, *updatePayload.Body, ac.Body)
+
+		acms, err := sqlctest.Q.ListArticleContentMutationByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		require.Len(t, acms, 2)
+		acm := acms[1]
+		assert.Equal(t, updatedAtOnDB, acm.CreatedAt)
+		assert.Equal(t, *updatePayload.Title, acm.Title)
+		assert.Equal(t, *updatePayload.Description, acm.Description)
+		assert.Equal(t, *updatePayload.Body, acm.Body)
+		assert.Equal(t, author.UserID, acm.AuthorUserID)
+	})
+
+	t.Run("update one thing", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+
+		articleID, createPayload := createArticle(t, ctx)
+
+		updatePayload := &goa.UpdatePayload{
+			ArticleID:   articleID,
+			Title:       null.StringFrom("updated_title").Ptr(), // change this field only
+			Description: nil,
+			Body:        nil,
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, *updatePayload.Title, res.Article.Title)
+		assert.Equal(t, createPayload.Description, res.Article.Description)
+		assert.Equal(t, createPayload.Body, res.Article.Body)
+
+		articleUUID := uuid.MustParse(articleID)
+
+		ac, err := sqlctest.Q.GetArticleContentByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		assert.Equal(t, *updatePayload.Title, ac.Title)
+		assert.Equal(t, createPayload.Description, ac.Description)
+		assert.Equal(t, createPayload.Body, ac.Body)
+
+		acms, err := sqlctest.Q.ListArticleContentMutationByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		require.Len(t, acms, 2)
+		acm := acms[1]
+		assert.Equal(t, *updatePayload.Title, acm.Title)
+		assert.Equal(t, createPayload.Description, acm.Description)
+		assert.Equal(t, createPayload.Body, acm.Body)
+		assert.Equal(t, author.UserID, acm.AuthorUserID)
+	})
+
+	t.Run("update nothing", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+
+		createdAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, createdAt)
+
+		articleID, createPayload := createArticle(t, ctx)
+
+		updatedAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, updatedAt)
+
+		updatePayload := &goa.UpdatePayload{
+			ArticleID:   articleID,
+			Title:       nil,
+			Description: nil,
+			Body:        nil,
+		}
+		res, err := svc.Update(ctx, updatePayload) // Act
+		require.NoError(t, err)
+
+		assert.Equal(t, createPayload.Title, res.Article.Title)
+		assert.Equal(t, createPayload.Description, res.Article.Description)
+		assert.Equal(t, createPayload.Body, res.Article.Body)
+
+		articleUUID := uuid.MustParse(articleID)
+		createdAtOnDB := mytimetest.TruncateTimeForDB(createdAt)
+
+		ac, err := sqlctest.Q.GetArticleContentByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		assert.Equal(t, createdAtOnDB, ac.UpdatedAt)
+		assert.Equal(t, createPayload.Title, ac.Title)
+		assert.Equal(t, createPayload.Description, ac.Description)
+		assert.Equal(t, createPayload.Body, ac.Body)
+
+		acms, err := sqlctest.Q.ListArticleContentMutationByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		assert.Len(t, acms, 1)
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		user := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, user.Username)
+		_, err := svc.Update(ctx, &goa.UpdatePayload{ArticleID: uuid.NewString()}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleUpdateArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+
+	t.Run("try to update other's article", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		other := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		articleID, _ := createArticle(t, ctx)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, other.Username)
+		_, err := svc.Update(ctx, &goa.UpdatePayload{ArticleID: articleID}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleUpdateArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ForbiddenOperation, badRequest.Code)
 	})
 }
 

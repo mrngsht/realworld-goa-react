@@ -577,12 +577,13 @@ components:
             properties:
                 code:
                     type: string
-                    example: ArticleNotFound
+                    example: ForbiddenOperation
                     enum:
                         - Unspecified
                         - ArticleNotFound
+                        - ForbiddenOperation
             example:
-                code: Unspecified
+                code: ArticleNotFound
             required:
                 - code
         CreateRequestBody:
