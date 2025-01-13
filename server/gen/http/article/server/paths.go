@@ -21,6 +21,11 @@ func CreateArticlePath() string {
 	return "/api/article/create"
 }
 
+// UpdateArticlePath returns the URL path to the article service update HTTP endpoint.
+func UpdateArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/update", articleID)
+}
+
 // FavoriteArticlePath returns the URL path to the article service favorite HTTP endpoint.
 func FavoriteArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/favorite", articleID)

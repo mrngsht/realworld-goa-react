@@ -17,6 +17,7 @@ import (
 type Endpoints struct {
 	Get        goa.Endpoint
 	Create     goa.Endpoint
+	Update     goa.Endpoint
 	Favorite   goa.Endpoint
 	Unfavorite goa.Endpoint
 }
@@ -26,6 +27,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Get:        NewGetEndpoint(s),
 		Create:     NewCreateEndpoint(s),
+		Update:     NewUpdateEndpoint(s),
 		Favorite:   NewFavoriteEndpoint(s),
 		Unfavorite: NewUnfavoriteEndpoint(s),
 	}
@@ -35,6 +37,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.Create = m(e.Create)
+	e.Update = m(e.Update)
 	e.Favorite = m(e.Favorite)
 	e.Unfavorite = m(e.Unfavorite)
 }
@@ -54,6 +57,15 @@ func NewCreateEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*CreatePayload)
 		return s.Create(ctx, p)
+	}
+}
+
+// NewUpdateEndpoint returns an endpoint function that calls the method
+// "update" of service "article".
+func NewUpdateEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UpdatePayload)
+		return s.Update(ctx, p)
 	}
 }
 

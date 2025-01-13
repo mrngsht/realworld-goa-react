@@ -6,10 +6,12 @@ var _ = Service("article", func() {
 	Description("article")
 
 	Method("get", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleGetArticleBadRequest)
+
 		HTTP(func() {
 			GET("article/{articleId}")
 			Response(StatusOK)
-			Response(errType_ArticleGetArticleBadRequest.Name(), StatusBadRequest)
+			Response(errorBadRequest, StatusBadRequest)
 		})
 
 		Payload(func() {
@@ -23,8 +25,6 @@ var _ = Service("article", func() {
 				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
-
-		Error(errType_ArticleGetArticleBadRequest.Name(), errType_ArticleGetArticleBadRequest)
 	})
 
 	Method("create", func() {
@@ -49,11 +49,38 @@ var _ = Service("article", func() {
 		})
 	})
 
+	Method("update", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleUpdateArticleBadRequest)
+
+		HTTP(func() {
+			POST("article/{articleId}/update")
+			Response(StatusOK)
+			Response(errorBadRequest, StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+			)
+			AttributeWithName("title", String, def_Article_RequestTitle)
+			AttributeWithName("description", String)
+			AttributeWithName("body", String)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("article", type_ArticleDetail),
+			)
+		})
+	})
+
 	Method("favorite", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleFavoriteArticleBadRequest)
+
 		HTTP(func() {
 			POST("article/{articleId}/favorite")
 			Response(StatusOK)
-			Response(errType_ArticleFavoriteArticleBadRequest.Name(), StatusBadRequest)
+			Response(errorBadRequest, StatusBadRequest)
 		})
 
 		Payload(func() {
@@ -67,15 +94,15 @@ var _ = Service("article", func() {
 				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
-
-		Error(errType_ArticleFavoriteArticleBadRequest.Name(), errType_ArticleFavoriteArticleBadRequest)
 	})
 
 	Method("unfavorite", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleUnfavoriteArticleBadRequest)
+
 		HTTP(func() {
 			POST("article/{articleId}/unfavorite")
 			Response(StatusOK)
-			Response(errType_ArticleUnfavoriteArticleBadRequest.Name(), StatusBadRequest)
+			Response(errorBadRequest, StatusBadRequest)
 		})
 
 		Payload(func() {
@@ -89,8 +116,6 @@ var _ = Service("article", func() {
 				AttributeWithName("article", type_ArticleDetail),
 			)
 		})
-
-		Error(errType_ArticleUnfavoriteArticleBadRequest.Name(), errType_ArticleUnfavoriteArticleBadRequest)
 	})
 })
 
@@ -128,6 +153,9 @@ var (
 
 var (
 	errType_ArticleGetArticleBadRequest = myErrorType("ArticleGetArticleBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+	}, nil)
+	errType_ArticleUpdateArticleBadRequest = myErrorType("ArticleUpdateArticleBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 	errType_ArticleFavoriteArticleBadRequest = myErrorType("ArticleFavoriteArticleBadRequest", []any{

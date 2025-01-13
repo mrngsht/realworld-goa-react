@@ -171,6 +171,104 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildUpdateRequest instantiates a HTTP request object with method and path
+// set to call the "article" service "update" endpoint
+func (c *Client) BuildUpdateRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.UpdatePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "update", "*article.UpdatePayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateArticlePath(articleID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "update", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateRequest returns an encoder for requests sent to the article
+// update server.
+func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*article.UpdatePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("article", "update", "*article.UpdatePayload", v)
+		}
+		body := NewUpdateRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("article", "update", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateResponse returns a decoder for responses returned by the article
+// update endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeUpdateResponse may return the following errors:
+//   - "ArticleUpdateArticleBadRequest" (type *article.ArticleUpdateArticleBadRequest): http.StatusBadRequest
+//   - error: internal error
+func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "update", err)
+			}
+			err = ValidateUpdateResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "update", err)
+			}
+			res := NewUpdateResultOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body UpdateArticleUpdateArticleBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "update", err)
+			}
+			err = ValidateUpdateArticleUpdateArticleBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "update", err)
+			}
+			return nil, NewUpdateArticleUpdateArticleBadRequest(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "update", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildFavoriteRequest instantiates a HTTP request object with method and path
 // set to call the "article" service "favorite" endpoint
 func (c *Client) BuildFavoriteRequest(ctx context.Context, v any) (*http.Request, error) {

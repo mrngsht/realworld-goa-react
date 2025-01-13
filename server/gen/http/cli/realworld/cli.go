@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article (get|create|favorite|unfavorite)
+	return `article (get|create|update|favorite|unfavorite)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,13 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "dd65659e-acf5-4c62-92c5-296381847794"` + "\n" +
+	return os.Args[0] + ` article get --article-id "99bd6f1e-10af-4647-a6f1-44d8a089e78d"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "5Bh"
+      "username": "ulu"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "lorenza_haley@conn.org",
-      "password": "v4p"
+      "email": "reynold@kuhic.biz",
+      "password": "oh7"
    }'` + "\n" +
 		""
 }
@@ -60,6 +60,10 @@ func ParseEndpoint(
 
 		articleCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
 		articleCreateBodyFlag = articleCreateFlags.String("body", "REQUIRED", "")
+
+		articleUpdateFlags         = flag.NewFlagSet("update", flag.ExitOnError)
+		articleUpdateBodyFlag      = articleUpdateFlags.String("body", "REQUIRED", "")
+		articleUpdateArticleIDFlag = articleUpdateFlags.String("article-id", "REQUIRED", "")
 
 		articleFavoriteFlags         = flag.NewFlagSet("favorite", flag.ExitOnError)
 		articleFavoriteArticleIDFlag = articleFavoriteFlags.String("article-id", "REQUIRED", "")
@@ -91,6 +95,7 @@ func ParseEndpoint(
 	articleFlags.Usage = articleUsage
 	articleGetFlags.Usage = articleGetUsage
 	articleCreateFlags.Usage = articleCreateUsage
+	articleUpdateFlags.Usage = articleUpdateUsage
 	articleFavoriteFlags.Usage = articleFavoriteUsage
 	articleUnfavoriteFlags.Usage = articleUnfavoriteUsage
 
@@ -147,6 +152,9 @@ func ParseEndpoint(
 
 			case "create":
 				epf = articleCreateFlags
+
+			case "update":
+				epf = articleUpdateFlags
 
 			case "favorite":
 				epf = articleFavoriteFlags
@@ -211,6 +219,9 @@ func ParseEndpoint(
 			case "create":
 				endpoint = c.Create()
 				data, err = articlec.BuildCreatePayload(*articleCreateBodyFlag)
+			case "update":
+				endpoint = c.Update()
+				data, err = articlec.BuildUpdatePayload(*articleUpdateBodyFlag, *articleUpdateArticleIDFlag)
 			case "favorite":
 				endpoint = c.Favorite()
 				data, err = articlec.BuildFavoritePayload(*articleFavoriteArticleIDFlag)
@@ -261,6 +272,7 @@ Usage:
 COMMAND:
     get: Get implements get.
     create: Create implements create.
+    update: Update implements update.
     favorite: Favorite implements favorite.
     unfavorite: Unfavorite implements unfavorite.
 
@@ -275,7 +287,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "dd65659e-acf5-4c62-92c5-296381847794"
+    %[1]s article get --article-id "99bd6f1e-10af-4647-a6f1-44d8a089e78d"
 `, os.Args[0])
 }
 
@@ -287,15 +299,32 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Quis sunt consequuntur.",
-      "description": "Quod repellat beatae.",
+      "body": "Nihil voluptatem animi et omnis rem aliquam.",
+      "description": "Consequatur asperiores est.",
       "tagList": [
-         "Sunt et debitis et facere.",
-         "Recusandae ab distinctio qui ratione earum.",
-         "Nihil ab ipsa autem dolore nisi aut."
+         "Est totam numquam quia.",
+         "Blanditiis velit debitis.",
+         "Corrupti non neque velit consequatur dolorum rerum.",
+         "Nisi voluptatem eius sint cum aut in."
       ],
-      "title": "9f3"
+      "title": "7pw"
    }'
+`, os.Args[0])
+}
+
+func articleUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article update -body JSON -article-id STRING
+
+Update implements update.
+    -body JSON: 
+    -article-id STRING: 
+
+Example:
+    %[1]s article update --body '{
+      "body": "Libero veniam voluptatem.",
+      "description": "Soluta porro quia odit excepturi possimus molestiae.",
+      "title": "c2w"
+   }' --article-id "0683f1c3-3f92-4fa3-9c0e-d890e6355d38"
 `, os.Args[0])
 }
 
@@ -306,7 +335,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "d51df7c4-24f5-41ca-84e9-e979d53fbbf3"
+    %[1]s article favorite --article-id "1da3baeb-f12b-4803-8417-96add6d0303d"
 `, os.Args[0])
 }
 
@@ -317,7 +346,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "54f25347-9041-4e5b-bcad-d175ca280aa1"
+    %[1]s article unfavorite --article-id "dc16bddb-3f89-4127-abef-b74396e4459e"
 `, os.Args[0])
 }
 
@@ -343,7 +372,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "5Bh"
+      "username": "ulu"
    }'
 `, os.Args[0])
 }
@@ -356,7 +385,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "E3Yf"
+      "username": "vOp_"
    }'
 `, os.Args[0])
 }
@@ -385,8 +414,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "lorenza_haley@conn.org",
-      "password": "v4p"
+      "email": "reynold@kuhic.biz",
+      "password": "oh7"
    }'
 `, os.Args[0])
 }
@@ -399,9 +428,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "lillian@muller.com",
-      "password": "pfn",
-      "username": "cMUk"
+      "email": "helene@nitzsche.name",
+      "password": "u5l",
+      "username": "dqB"
    }'
 `, os.Args[0])
 }
@@ -424,11 +453,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "j2r",
-      "email": "zoey_corwin@deckow.net",
-      "image": "http://u",
-      "password": "ssu",
-      "username": "von"
+      "bio": "2s2",
+      "email": "kelsie@bernhard.net",
+      "image": "https://i",
+      "password": "rt6",
+      "username": "TAok"
    }'
 `, os.Args[0])
 }

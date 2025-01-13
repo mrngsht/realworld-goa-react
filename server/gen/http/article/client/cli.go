@@ -42,7 +42,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quis sunt consequuntur.\",\n      \"description\": \"Quod repellat beatae.\",\n      \"tagList\": [\n         \"Sunt et debitis et facere.\",\n         \"Recusandae ab distinctio qui ratione earum.\",\n         \"Nihil ab ipsa autem dolore nisi aut.\"\n      ],\n      \"title\": \"9f3\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Nihil voluptatem animi et omnis rem aliquam.\",\n      \"description\": \"Consequatur asperiores est.\",\n      \"tagList\": [\n         \"Est totam numquam quia.\",\n         \"Blanditiis velit debitis.\",\n         \"Corrupti non neque velit consequatur dolorum rerum.\",\n         \"Nisi voluptatem eius sint cum aut in.\"\n      ],\n      \"title\": \"7pw\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -67,6 +67,43 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	} else {
 		v.TagList = []string{}
 	}
+
+	return v, nil
+}
+
+// BuildUpdatePayload builds the payload for the article update endpoint from
+// CLI flags.
+func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string) (*article.UpdatePayload, error) {
+	var err error
+	var body UpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(articleUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Libero veniam voluptatem.\",\n      \"description\": \"Soluta porro quia odit excepturi possimus molestiae.\",\n      \"title\": \"c2w\"\n   }'")
+		}
+		if body.Title != nil {
+			if utf8.RuneCountInString(*body.Title) > 128 {
+				err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
+			}
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var articleID string
+	{
+		articleID = articleUpdateArticleID
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &article.UpdatePayload{
+		Title:       body.Title,
+		Description: body.Description,
+		Body:        body.Body,
+	}
+	v.ArticleID = articleID
 
 	return v, nil
 }

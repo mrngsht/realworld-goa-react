@@ -23,6 +23,9 @@ type Client struct {
 	// Create Doer is the HTTP client used to make requests to the create endpoint.
 	CreateDoer goahttp.Doer
 
+	// Update Doer is the HTTP client used to make requests to the update endpoint.
+	UpdateDoer goahttp.Doer
+
 	// Favorite Doer is the HTTP client used to make requests to the favorite
 	// endpoint.
 	FavoriteDoer goahttp.Doer
@@ -53,6 +56,7 @@ func NewClient(
 	return &Client{
 		GetDoer:             doer,
 		CreateDoer:          doer,
+		UpdateDoer:          doer,
 		FavoriteDoer:        doer,
 		UnfavoriteDoer:      doer,
 		RestoreResponseBody: restoreBody,
@@ -101,6 +105,30 @@ func (c *Client) Create() goa.Endpoint {
 		resp, err := c.CreateDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "create", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Update returns an endpoint that makes HTTP requests to the article service
+// update server.
+func (c *Client) Update() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateRequest(c.encoder)
+		decodeResponse = DecodeUpdateResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUpdateRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "update", err)
 		}
 		return decodeResponse(resp)
 	}

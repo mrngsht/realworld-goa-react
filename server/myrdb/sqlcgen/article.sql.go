@@ -298,6 +298,34 @@ func (q *Queries) ListArticleTagByArticleID(ctx context.Context, db DBTX, articl
 	return items, nil
 }
 
+const updateArticleContent = `-- name: UpdateArticleContent :exec
+UPDATE article_content_ SET 
+  updated_at_ = $2,
+  title_ = $3,
+  description_ = $4,
+  body_ = $5
+WHERE article_id_ = $1
+`
+
+type UpdateArticleContentParams struct {
+	ArticleID   uuid.UUID
+	UpdatedAt   time.Time
+	Title       string
+	Description string
+	Body        string
+}
+
+func (q *Queries) UpdateArticleContent(ctx context.Context, db DBTX, arg UpdateArticleContentParams) error {
+	_, err := db.Exec(ctx, updateArticleContent,
+		arg.ArticleID,
+		arg.UpdatedAt,
+		arg.Title,
+		arg.Description,
+		arg.Body,
+	)
+	return err
+}
+
 const updateArticleStatsFavoritesCount = `-- name: UpdateArticleStatsFavoritesCount :exec
 UPDATE article_stats_
 SET favorites_count_ = $1

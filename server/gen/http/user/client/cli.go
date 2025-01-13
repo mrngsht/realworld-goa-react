@@ -24,7 +24,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"lorenza_haley@conn.org\",\n      \"password\": \"v4p\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"reynold@kuhic.biz\",\n      \"password\": \"oh7\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 		if utf8.RuneCountInString(body.Password) < 6 {
@@ -53,7 +53,7 @@ func BuildRegisterPayload(userRegisterBody string) (*user.RegisterPayload, error
 	{
 		err = json.Unmarshal([]byte(userRegisterBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"lillian@muller.com\",\n      \"password\": \"pfn\",\n      \"username\": \"cMUk\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"helene@nitzsche.name\",\n      \"password\": \"u5l\",\n      \"username\": \"dqB\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
@@ -84,7 +84,7 @@ func BuildUpdatePayload(userUpdateBody string) (*user.UpdatePayload, error) {
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bio\": \"j2r\",\n      \"email\": \"zoey_corwin@deckow.net\",\n      \"image\": \"http://u\",\n      \"password\": \"ssu\",\n      \"username\": \"von\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bio\": \"2s2\",\n      \"email\": \"kelsie@bernhard.net\",\n      \"image\": \"https://i\",\n      \"password\": \"rt6\",\n      \"username\": \"TAok\"\n   }'")
 		}
 	}
 	v := &user.UpdatePayload{

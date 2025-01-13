@@ -8,6 +8,14 @@ INSERT INTO article_content_
 (created_at_, updated_at_, article_id_, title_, description_, body_, author_user_id_) 
 VALUES (sqlc.arg(created_at), sqlc.arg(created_at), $1, $2, $3, $4, $5);
 
+-- name: UpdateArticleContent :exec
+UPDATE article_content_ SET 
+  updated_at_ = $2,
+  title_ = $3,
+  description_ = $4,
+  body_ = $5
+WHERE article_id_ = $1;
+
 -- name: InsertArticleContentMutation :exec
 INSERT INTO article_content_mutation_
 (created_at_, article_id_, title_, description_, body_, author_user_id_) 

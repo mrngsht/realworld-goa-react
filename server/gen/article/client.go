@@ -17,15 +17,17 @@ import (
 type Client struct {
 	GetEndpoint        goa.Endpoint
 	CreateEndpoint     goa.Endpoint
+	UpdateEndpoint     goa.Endpoint
 	FavoriteEndpoint   goa.Endpoint
 	UnfavoriteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, create, favorite, unfavorite goa.Endpoint) *Client {
+func NewClient(get, create, update, favorite, unfavorite goa.Endpoint) *Client {
 	return &Client{
 		GetEndpoint:        get,
 		CreateEndpoint:     create,
+		UpdateEndpoint:     update,
 		FavoriteEndpoint:   favorite,
 		UnfavoriteEndpoint: unfavorite,
 	}
@@ -52,6 +54,19 @@ func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *CreateResul
 		return
 	}
 	return ires.(*CreateResult), nil
+}
+
+// Update calls the "update" endpoint of the "article" service.
+// Update may return the following errors:
+//   - "ArticleUpdateArticleBadRequest" (type *ArticleUpdateArticleBadRequest)
+//   - error: internal error
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *UpdateResult, err error) {
+	var ires any
+	ires, err = c.UpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*UpdateResult), nil
 }
 
 // Favorite calls the "favorite" endpoint of the "article" service.

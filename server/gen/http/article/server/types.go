@@ -23,6 +23,14 @@ type CreateRequestBody struct {
 	TagList     []string `form:"tagList,omitempty" json:"tagList,omitempty" xml:"tagList,omitempty"`
 }
 
+// UpdateRequestBody is the type of the "article" service "update" endpoint
+// HTTP request body.
+type UpdateRequestBody struct {
+	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -32,6 +40,12 @@ type GetResponseBody struct {
 // CreateResponseBody is the type of the "article" service "create" endpoint
 // HTTP response body.
 type CreateResponseBody struct {
+	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
+}
+
+// UpdateResponseBody is the type of the "article" service "update" endpoint
+// HTTP response body.
+type UpdateResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
 }
 
@@ -51,6 +65,13 @@ type UnfavoriteResponseBody struct {
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
 type GetArticleGetArticleBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// UpdateArticleUpdateArticleBadRequestResponseBody is the type of the
+// "article" service "update" endpoint HTTP response body for the
+// "ArticleUpdateArticleBadRequest" error.
+type UpdateArticleUpdateArticleBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -110,6 +131,16 @@ func NewCreateResponseBody(res *article.CreateResult) *CreateResponseBody {
 	return body
 }
 
+// NewUpdateResponseBody builds the HTTP response body from the result of the
+// "update" endpoint of the "article" service.
+func NewUpdateResponseBody(res *article.UpdateResult) *UpdateResponseBody {
+	body := &UpdateResponseBody{}
+	if res.Article != nil {
+		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
+	}
+	return body
+}
+
 // NewFavoriteResponseBody builds the HTTP response body from the result of the
 // "favorite" endpoint of the "article" service.
 func NewFavoriteResponseBody(res *article.FavoriteResult) *FavoriteResponseBody {
@@ -134,6 +165,15 @@ func NewUnfavoriteResponseBody(res *article.UnfavoriteResult) *UnfavoriteRespons
 // from the result of the "get" endpoint of the "article" service.
 func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticleBadRequest) *GetArticleGetArticleBadRequestResponseBody {
 	body := &GetArticleGetArticleBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
+// NewUpdateArticleUpdateArticleBadRequestResponseBody builds the HTTP response
+// body from the result of the "update" endpoint of the "article" service.
+func NewUpdateArticleUpdateArticleBadRequestResponseBody(res *article.ArticleUpdateArticleBadRequest) *UpdateArticleUpdateArticleBadRequestResponseBody {
+	body := &UpdateArticleUpdateArticleBadRequestResponseBody{
 		Code: res.Code,
 	}
 	return body
@@ -182,6 +222,18 @@ func NewCreatePayload(body *CreateRequestBody) *article.CreatePayload {
 	return v
 }
 
+// NewUpdatePayload builds a article service update endpoint payload.
+func NewUpdatePayload(body *UpdateRequestBody, articleID string) *article.UpdatePayload {
+	v := &article.UpdatePayload{
+		Title:       body.Title,
+		Description: body.Description,
+		Body:        body.Body,
+	}
+	v.ArticleID = articleID
+
+	return v
+}
+
 // NewFavoritePayload builds a article service favorite endpoint payload.
 func NewFavoritePayload(articleID string) *article.FavoritePayload {
 	v := &article.FavoritePayload{}
@@ -212,6 +264,16 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 	if body.TagList == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
 	}
+	if body.Title != nil {
+		if utf8.RuneCountInString(*body.Title) > 128 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
+		}
+	}
+	return
+}
+
+// ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
+func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	if body.Title != nil {
 		if utf8.RuneCountInString(*body.Title) > 128 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))

@@ -156,6 +156,84 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 	}, nil
 }
 
+func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	db := s.db
+
+	articleID := uuid.MustParse(payload.ArticleID)
+	detail, err := s.getArticleDetail(ctx, articleID, &userID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	isUpdated := false
+	if payload.Title != nil {
+		detail.Title = *payload.Title
+		isUpdated = true
+	}
+	if payload.Description != nil {
+		detail.Description = *payload.Description
+		isUpdated = true
+	}
+	if payload.Body != nil {
+		detail.Body = *payload.Body
+		isUpdated = true
+	}
+
+	res = &goa.UpdateResult{
+		Article: detail,
+	}
+
+	if !isUpdated {
+		return res, nil
+	}
+
+	now := mytime.Now(ctx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
+
+		if err := sqlcgen.Q.UpdateArticleContent(ctx, db, sqlcgen.UpdateArticleContentParams{
+			UpdatedAt:   now,
+			ArticleID:   articleID,
+			Title:       detail.Title,
+			Description: detail.Description,
+			Body:        detail.Body,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := sqlcgen.Q.InsertArticleContentMutation(ctx, db, sqlcgen.InsertArticleContentMutationParams{
+			CreatedAt:    now,
+			ArticleID:    articleID,
+			Title:        detail.ArticleID,
+			Description:  detail.Description,
+			Body:         detail.Body,
+			AuthorUserID: userID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	}); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return res, nil
+}
+
 func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
 	defer func() {
 		if apErr, ok := myerr.AsAppErr(err); ok {
