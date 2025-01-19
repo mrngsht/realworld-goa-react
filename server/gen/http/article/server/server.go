@@ -22,6 +22,7 @@ type Server struct {
 	Get        http.Handler
 	Create     http.Handler
 	Update     http.Handler
+	Delete     http.Handler
 	Favorite   http.Handler
 	Unfavorite http.Handler
 }
@@ -56,12 +57,14 @@ func New(
 			{"Get", "GET", "/api/article/{articleId}"},
 			{"Create", "POST", "/api/article/create"},
 			{"Update", "POST", "/api/article/{articleId}/update"},
+			{"Delete", "POST", "/api/article/{articleId}/delete"},
 			{"Favorite", "POST", "/api/article/{articleId}/favorite"},
 			{"Unfavorite", "POST", "/api/article/{articleId}/unfavorite"},
 		},
 		Get:        NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		Create:     NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
 		Update:     NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Delete:     NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
 		Favorite:   NewFavoriteHandler(e.Favorite, mux, decoder, encoder, errhandler, formatter),
 		Unfavorite: NewUnfavoriteHandler(e.Unfavorite, mux, decoder, encoder, errhandler, formatter),
 	}
@@ -75,6 +78,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.Create = m(s.Create)
 	s.Update = m(s.Update)
+	s.Delete = m(s.Delete)
 	s.Favorite = m(s.Favorite)
 	s.Unfavorite = m(s.Unfavorite)
 }
@@ -87,6 +91,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountCreateHandler(mux, h.Create)
 	MountUpdateHandler(mux, h.Update)
+	MountDeleteHandler(mux, h.Delete)
 	MountFavoriteHandler(mux, h.Favorite)
 	MountUnfavoriteHandler(mux, h.Unfavorite)
 }
@@ -228,6 +233,57 @@ func NewUpdateHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "update")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteHandler configures the mux to serve the "article" service
+// "delete" endpoint.
+func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/article/{articleId}/delete", f)
+}
+
+// NewDeleteHandler creates a HTTP handler which loads the HTTP request and
+// calls the "article" service "delete" endpoint.
+func NewDeleteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteRequest(mux, decoder)
+		encodeResponse = EncodeDeleteResponse(encoder)
+		encodeError    = EncodeDeleteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

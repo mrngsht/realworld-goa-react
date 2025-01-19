@@ -29,6 +29,14 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// DeleteRequestBody is the type of the "article" service "delete" endpoint
+// HTTP request body.
+type DeleteRequestBody struct {
+	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -70,6 +78,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 // "article" service "update" endpoint HTTP response body for the
 // "ArticleUpdateArticleBadRequest" error.
 type UpdateArticleUpdateArticleBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
+// DeleteArticleDeleteArticleBadRequestResponseBody is the type of the
+// "article" service "delete" endpoint HTTP response body for the
+// "ArticleDeleteArticleBadRequest" error.
+type DeleteArticleDeleteArticleBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
@@ -139,6 +154,17 @@ func NewUpdateRequestBody(p *article.UpdatePayload) *UpdateRequestBody {
 	return body
 }
 
+// NewDeleteRequestBody builds the HTTP request body from the payload of the
+// "delete" endpoint of the "article" service.
+func NewDeleteRequestBody(p *article.DeletePayload) *DeleteRequestBody {
+	body := &DeleteRequestBody{
+		Title:       p.Title,
+		Description: p.Description,
+		Body:        p.Body,
+	}
+	return body
+}
+
 // NewGetResultOK builds a "article" service "get" endpoint result from a HTTP
 // "OK" response.
 func NewGetResultOK(body *GetResponseBody) *article.GetResult {
@@ -180,6 +206,16 @@ func NewUpdateResultOK(body *UpdateResponseBody) *article.UpdateResult {
 // endpoint ArticleUpdateArticleBadRequest error.
 func NewUpdateArticleUpdateArticleBadRequest(body *UpdateArticleUpdateArticleBadRequestResponseBody) *article.ArticleUpdateArticleBadRequest {
 	v := &article.ArticleUpdateArticleBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
+// NewDeleteArticleDeleteArticleBadRequest builds a article service delete
+// endpoint ArticleDeleteArticleBadRequest error.
+func NewDeleteArticleDeleteArticleBadRequest(body *DeleteArticleDeleteArticleBadRequestResponseBody) *article.ArticleDeleteArticleBadRequest {
+	v := &article.ArticleDeleteArticleBadRequest{
 		Code: *body.Code,
 	}
 
@@ -308,6 +344,20 @@ func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArtic
 // ValidateUpdateArticleUpdateArticleBadRequestResponseBody runs the
 // validations defined on update_ArticleUpdateArticleBadRequest_response_body
 func ValidateUpdateArticleUpdateArticleBadRequestResponseBody(body *UpdateArticleUpdateArticleBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound" || *body.Code == "ForbiddenOperation") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound", "ForbiddenOperation"}))
+		}
+	}
+	return
+}
+
+// ValidateDeleteArticleDeleteArticleBadRequestResponseBody runs the
+// validations defined on delete_ArticleDeleteArticleBadRequest_response_body
+func ValidateDeleteArticleDeleteArticleBadRequestResponseBody(body *DeleteArticleDeleteArticleBadRequestResponseBody) (err error) {
 	if body.Code == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}

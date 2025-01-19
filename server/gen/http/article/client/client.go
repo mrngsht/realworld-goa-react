@@ -26,6 +26,9 @@ type Client struct {
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
 
+	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
+	DeleteDoer goahttp.Doer
+
 	// Favorite Doer is the HTTP client used to make requests to the favorite
 	// endpoint.
 	FavoriteDoer goahttp.Doer
@@ -57,6 +60,7 @@ func NewClient(
 		GetDoer:             doer,
 		CreateDoer:          doer,
 		UpdateDoer:          doer,
+		DeleteDoer:          doer,
 		FavoriteDoer:        doer,
 		UnfavoriteDoer:      doer,
 		RestoreResponseBody: restoreBody,
@@ -129,6 +133,30 @@ func (c *Client) Update() goa.Endpoint {
 		resp, err := c.UpdateDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Delete returns an endpoint that makes HTTP requests to the article service
+// delete server.
+func (c *Client) Delete() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteRequest(c.encoder)
+		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildDeleteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "delete", err)
 		}
 		return decodeResponse(resp)
 	}

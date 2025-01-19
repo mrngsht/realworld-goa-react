@@ -19,6 +19,8 @@ type Service interface {
 	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
 	// Update implements update.
 	Update(context.Context, *UpdatePayload) (res *UpdateResult, err error)
+	// Delete implements delete.
+	Delete(context.Context, *DeletePayload) (err error)
 	// Favorite implements favorite.
 	Favorite(context.Context, *FavoritePayload) (res *FavoriteResult, err error)
 	// Unfavorite implements unfavorite.
@@ -39,7 +41,11 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"get", "create", "update", "favorite", "unfavorite"}
+var MethodNames = [6]string{"get", "create", "update", "delete", "favorite", "unfavorite"}
+
+type ArticleDeleteArticleBadRequest struct {
+	Code string
+}
 
 type ArticleDetail struct {
 	ArticleID      string
@@ -81,6 +87,14 @@ type CreatePayload struct {
 // CreateResult is the result type of the article service create method.
 type CreateResult struct {
 	Article *ArticleDetail
+}
+
+// DeletePayload is the payload type of the article service delete method.
+type DeletePayload struct {
+	ArticleID   string
+	Title       *string
+	Description *string
+	Body        *string
 }
 
 // FavoritePayload is the payload type of the article service favorite method.
@@ -132,6 +146,23 @@ type UpdatePayload struct {
 // UpdateResult is the result type of the article service update method.
 type UpdateResult struct {
 	Article *ArticleDetail
+}
+
+// Error returns an error description.
+func (e *ArticleDeleteArticleBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleDeleteArticleBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleDeleteArticleBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleDeleteArticleBadRequest".
+func (e *ArticleDeleteArticleBadRequest) GoaErrorName() string {
+	return "ArticleDeleteArticleBadRequest"
 }
 
 // Error returns an error description.

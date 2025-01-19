@@ -74,6 +74,25 @@ var _ = Service("article", func() {
 		})
 	})
 
+	Method("delete", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleDeleteArticleBadRequest)
+
+		HTTP(func() {
+			POST("article/{articleId}/delete")
+			Response(StatusOK)
+			Response(errorBadRequest, StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+			)
+			AttributeWithName("title", String, def_Article_RequestTitle)
+			AttributeWithName("description", String)
+			AttributeWithName("body", String)
+		})
+	})
+
 	Method("favorite", func() {
 		errorBadRequest := ErrorByErrorType(errType_ArticleFavoriteArticleBadRequest)
 
@@ -156,6 +175,10 @@ var (
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 	errType_ArticleUpdateArticleBadRequest = myErrorType("ArticleUpdateArticleBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+		ErrCode_Article_ForbiddenOperation,
+	}, nil)
+	errType_ArticleDeleteArticleBadRequest = myErrorType("ArticleDeleteArticleBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
 		ErrCode_Article_ForbiddenOperation,
 	}, nil)

@@ -31,6 +31,14 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// DeleteRequestBody is the type of the "article" service "delete" endpoint
+// HTTP request body.
+type DeleteRequestBody struct {
+	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -72,6 +80,13 @@ type GetArticleGetArticleBadRequestResponseBody struct {
 // "article" service "update" endpoint HTTP response body for the
 // "ArticleUpdateArticleBadRequest" error.
 type UpdateArticleUpdateArticleBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// DeleteArticleDeleteArticleBadRequestResponseBody is the type of the
+// "article" service "delete" endpoint HTTP response body for the
+// "ArticleDeleteArticleBadRequest" error.
+type DeleteArticleDeleteArticleBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -179,6 +194,15 @@ func NewUpdateArticleUpdateArticleBadRequestResponseBody(res *article.ArticleUpd
 	return body
 }
 
+// NewDeleteArticleDeleteArticleBadRequestResponseBody builds the HTTP response
+// body from the result of the "delete" endpoint of the "article" service.
+func NewDeleteArticleDeleteArticleBadRequestResponseBody(res *article.ArticleDeleteArticleBadRequest) *DeleteArticleDeleteArticleBadRequestResponseBody {
+	body := &DeleteArticleDeleteArticleBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
 // NewFavoriteArticleFavoriteArticleBadRequestResponseBody builds the HTTP
 // response body from the result of the "favorite" endpoint of the "article"
 // service.
@@ -234,6 +258,18 @@ func NewUpdatePayload(body *UpdateRequestBody, articleID string) *article.Update
 	return v
 }
 
+// NewDeletePayload builds a article service delete endpoint payload.
+func NewDeletePayload(body *DeleteRequestBody, articleID string) *article.DeletePayload {
+	v := &article.DeletePayload{
+		Title:       body.Title,
+		Description: body.Description,
+		Body:        body.Body,
+	}
+	v.ArticleID = articleID
+
+	return v
+}
+
 // NewFavoritePayload builds a article service favorite endpoint payload.
 func NewFavoritePayload(articleID string) *article.FavoritePayload {
 	v := &article.FavoritePayload{}
@@ -274,6 +310,16 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 
 // ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
 func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
+	if body.Title != nil {
+		if utf8.RuneCountInString(*body.Title) > 128 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
+		}
+	}
+	return
+}
+
+// ValidateDeleteRequestBody runs the validations defined on DeleteRequestBody
+func ValidateDeleteRequestBody(body *DeleteRequestBody) (err error) {
 	if body.Title != nil {
 		if utf8.RuneCountInString(*body.Title) > 128 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))

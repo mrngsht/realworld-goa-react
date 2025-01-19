@@ -16,6 +16,10 @@ UPDATE article_content_ SET
   body_ = $5
 WHERE article_id_ = $1;
 
+-- name: DeleteArticleContent :exec
+DELETE FROM article_content_ 
+WHERE article_id_ = $1;
+
 -- name: InsertArticleContentMutation :exec
 INSERT INTO article_content_mutation_
 (created_at_, article_id_, title_, description_, body_, author_user_id_) 
@@ -54,6 +58,11 @@ VALUES ($1, $2, $3, $4);
 UPDATE article_stats_
 SET favorites_count_ = $1
 WHERE article_id_ = $2;
+
+-- name: InsertArticleDeleted :exec
+INSERT INTO article_deleted_
+(created_at_, article_id_)
+VALUES ($1, $2);
 
 -- name: GetArticleContentByArticleID :one
 SELECT 

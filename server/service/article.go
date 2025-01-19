@@ -236,6 +236,54 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 	return res, nil
 }
 
+func (s *Article) Delete(ctx context.Context, payload *goa.DeletePayload) (err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			case article.ErrRequestUserIsNotAuthor:
+				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	db := s.db
+
+	articleID := uuid.MustParse(payload.ArticleID)
+
+	if _, err = s.getArticleDetail(ctx, articleID, &userID, true); err != nil {
+		return errors.WithStack(err)
+	}
+
+	now := mytime.Now(ctx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
+
+		if err := sqlcgen.Q.DeleteArticleContent(ctx, db, articleID); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := sqlcgen.Q.InsertArticleDeleted(ctx, db, sqlcgen.InsertArticleDeletedParams{
+			CreatedAt: now,
+			ArticleID: articleID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	}); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
 func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (res *goa.FavoriteResult, err error) {
 	defer func() {
 		if apErr, ok := myerr.AsAppErr(err); ok {

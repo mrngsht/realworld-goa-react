@@ -18,16 +18,18 @@ type Client struct {
 	GetEndpoint        goa.Endpoint
 	CreateEndpoint     goa.Endpoint
 	UpdateEndpoint     goa.Endpoint
+	DeleteEndpoint     goa.Endpoint
 	FavoriteEndpoint   goa.Endpoint
 	UnfavoriteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, create, update, favorite, unfavorite goa.Endpoint) *Client {
+func NewClient(get, create, update, delete_, favorite, unfavorite goa.Endpoint) *Client {
 	return &Client{
 		GetEndpoint:        get,
 		CreateEndpoint:     create,
 		UpdateEndpoint:     update,
+		DeleteEndpoint:     delete_,
 		FavoriteEndpoint:   favorite,
 		UnfavoriteEndpoint: unfavorite,
 	}
@@ -67,6 +69,15 @@ func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *UpdateResul
 		return
 	}
 	return ires.(*UpdateResult), nil
+}
+
+// Delete calls the "delete" endpoint of the "article" service.
+// Delete may return the following errors:
+//   - "ArticleDeleteArticleBadRequest" (type *ArticleDeleteArticleBadRequest)
+//   - error: internal error
+func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
+	_, err = c.DeleteEndpoint(ctx, p)
+	return
 }
 
 // Favorite calls the "favorite" endpoint of the "article" service.

@@ -12,6 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteArticleContent = `-- name: DeleteArticleContent :exec
+DELETE FROM article_content_ 
+WHERE article_id_ = $1
+`
+
+func (q *Queries) DeleteArticleContent(ctx context.Context, db DBTX, articleID uuid.UUID) error {
+	_, err := db.Exec(ctx, deleteArticleContent, articleID)
+	return err
+}
+
 const deleteArticleFavorite = `-- name: DeleteArticleFavorite :exec
 DELETE FROM article_favorite_
 WHERE article_id_ = $1 AND user_id_ = $2
@@ -166,6 +176,22 @@ func (q *Queries) InsertArticleContentMutation(ctx context.Context, db DBTX, arg
 		arg.Body,
 		arg.AuthorUserID,
 	)
+	return err
+}
+
+const insertArticleDeleted = `-- name: InsertArticleDeleted :exec
+INSERT INTO article_deleted_
+(created_at_, article_id_)
+VALUES ($1, $2)
+`
+
+type InsertArticleDeletedParams struct {
+	CreatedAt time.Time
+	ArticleID uuid.UUID
+}
+
+func (q *Queries) InsertArticleDeleted(ctx context.Context, db DBTX, arg InsertArticleDeletedParams) error {
+	_, err := db.Exec(ctx, insertArticleDeleted, arg.CreatedAt, arg.ArticleID)
 	return err
 }
 

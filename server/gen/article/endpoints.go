@@ -18,6 +18,7 @@ type Endpoints struct {
 	Get        goa.Endpoint
 	Create     goa.Endpoint
 	Update     goa.Endpoint
+	Delete     goa.Endpoint
 	Favorite   goa.Endpoint
 	Unfavorite goa.Endpoint
 }
@@ -28,6 +29,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Get:        NewGetEndpoint(s),
 		Create:     NewCreateEndpoint(s),
 		Update:     NewUpdateEndpoint(s),
+		Delete:     NewDeleteEndpoint(s),
 		Favorite:   NewFavoriteEndpoint(s),
 		Unfavorite: NewUnfavoriteEndpoint(s),
 	}
@@ -38,6 +40,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.Create = m(e.Create)
 	e.Update = m(e.Update)
+	e.Delete = m(e.Delete)
 	e.Favorite = m(e.Favorite)
 	e.Unfavorite = m(e.Unfavorite)
 }
@@ -66,6 +69,15 @@ func NewUpdateEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*UpdatePayload)
 		return s.Update(ctx, p)
+	}
+}
+
+// NewDeleteEndpoint returns an endpoint function that calls the method
+// "delete" of service "article".
+func NewDeleteEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*DeletePayload)
+		return nil, s.Delete(ctx, p)
 	}
 }
 

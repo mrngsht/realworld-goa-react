@@ -26,6 +26,11 @@ func UpdateArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/update", articleID)
 }
 
+// DeleteArticlePath returns the URL path to the article service delete HTTP endpoint.
+func DeleteArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/delete", articleID)
+}
+
 // FavoriteArticlePath returns the URL path to the article service favorite HTTP endpoint.
 func FavoriteArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/favorite", articleID)
