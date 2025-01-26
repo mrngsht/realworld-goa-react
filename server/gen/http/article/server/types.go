@@ -31,14 +31,6 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
-// DeleteRequestBody is the type of the "article" service "delete" endpoint
-// HTTP request body.
-type DeleteRequestBody struct {
-	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-}
-
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -259,12 +251,8 @@ func NewUpdatePayload(body *UpdateRequestBody, articleID string) *article.Update
 }
 
 // NewDeletePayload builds a article service delete endpoint payload.
-func NewDeletePayload(body *DeleteRequestBody, articleID string) *article.DeletePayload {
-	v := &article.DeletePayload{
-		Title:       body.Title,
-		Description: body.Description,
-		Body:        body.Body,
-	}
+func NewDeletePayload(articleID string) *article.DeletePayload {
+	v := &article.DeletePayload{}
 	v.ArticleID = articleID
 
 	return v
@@ -310,16 +298,6 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 
 // ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
 func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
-	if body.Title != nil {
-		if utf8.RuneCountInString(*body.Title) > 128 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
-		}
-	}
-	return
-}
-
-// ValidateDeleteRequestBody runs the validations defined on DeleteRequestBody
-func ValidateDeleteRequestBody(body *DeleteRequestBody) (err error) {
 	if body.Title != nil {
 		if utf8.RuneCountInString(*body.Title) > 128 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))

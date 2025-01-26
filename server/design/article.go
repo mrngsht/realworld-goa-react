@@ -87,9 +87,6 @@ var _ = Service("article", func() {
 			Required(
 				AttributeWithName("articleId", String, def_Article_RequestArticleID),
 			)
-			AttributeWithName("title", String, def_Article_RequestTitle)
-			AttributeWithName("description", String)
-			AttributeWithName("body", String)
 		})
 	})
 

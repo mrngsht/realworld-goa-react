@@ -91,10 +91,7 @@ type CreateResult struct {
 
 // DeletePayload is the payload type of the article service delete method.
 type DeletePayload struct {
-	ArticleID   string
-	Title       *string
-	Description *string
-	Body        *string
+	ArticleID string
 }
 
 // FavoritePayload is the payload type of the article service favorite method.

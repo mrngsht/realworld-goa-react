@@ -45,6 +45,19 @@ func (q *Queries) GetArticleContentByArticleID(ctx context.Context, db DBTX, art
 	return i, err
 }
 
+const getArticleDeletedByArticleID = `-- name: GetArticleDeletedByArticleID :one
+SELECT created_at_, article_id_ FROM article_deleted_
+WHERE article_id_ = $1
+LIMIT 1
+`
+
+func (q *Queries) GetArticleDeletedByArticleID(ctx context.Context, db DBTX, articleID uuid.UUID) (ArticleDeleted, error) {
+	row := db.QueryRow(ctx, getArticleDeletedByArticleID, articleID)
+	var i ArticleDeleted
+	err := row.Scan(&i.CreatedAt, &i.ArticleID)
+	return i, err
+}
+
 const getArticleStatsByArticleID = `-- name: GetArticleStatsByArticleID :one
 SELECT created_at_, updated_at_, article_id_, favorites_count_ FROM article_stats_
 WHERE article_id_ = $1

@@ -32,13 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "31dfd579-7560-417e-b424-68b5d69d3b27"` + "\n" +
+	return os.Args[0] + ` article get --article-id "bb64c2bc-4fc1-4145-af9d-265b3932c31f"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "WWnE"
+      "username": "qzW"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "jamison.hamill@cummingssawayn.info",
-      "password": "8vm"
+      "email": "skyla@gibsonkessler.name",
+      "password": "0jd"
    }'` + "\n" +
 		""
 }
@@ -66,7 +66,6 @@ func ParseEndpoint(
 		articleUpdateArticleIDFlag = articleUpdateFlags.String("article-id", "REQUIRED", "")
 
 		articleDeleteFlags         = flag.NewFlagSet("delete", flag.ExitOnError)
-		articleDeleteBodyFlag      = articleDeleteFlags.String("body", "REQUIRED", "")
 		articleDeleteArticleIDFlag = articleDeleteFlags.String("article-id", "REQUIRED", "")
 
 		articleFavoriteFlags         = flag.NewFlagSet("favorite", flag.ExitOnError)
@@ -232,7 +231,7 @@ func ParseEndpoint(
 				data, err = articlec.BuildUpdatePayload(*articleUpdateBodyFlag, *articleUpdateArticleIDFlag)
 			case "delete":
 				endpoint = c.Delete()
-				data, err = articlec.BuildDeletePayload(*articleDeleteBodyFlag, *articleDeleteArticleIDFlag)
+				data, err = articlec.BuildDeletePayload(*articleDeleteArticleIDFlag)
 			case "favorite":
 				endpoint = c.Favorite()
 				data, err = articlec.BuildFavoritePayload(*articleFavoriteArticleIDFlag)
@@ -299,7 +298,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "31dfd579-7560-417e-b424-68b5d69d3b27"
+    %[1]s article get --article-id "bb64c2bc-4fc1-4145-af9d-265b3932c31f"
 `, os.Args[0])
 }
 
@@ -311,13 +310,15 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Quia omnis magnam velit distinctio soluta.",
-      "description": "Dignissimos impedit culpa nobis temporibus voluptas.",
+      "body": "Ut vitae delectus alias laboriosam.",
+      "description": "Odio et.",
       "tagList": [
-         "Odit excepturi possimus molestiae laudantium.",
-         "Veniam voluptatem quis."
+         "Rerum non non eum eum.",
+         "Dignissimos impedit culpa nobis temporibus voluptas.",
+         "Quia omnis magnam velit distinctio soluta.",
+         "Quia odit excepturi possimus molestiae laudantium."
       ],
-      "title": "fc4"
+      "title": "9e8"
    }'
 `, os.Args[0])
 }
@@ -331,26 +332,21 @@ Update implements update.
 
 Example:
     %[1]s article update --body '{
-      "body": "Minus enim voluptatum ut eaque odit.",
-      "description": "Vitae voluptatem qui.",
-      "title": "08k"
-   }' --article-id "85bcec4c-9133-4c9c-a56e-85e6e91369c1"
+      "body": "Temporibus minus enim voluptatum ut.",
+      "description": "Culpa ipsam excepturi vitae voluptatem.",
+      "title": "kev"
+   }' --article-id "8346c49e-795c-4cfb-9395-c4f7ef579afb"
 `, os.Args[0])
 }
 
 func articleDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] article delete -body JSON -article-id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article delete -article-id STRING
 
 Delete implements delete.
-    -body JSON: 
     -article-id STRING: 
 
 Example:
-    %[1]s article delete --body '{
-      "body": "Sit tempore consequatur temporibus.",
-      "description": "Voluptatem et itaque.",
-      "title": "14a"
-   }' --article-id "8f3bf4c6-3a93-472d-a649-ff2d0a69f1ca"
+    %[1]s article delete --article-id "6de1c169-2164-4e85-9ae7-d86395684dd2"
 `, os.Args[0])
 }
 
@@ -361,7 +357,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "3a329a40-3d36-4405-a4db-4f3f75061703"
+    %[1]s article favorite --article-id "869191f9-8e0f-4749-88b9-d2134e59a811"
 `, os.Args[0])
 }
 
@@ -372,7 +368,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "e90671a2-dd05-4fb0-b8be-db5539b43fcf"
+    %[1]s article unfavorite --article-id "62bf8365-2ef7-4054-b5d2-63719060aace"
 `, os.Args[0])
 }
 
@@ -398,7 +394,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "WWnE"
+      "username": "qzW"
    }'
 `, os.Args[0])
 }
@@ -411,7 +407,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "woM"
+      "username": "Irn8"
    }'
 `, os.Args[0])
 }
@@ -440,8 +436,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "jamison.hamill@cummingssawayn.info",
-      "password": "8vm"
+      "email": "skyla@gibsonkessler.name",
+      "password": "0jd"
    }'
 `, os.Args[0])
 }
@@ -454,9 +450,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "delbert_schmitt@heidenreichjaskolski.biz",
-      "password": "99l",
-      "username": "dybY"
+      "email": "bernard.becker@jacobirunolfsson.biz",
+      "password": "v0u",
+      "username": "ocO"
    }'
 `, os.Args[0])
 }
@@ -479,11 +475,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "ed6",
-      "email": "haskell.dooley@funk.net",
-      "image": "http://vk",
-      "password": "655",
-      "username": "bFnZ"
+      "bio": "bzf",
+      "email": "alvah@gibson.biz",
+      "image": "https://u0",
+      "password": "pkb",
+      "username": "AIduk"
    }'
 `, os.Args[0])
 }

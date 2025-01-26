@@ -29,14 +29,6 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
-// DeleteRequestBody is the type of the "article" service "delete" endpoint
-// HTTP request body.
-type DeleteRequestBody struct {
-	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-}
-
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -147,17 +139,6 @@ func NewCreateRequestBody(p *article.CreatePayload) *CreateRequestBody {
 // "update" endpoint of the "article" service.
 func NewUpdateRequestBody(p *article.UpdatePayload) *UpdateRequestBody {
 	body := &UpdateRequestBody{
-		Title:       p.Title,
-		Description: p.Description,
-		Body:        p.Body,
-	}
-	return body
-}
-
-// NewDeleteRequestBody builds the HTTP request body from the payload of the
-// "delete" endpoint of the "article" service.
-func NewDeleteRequestBody(p *article.DeletePayload) *DeleteRequestBody {
-	body := &DeleteRequestBody{
 		Title:       p.Title,
 		Description: p.Description,
 		Body:        p.Body,

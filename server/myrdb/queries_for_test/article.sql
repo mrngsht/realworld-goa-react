@@ -28,3 +28,8 @@ SELECT * FROM article_stats_
 WHERE article_id_ = $1
 LIMIT 1;
 
+-- name: GetArticleDeletedByArticleID :one
+SELECT * FROM article_deleted_
+WHERE article_id_ = $1
+LIMIT 1;
+

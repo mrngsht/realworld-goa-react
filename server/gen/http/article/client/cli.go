@@ -42,7 +42,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quia omnis magnam velit distinctio soluta.\",\n      \"description\": \"Dignissimos impedit culpa nobis temporibus voluptas.\",\n      \"tagList\": [\n         \"Odit excepturi possimus molestiae laudantium.\",\n         \"Veniam voluptatem quis.\"\n      ],\n      \"title\": \"fc4\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Ut vitae delectus alias laboriosam.\",\n      \"description\": \"Odio et.\",\n      \"tagList\": [\n         \"Rerum non non eum eum.\",\n         \"Dignissimos impedit culpa nobis temporibus voluptas.\",\n         \"Quia omnis magnam velit distinctio soluta.\",\n         \"Quia odit excepturi possimus molestiae laudantium.\"\n      ],\n      \"title\": \"9e8\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -79,7 +79,7 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 	{
 		err = json.Unmarshal([]byte(articleUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Minus enim voluptatum ut eaque odit.\",\n      \"description\": \"Vitae voluptatem qui.\",\n      \"title\": \"08k\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Temporibus minus enim voluptatum ut.\",\n      \"description\": \"Culpa ipsam excepturi vitae voluptatem.\",\n      \"title\": \"kev\"\n   }'")
 		}
 		if body.Title != nil {
 			if utf8.RuneCountInString(*body.Title) > 128 {
@@ -110,23 +110,8 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 
 // BuildDeletePayload builds the payload for the article delete endpoint from
 // CLI flags.
-func BuildDeletePayload(articleDeleteBody string, articleDeleteArticleID string) (*article.DeletePayload, error) {
+func BuildDeletePayload(articleDeleteArticleID string) (*article.DeletePayload, error) {
 	var err error
-	var body DeleteRequestBody
-	{
-		err = json.Unmarshal([]byte(articleDeleteBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Sit tempore consequatur temporibus.\",\n      \"description\": \"Voluptatem et itaque.\",\n      \"title\": \"14a\"\n   }'")
-		}
-		if body.Title != nil {
-			if utf8.RuneCountInString(*body.Title) > 128 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
-			}
-		}
-		if err != nil {
-			return nil, err
-		}
-	}
 	var articleID string
 	{
 		articleID = articleDeleteArticleID
@@ -135,11 +120,7 @@ func BuildDeletePayload(articleDeleteBody string, articleDeleteArticleID string)
 			return nil, err
 		}
 	}
-	v := &article.DeletePayload{
-		Title:       body.Title,
-		Description: body.Description,
-		Body:        body.Body,
-	}
+	v := &article.DeletePayload{}
 	v.ArticleID = articleID
 
 	return v, nil

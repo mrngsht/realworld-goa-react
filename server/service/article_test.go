@@ -400,6 +400,79 @@ func TestArticle_Update(t *testing.T) {
 	})
 }
 
+func TestArticle_Delete(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context) (string, *goa.CreatePayload) {
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID, payload
+	}
+
+	t.Run("delete", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+
+		articleID, _ := createArticle(t, ctx)
+
+		deletedAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, deletedAt)
+		{
+			err := svc.Delete(ctx, &goa.DeletePayload{ArticleID: articleID}) // Act
+			require.NoError(t, err)
+		}
+
+		{
+			_, err := svc.Get(ctx, &goa.GetPayload{ArticleID: articleID})
+			assert.Error(t, err)
+		}
+
+		articleUUID := uuid.MustParse(articleID)
+		deletedAtOnDB := mytimetest.TruncateTimeForDB(deletedAt)
+
+		del, err := sqlctest.Q.GetArticleDeletedByArticleID(ctx, db, articleUUID)
+		require.NoError(t, err)
+		assert.Equal(t, deletedAtOnDB, del.CreatedAt)
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		user := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, user.Username)
+		err := svc.Delete(ctx, &goa.DeletePayload{ArticleID: uuid.NewString()}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleDeleteArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+
+	t.Run("try to delete other's article", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		other := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		articleID, _ := createArticle(t, ctx)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, other.Username)
+		err := svc.Delete(ctx, &goa.DeletePayload{ArticleID: articleID}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleDeleteArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ForbiddenOperation, badRequest.Code)
+	})
+}
+
 func TestArticle_Favoite(t *testing.T) {
 	ctx := servicetest.NewContext()
 	db := rdbtest.OpenDB(t, ctx)
