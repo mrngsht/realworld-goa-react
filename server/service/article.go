@@ -241,9 +241,9 @@ func (s *Article) Delete(ctx context.Context, payload *goa.DeletePayload) (err e
 		if apErr, ok := myerr.AsAppErr(err); ok {
 			switch apErr {
 			case article.ErrArticleNotFound:
-				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+				err = &goa.ArticleDeleteArticleBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
 			case article.ErrRequestUserIsNotAuthor:
-				err = &goa.ArticleUpdateArticleBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
+				err = &goa.ArticleDeleteArticleBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
 			}
 		}
 	}()
