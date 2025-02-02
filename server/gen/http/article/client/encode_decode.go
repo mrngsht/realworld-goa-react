@@ -100,6 +100,77 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 	}
 }
 
+// BuildListRequest instantiates a HTTP request object with method and path set
+// to call the "article" service "list" endpoint
+func (c *Client) BuildListRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListArticlePath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "list", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListRequest returns an encoder for requests sent to the article list
+// server.
+func EncodeListRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*article.ListPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("article", "list", "*article.ListPayload", v)
+		}
+		body := NewListRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("article", "list", err)
+		}
+		return nil
+	}
+}
+
+// DecodeListResponse returns a decoder for responses returned by the article
+// list endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "list", err)
+			}
+			err = ValidateListResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "list", err)
+			}
+			res := NewListResultOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "list", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildCreateRequest instantiates a HTTP request object with method and path
 // set to call the "article" service "create" endpoint
 func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, error) {
@@ -533,6 +604,28 @@ func unmarshalProfileResponseBodyToArticleProfile(v *ProfileResponseBody) *artic
 		Image:     *v.Image,
 		Following: *v.Following,
 	}
+
+	return res
+}
+
+// unmarshalArticleSummaryResponseBodyToArticleArticleSummary builds a value of
+// type *article.ArticleSummary from a value of type
+// *ArticleSummaryResponseBody.
+func unmarshalArticleSummaryResponseBodyToArticleArticleSummary(v *ArticleSummaryResponseBody) *article.ArticleSummary {
+	res := &article.ArticleSummary{
+		ArticleID:      *v.ArticleID,
+		Title:          *v.Title,
+		Description:    *v.Description,
+		CreatedAt:      *v.CreatedAt,
+		UpdatedAt:      *v.UpdatedAt,
+		Favorited:      *v.Favorited,
+		FavoritesCount: *v.FavoritesCount,
+	}
+	res.TagList = make([]string, len(v.TagList))
+	for i, val := range v.TagList {
+		res.TagList[i] = val
+	}
+	res.Author = unmarshalProfileResponseBodyToArticleProfile(v.Author)
 
 	return res
 }

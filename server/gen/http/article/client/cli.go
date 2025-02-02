@@ -34,6 +34,40 @@ func BuildGetPayload(articleGetArticleID string) (*article.GetPayload, error) {
 	return v, nil
 }
 
+// BuildListPayload builds the payload for the article list endpoint from CLI
+// flags.
+func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
+	var err error
+	var body ListRequestBody
+	{
+		err = json.Unmarshal([]byte(articleListBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Non eum.\",\n      \"favorited\": \"Et ut aut quasi.\",\n      \"limit\": 916,\n      \"offset\": 16815026151906876920,\n      \"tag\": \"Tenetur reiciendis ab voluptas.\"\n   }'")
+		}
+	}
+	v := &article.ListPayload{
+		Tag:       body.Tag,
+		Author:    body.Author,
+		Favorited: body.Favorited,
+		Limit:     body.Limit,
+		Offset:    body.Offset,
+	}
+	{
+		var zero uint
+		if v.Limit == zero {
+			v.Limit = 20
+		}
+	}
+	{
+		var zero uint
+		if v.Offset == zero {
+			v.Offset = 0
+		}
+	}
+
+	return v, nil
+}
+
 // BuildCreatePayload builds the payload for the article create endpoint from
 // CLI flags.
 func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error) {
@@ -42,7 +76,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Ut vitae delectus alias laboriosam.\",\n      \"description\": \"Odio et.\",\n      \"tagList\": [\n         \"Rerum non non eum eum.\",\n         \"Dignissimos impedit culpa nobis temporibus voluptas.\",\n         \"Quia omnis magnam velit distinctio soluta.\",\n         \"Quia odit excepturi possimus molestiae laudantium.\"\n      ],\n      \"title\": \"9e8\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Dolore qui facilis eligendi.\",\n      \"description\": \"Asperiores pariatur et.\",\n      \"tagList\": [\n         \"Et voluptas non excepturi et.\",\n         \"Aut necessitatibus molestiae aut in ut non.\",\n         \"Rerum cumque id animi nesciunt inventore nulla.\",\n         \"Impedit dolorem est eligendi voluptatem expedita.\"\n      ],\n      \"title\": \"sa6\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -79,7 +113,7 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 	{
 		err = json.Unmarshal([]byte(articleUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Temporibus minus enim voluptatum ut.\",\n      \"description\": \"Culpa ipsam excepturi vitae voluptatem.\",\n      \"title\": \"kev\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Saepe autem et sit in repellat debitis.\",\n      \"description\": \"Aut dolores et veniam.\",\n      \"title\": \"87u\"\n   }'")
 		}
 		if body.Title != nil {
 			if utf8.RuneCountInString(*body.Title) > 128 {

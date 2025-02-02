@@ -14,6 +14,16 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// ListRequestBody is the type of the "article" service "list" endpoint HTTP
+// request body.
+type ListRequestBody struct {
+	Tag       *string `form:"tag,omitempty" json:"tag,omitempty" xml:"tag,omitempty"`
+	Author    *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Favorited *string `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
+	Limit     *uint   `form:"limit,omitempty" json:"limit,omitempty" xml:"limit,omitempty"`
+	Offset    *uint   `form:"offset,omitempty" json:"offset,omitempty" xml:"offset,omitempty"`
+}
+
 // CreateRequestBody is the type of the "article" service "create" endpoint
 // HTTP request body.
 type CreateRequestBody struct {
@@ -35,6 +45,12 @@ type UpdateRequestBody struct {
 // response body.
 type GetResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
+}
+
+// ListResponseBody is the type of the "article" service "list" endpoint HTTP
+// response body.
+type ListResponseBody struct {
+	Articles []*ArticleSummaryResponseBody `form:"articles" json:"articles" xml:"articles"`
 }
 
 // CreateResponseBody is the type of the "article" service "create" endpoint
@@ -118,12 +134,40 @@ type ProfileResponseBody struct {
 	Following bool   `form:"following" json:"following" xml:"following"`
 }
 
+// ArticleSummaryResponseBody is used to define fields on response body types.
+type ArticleSummaryResponseBody struct {
+	ArticleID      string               `form:"articleId" json:"articleId" xml:"articleId"`
+	Title          string               `form:"title" json:"title" xml:"title"`
+	Description    string               `form:"description" json:"description" xml:"description"`
+	TagList        []string             `form:"tagList" json:"tagList" xml:"tagList"`
+	CreatedAt      string               `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	UpdatedAt      string               `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
+	Favorited      bool                 `form:"favorited" json:"favorited" xml:"favorited"`
+	FavoritesCount uint                 `form:"favoritesCount" json:"favoritesCount" xml:"favoritesCount"`
+	Author         *ProfileResponseBody `form:"author" json:"author" xml:"author"`
+}
+
 // NewGetResponseBody builds the HTTP response body from the result of the
 // "get" endpoint of the "article" service.
 func NewGetResponseBody(res *article.GetResult) *GetResponseBody {
 	body := &GetResponseBody{}
 	if res.Article != nil {
 		body.Article = marshalArticleArticleDetailToArticleDetailResponseBody(res.Article)
+	}
+	return body
+}
+
+// NewListResponseBody builds the HTTP response body from the result of the
+// "list" endpoint of the "article" service.
+func NewListResponseBody(res *article.ListResult) *ListResponseBody {
+	body := &ListResponseBody{}
+	if res.Articles != nil {
+		body.Articles = make([]*ArticleSummaryResponseBody, len(res.Articles))
+		for i, val := range res.Articles {
+			body.Articles[i] = marshalArticleArticleSummaryToArticleSummaryResponseBody(val)
+		}
+	} else {
+		body.Articles = []*ArticleSummaryResponseBody{}
 	}
 	return body
 }
@@ -223,6 +267,29 @@ func NewGetPayload(articleID string) *article.GetPayload {
 	return v
 }
 
+// NewListPayload builds a article service list endpoint payload.
+func NewListPayload(body *ListRequestBody) *article.ListPayload {
+	v := &article.ListPayload{
+		Tag:       body.Tag,
+		Author:    body.Author,
+		Favorited: body.Favorited,
+	}
+	if body.Limit != nil {
+		v.Limit = *body.Limit
+	}
+	if body.Offset != nil {
+		v.Offset = *body.Offset
+	}
+	if body.Limit == nil {
+		v.Limit = 20
+	}
+	if body.Offset == nil {
+		v.Offset = 0
+	}
+
+	return v
+}
+
 // NewCreatePayload builds a article service create endpoint payload.
 func NewCreatePayload(body *CreateRequestBody) *article.CreatePayload {
 	v := &article.CreatePayload{
@@ -272,6 +339,26 @@ func NewUnfavoritePayload(articleID string) *article.UnfavoritePayload {
 	v.ArticleID = articleID
 
 	return v
+}
+
+// ValidateListRequestBody runs the validations defined on ListRequestBody
+func ValidateListRequestBody(body *ListRequestBody) (err error) {
+	if body.Limit != nil {
+		if *body.Limit < 1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.limit", *body.Limit, 1, true))
+		}
+	}
+	if body.Limit != nil {
+		if *body.Limit > 1000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.limit", *body.Limit, 1000, false))
+		}
+	}
+	if body.Offset != nil {
+		if *body.Offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.offset", *body.Offset, 0, true))
+		}
+	}
+	return
 }
 
 // ValidateCreateRequestBody runs the validations defined on CreateRequestBody

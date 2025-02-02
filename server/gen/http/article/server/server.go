@@ -20,6 +20,7 @@ import (
 type Server struct {
 	Mounts     []*MountPoint
 	Get        http.Handler
+	List       http.Handler
 	Create     http.Handler
 	Update     http.Handler
 	Delete     http.Handler
@@ -55,6 +56,7 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Get", "GET", "/api/article/{articleId}"},
+			{"List", "GET", "/api/articles"},
 			{"Create", "POST", "/api/article/create"},
 			{"Update", "POST", "/api/article/{articleId}/update"},
 			{"Delete", "POST", "/api/article/{articleId}/delete"},
@@ -62,6 +64,7 @@ func New(
 			{"Unfavorite", "POST", "/api/article/{articleId}/unfavorite"},
 		},
 		Get:        NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		List:       NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
 		Create:     NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
 		Update:     NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		Delete:     NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
@@ -76,6 +79,7 @@ func (s *Server) Service() string { return "article" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
+	s.List = m(s.List)
 	s.Create = m(s.Create)
 	s.Update = m(s.Update)
 	s.Delete = m(s.Delete)
@@ -89,6 +93,7 @@ func (s *Server) MethodNames() []string { return article.MethodNames[:] }
 // Mount configures the mux to serve the article endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
+	MountListHandler(mux, h.List)
 	MountCreateHandler(mux, h.Create)
 	MountUpdateHandler(mux, h.Update)
 	MountDeleteHandler(mux, h.Delete)
@@ -131,6 +136,57 @@ func NewGetHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "get")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountListHandler configures the mux to serve the "article" service "list"
+// endpoint.
+func MountListHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/articles", f)
+}
+
+// NewListHandler creates a HTTP handler which loads the HTTP request and calls
+// the "article" service "list" endpoint.
+func NewListHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListRequest(mux, decoder)
+		encodeResponse = EncodeListResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

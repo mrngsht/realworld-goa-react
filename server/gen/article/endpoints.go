@@ -16,6 +16,7 @@ import (
 // Endpoints wraps the "article" service endpoints.
 type Endpoints struct {
 	Get        goa.Endpoint
+	List       goa.Endpoint
 	Create     goa.Endpoint
 	Update     goa.Endpoint
 	Delete     goa.Endpoint
@@ -27,6 +28,7 @@ type Endpoints struct {
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Get:        NewGetEndpoint(s),
+		List:       NewListEndpoint(s),
 		Create:     NewCreateEndpoint(s),
 		Update:     NewUpdateEndpoint(s),
 		Delete:     NewDeleteEndpoint(s),
@@ -38,6 +40,7 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "article" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
+	e.List = m(e.List)
 	e.Create = m(e.Create)
 	e.Update = m(e.Update)
 	e.Delete = m(e.Delete)
@@ -51,6 +54,15 @@ func NewGetEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*GetPayload)
 		return s.Get(ctx, p)
+	}
+}
+
+// NewListEndpoint returns an endpoint function that calls the method "list" of
+// service "article".
+func NewListEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*ListPayload)
+		return s.List(ctx, p)
 	}
 }
 

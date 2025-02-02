@@ -12,6 +12,16 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// ListRequestBody is the type of the "article" service "list" endpoint HTTP
+// request body.
+type ListRequestBody struct {
+	Tag       *string `form:"tag,omitempty" json:"tag,omitempty" xml:"tag,omitempty"`
+	Author    *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Favorited *string `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
+	Limit     uint    `form:"limit" json:"limit" xml:"limit"`
+	Offset    uint    `form:"offset" json:"offset" xml:"offset"`
+}
+
 // CreateRequestBody is the type of the "article" service "create" endpoint
 // HTTP request body.
 type CreateRequestBody struct {
@@ -33,6 +43,12 @@ type UpdateRequestBody struct {
 // response body.
 type GetResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
+}
+
+// ListResponseBody is the type of the "article" service "list" endpoint HTTP
+// response body.
+type ListResponseBody struct {
+	Articles []*ArticleSummaryResponseBody `form:"articles,omitempty" json:"articles,omitempty" xml:"articles,omitempty"`
 }
 
 // CreateResponseBody is the type of the "article" service "create" endpoint
@@ -116,6 +132,44 @@ type ProfileResponseBody struct {
 	Following *bool   `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
 }
 
+// ArticleSummaryResponseBody is used to define fields on response body types.
+type ArticleSummaryResponseBody struct {
+	ArticleID      *string              `form:"articleId,omitempty" json:"articleId,omitempty" xml:"articleId,omitempty"`
+	Title          *string              `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description    *string              `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	TagList        []string             `form:"tagList,omitempty" json:"tagList,omitempty" xml:"tagList,omitempty"`
+	CreatedAt      *string              `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt      *string              `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	Favorited      *bool                `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
+	FavoritesCount *uint                `form:"favoritesCount,omitempty" json:"favoritesCount,omitempty" xml:"favoritesCount,omitempty"`
+	Author         *ProfileResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+}
+
+// NewListRequestBody builds the HTTP request body from the payload of the
+// "list" endpoint of the "article" service.
+func NewListRequestBody(p *article.ListPayload) *ListRequestBody {
+	body := &ListRequestBody{
+		Tag:       p.Tag,
+		Author:    p.Author,
+		Favorited: p.Favorited,
+		Limit:     p.Limit,
+		Offset:    p.Offset,
+	}
+	{
+		var zero uint
+		if body.Limit == zero {
+			body.Limit = 20
+		}
+	}
+	{
+		var zero uint
+		if body.Offset == zero {
+			body.Offset = 0
+		}
+	}
+	return body
+}
+
 // NewCreateRequestBody builds the HTTP request body from the payload of the
 // "create" endpoint of the "article" service.
 func NewCreateRequestBody(p *article.CreatePayload) *CreateRequestBody {
@@ -160,6 +214,18 @@ func NewGetResultOK(body *GetResponseBody) *article.GetResult {
 func NewGetArticleGetArticleBadRequest(body *GetArticleGetArticleBadRequestResponseBody) *article.ArticleGetArticleBadRequest {
 	v := &article.ArticleGetArticleBadRequest{
 		Code: *body.Code,
+	}
+
+	return v
+}
+
+// NewListResultOK builds a "article" service "list" endpoint result from a
+// HTTP "OK" response.
+func NewListResultOK(body *ListResponseBody) *article.ListResult {
+	v := &article.ListResult{}
+	v.Articles = make([]*article.ArticleSummary, len(body.Articles))
+	for i, val := range body.Articles {
+		v.Articles[i] = unmarshalArticleSummaryResponseBodyToArticleArticleSummary(val)
 	}
 
 	return v
@@ -249,6 +315,21 @@ func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article != nil {
 		if err2 := ValidateArticleDetailResponseBody(body.Article); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateListResponseBody runs the validations defined on ListResponseBody
+func ValidateListResponseBody(body *ListResponseBody) (err error) {
+	if body.Articles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("articles", "body"))
+	}
+	for _, e := range body.Articles {
+		if e != nil {
+			if err2 := ValidateArticleSummaryResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -444,6 +525,53 @@ func ValidateProfileResponseBody(body *ProfileResponseBody) (err error) {
 	}
 	if body.Following == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
+	}
+	return
+}
+
+// ValidateArticleSummaryResponseBody runs the validations defined on
+// ArticleSummaryResponseBody
+func ValidateArticleSummaryResponseBody(body *ArticleSummaryResponseBody) (err error) {
+	if body.ArticleID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("articleId", "body"))
+	}
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.TagList == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.Favorited == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("favorited", "body"))
+	}
+	if body.FavoritesCount == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("favoritesCount", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.ArticleID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.articleId", *body.ArticleID, goa.FormatUUID))
+	}
+	if body.CreatedAt != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.createdAt", *body.CreatedAt, goa.FormatDateTime))
+	}
+	if body.UpdatedAt != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.updatedAt", *body.UpdatedAt, goa.FormatDateTime))
+	}
+	if body.Author != nil {
+		if err2 := ValidateProfileResponseBody(body.Author); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

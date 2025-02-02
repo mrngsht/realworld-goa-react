@@ -80,6 +80,47 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 	}
 }
 
+// EncodeListResponse returns an encoder for responses returned by the article
+// list endpoint.
+func EncodeListResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*article.ListResult)
+		enc := encoder(ctx, w)
+		body := NewListResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListRequest returns a decoder for requests sent to the article list
+// endpoint.
+func DecodeListRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			body ListRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return nil, gerr
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateListRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListPayload(&body)
+
+		return payload, nil
+	}
+}
+
 // EncodeCreateResponse returns an encoder for responses returned by the
 // article create endpoint.
 func EncodeCreateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
@@ -421,6 +462,34 @@ func marshalArticleProfileToProfileResponseBody(v *article.Profile) *ProfileResp
 		Bio:       v.Bio,
 		Image:     v.Image,
 		Following: v.Following,
+	}
+
+	return res
+}
+
+// marshalArticleArticleSummaryToArticleSummaryResponseBody builds a value of
+// type *ArticleSummaryResponseBody from a value of type
+// *article.ArticleSummary.
+func marshalArticleArticleSummaryToArticleSummaryResponseBody(v *article.ArticleSummary) *ArticleSummaryResponseBody {
+	res := &ArticleSummaryResponseBody{
+		ArticleID:      v.ArticleID,
+		Title:          v.Title,
+		Description:    v.Description,
+		CreatedAt:      v.CreatedAt,
+		UpdatedAt:      v.UpdatedAt,
+		Favorited:      v.Favorited,
+		FavoritesCount: v.FavoritesCount,
+	}
+	if v.TagList != nil {
+		res.TagList = make([]string, len(v.TagList))
+		for i, val := range v.TagList {
+			res.TagList[i] = val
+		}
+	} else {
+		res.TagList = []string{}
+	}
+	if v.Author != nil {
+		res.Author = marshalArticleProfileToProfileResponseBody(v.Author)
 	}
 
 	return res

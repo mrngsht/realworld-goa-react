@@ -15,6 +15,8 @@ import (
 type Service interface {
 	// Get implements get.
 	Get(context.Context, *GetPayload) (res *GetResult, err error)
+	// List implements list.
+	List(context.Context, *ListPayload) (res *ListResult, err error)
 	// Create implements create.
 	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
 	// Update implements update.
@@ -41,7 +43,7 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"get", "create", "update", "delete", "favorite", "unfavorite"}
+var MethodNames = [7]string{"get", "list", "create", "update", "delete", "favorite", "unfavorite"}
 
 type ArticleDeleteArticleBadRequest struct {
 	Code string
@@ -66,6 +68,18 @@ type ArticleFavoriteArticleBadRequest struct {
 
 type ArticleGetArticleBadRequest struct {
 	Code string
+}
+
+type ArticleSummary struct {
+	ArticleID      string
+	Title          string
+	Description    string
+	TagList        []string
+	CreatedAt      string
+	UpdatedAt      string
+	Favorited      bool
+	FavoritesCount uint
+	Author         *Profile
 }
 
 type ArticleUnfavoriteArticleBadRequest struct {
@@ -112,6 +126,20 @@ type GetPayload struct {
 // GetResult is the result type of the article service get method.
 type GetResult struct {
 	Article *ArticleDetail
+}
+
+// ListPayload is the payload type of the article service list method.
+type ListPayload struct {
+	Tag       *string
+	Author    *string
+	Favorited *string
+	Limit     uint
+	Offset    uint
+}
+
+// ListResult is the result type of the article service list method.
+type ListResult struct {
+	Articles []*ArticleSummary
 }
 
 type Profile struct {

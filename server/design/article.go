@@ -27,6 +27,34 @@ var _ = Service("article", func() {
 		})
 	})
 
+	Method("list", func() {
+		HTTP(func() {
+			GET("articles")
+			Response(StatusOK)
+		})
+
+		Payload(func() {
+			AttributeWithName("tag", String)
+			AttributeWithName("author", String)
+			AttributeWithName("favorited", String)
+			AttributeWithName("limit", UInt, func() {
+				Default(20)
+				Minimum(1)
+				Maximum(1000)
+			})
+			AttributeWithName("offset", UInt, func() {
+				Default(0)
+				Minimum(0)
+			})
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("articles", ArrayOf(type_ArticleSummary)),
+			)
+		})
+	})
+
 	Method("create", func() {
 		HTTP(func() {
 			POST("article/create")
@@ -145,6 +173,26 @@ var (
 )
 
 var (
+	type_ArticleSummary = Type("ArticleSummary", func() {
+		Required(
+			AttributeWithName("articleId", String, func() {
+				Format(FormatUUID)
+			}),
+			AttributeWithName("title", String),
+			AttributeWithName("description", String),
+			AttributeWithName("tagList", ArrayOf(String)),
+			AttributeWithName("createdAt", String, func() {
+				Format(FormatDateTime)
+			}),
+			AttributeWithName("updatedAt", String, func() {
+				Format(FormatDateTime)
+			}),
+			AttributeWithName("favorited", Boolean),
+			AttributeWithName("favoritesCount", UInt),
+			AttributeWithName("author", type_Profile),
+		)
+	})
+
 	type_ArticleDetail = Type("ArticleDetail", func() {
 		Required(
 			AttributeWithName("articleId", String, func() {

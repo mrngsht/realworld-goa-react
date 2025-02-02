@@ -16,6 +16,11 @@ func GetArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v", articleID)
 }
 
+// ListArticlePath returns the URL path to the article service list HTTP endpoint.
+func ListArticlePath() string {
+	return "/api/articles"
+}
+
 // CreateArticlePath returns the URL path to the article service create HTTP endpoint.
 func CreateArticlePath() string {
 	return "/api/article/create"

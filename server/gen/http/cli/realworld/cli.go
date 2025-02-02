@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article (get|create|update|delete|favorite|unfavorite)
+	return `article (get|list|create|update|delete|favorite|unfavorite)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,13 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "bb64c2bc-4fc1-4145-af9d-265b3932c31f"` + "\n" +
+	return os.Args[0] + ` article get --article-id "be40ddef-f79b-4c47-8169-85bc9866bb3b"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "qzW"
+      "username": "M603"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "skyla@gibsonkessler.name",
-      "password": "0jd"
+      "email": "liliane.schuster@bauch.name",
+      "password": "x46"
    }'` + "\n" +
 		""
 }
@@ -57,6 +57,9 @@ func ParseEndpoint(
 
 		articleGetFlags         = flag.NewFlagSet("get", flag.ExitOnError)
 		articleGetArticleIDFlag = articleGetFlags.String("article-id", "REQUIRED", "")
+
+		articleListFlags    = flag.NewFlagSet("list", flag.ExitOnError)
+		articleListBodyFlag = articleListFlags.String("body", "REQUIRED", "")
 
 		articleCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
 		articleCreateBodyFlag = articleCreateFlags.String("body", "REQUIRED", "")
@@ -97,6 +100,7 @@ func ParseEndpoint(
 	)
 	articleFlags.Usage = articleUsage
 	articleGetFlags.Usage = articleGetUsage
+	articleListFlags.Usage = articleListUsage
 	articleCreateFlags.Usage = articleCreateUsage
 	articleUpdateFlags.Usage = articleUpdateUsage
 	articleDeleteFlags.Usage = articleDeleteUsage
@@ -153,6 +157,9 @@ func ParseEndpoint(
 			switch epn {
 			case "get":
 				epf = articleGetFlags
+
+			case "list":
+				epf = articleListFlags
 
 			case "create":
 				epf = articleCreateFlags
@@ -223,6 +230,9 @@ func ParseEndpoint(
 			case "get":
 				endpoint = c.Get()
 				data, err = articlec.BuildGetPayload(*articleGetArticleIDFlag)
+			case "list":
+				endpoint = c.List()
+				data, err = articlec.BuildListPayload(*articleListBodyFlag)
 			case "create":
 				endpoint = c.Create()
 				data, err = articlec.BuildCreatePayload(*articleCreateBodyFlag)
@@ -281,6 +291,7 @@ Usage:
 
 COMMAND:
     get: Get implements get.
+    list: List implements list.
     create: Create implements create.
     update: Update implements update.
     delete: Delete implements delete.
@@ -298,7 +309,24 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "bb64c2bc-4fc1-4145-af9d-265b3932c31f"
+    %[1]s article get --article-id "be40ddef-f79b-4c47-8169-85bc9866bb3b"
+`, os.Args[0])
+}
+
+func articleListUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article list -body JSON
+
+List implements list.
+    -body JSON: 
+
+Example:
+    %[1]s article list --body '{
+      "author": "Non eum.",
+      "favorited": "Et ut aut quasi.",
+      "limit": 916,
+      "offset": 16815026151906876920,
+      "tag": "Tenetur reiciendis ab voluptas."
+   }'
 `, os.Args[0])
 }
 
@@ -310,15 +338,15 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Ut vitae delectus alias laboriosam.",
-      "description": "Odio et.",
+      "body": "Dolore qui facilis eligendi.",
+      "description": "Asperiores pariatur et.",
       "tagList": [
-         "Rerum non non eum eum.",
-         "Dignissimos impedit culpa nobis temporibus voluptas.",
-         "Quia omnis magnam velit distinctio soluta.",
-         "Quia odit excepturi possimus molestiae laudantium."
+         "Et voluptas non excepturi et.",
+         "Aut necessitatibus molestiae aut in ut non.",
+         "Rerum cumque id animi nesciunt inventore nulla.",
+         "Impedit dolorem est eligendi voluptatem expedita."
       ],
-      "title": "9e8"
+      "title": "sa6"
    }'
 `, os.Args[0])
 }
@@ -332,10 +360,10 @@ Update implements update.
 
 Example:
     %[1]s article update --body '{
-      "body": "Temporibus minus enim voluptatum ut.",
-      "description": "Culpa ipsam excepturi vitae voluptatem.",
-      "title": "kev"
-   }' --article-id "8346c49e-795c-4cfb-9395-c4f7ef579afb"
+      "body": "Saepe autem et sit in repellat debitis.",
+      "description": "Aut dolores et veniam.",
+      "title": "87u"
+   }' --article-id "ea6743bd-aa9a-4947-9d39-a76289794720"
 `, os.Args[0])
 }
 
@@ -346,7 +374,7 @@ Delete implements delete.
     -article-id STRING: 
 
 Example:
-    %[1]s article delete --article-id "6de1c169-2164-4e85-9ae7-d86395684dd2"
+    %[1]s article delete --article-id "5eceb58d-264c-47c5-bd8d-02dbc269a0fd"
 `, os.Args[0])
 }
 
@@ -357,7 +385,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "869191f9-8e0f-4749-88b9-d2134e59a811"
+    %[1]s article favorite --article-id "d3737600-1a05-40e7-a5c6-44f90bdda62d"
 `, os.Args[0])
 }
 
@@ -368,7 +396,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "62bf8365-2ef7-4054-b5d2-63719060aace"
+    %[1]s article unfavorite --article-id "4d515442-63fb-4bff-8cf1-7dc8b5ccfb90"
 `, os.Args[0])
 }
 
@@ -394,7 +422,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "qzW"
+      "username": "M603"
    }'
 `, os.Args[0])
 }
@@ -407,7 +435,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "Irn8"
+      "username": "WoZ"
    }'
 `, os.Args[0])
 }
@@ -436,8 +464,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "skyla@gibsonkessler.name",
-      "password": "0jd"
+      "email": "liliane.schuster@bauch.name",
+      "password": "x46"
    }'
 `, os.Args[0])
 }
@@ -450,9 +478,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "bernard.becker@jacobirunolfsson.biz",
-      "password": "v0u",
-      "username": "ocO"
+      "email": "gillian@glover.biz",
+      "password": "e1h",
+      "username": "5rq_stK"
    }'
 `, os.Args[0])
 }
@@ -475,11 +503,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "bzf",
-      "email": "alvah@gibson.biz",
-      "image": "https://u0",
-      "password": "pkb",
-      "username": "AIduk"
+      "bio": "1jf",
+      "email": "friedrich@lynch.org",
+      "image": "http://t",
+      "password": "2ad",
+      "username": "9lU"
    }'
 `, os.Args[0])
 }
