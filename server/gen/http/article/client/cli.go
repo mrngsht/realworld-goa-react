@@ -42,7 +42,7 @@ func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleListBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Non eum.\",\n      \"favorited\": \"Et ut aut quasi.\",\n      \"limit\": 916,\n      \"offset\": 16815026151906876920,\n      \"tag\": \"Tenetur reiciendis ab voluptas.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Non eum.\",\n      \"favorited\": \"Et ut aut quasi.\",\n      \"limit\": 294,\n      \"offset\": 1767569714,\n      \"tag\": \"Tenetur reiciendis ab voluptas.\"\n   }'")
 		}
 	}
 	v := &article.ListPayload{
@@ -53,13 +53,13 @@ func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
 		Offset:    body.Offset,
 	}
 	{
-		var zero uint
+		var zero int32
 		if v.Limit == zero {
 			v.Limit = 20
 		}
 	}
 	{
-		var zero uint
+		var zero int32
 		if v.Offset == zero {
 			v.Offset = 0
 		}

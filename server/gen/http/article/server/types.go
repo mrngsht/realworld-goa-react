@@ -20,8 +20,8 @@ type ListRequestBody struct {
 	Tag       *string `form:"tag,omitempty" json:"tag,omitempty" xml:"tag,omitempty"`
 	Author    *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	Favorited *string `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
-	Limit     *uint   `form:"limit,omitempty" json:"limit,omitempty" xml:"limit,omitempty"`
-	Offset    *uint   `form:"offset,omitempty" json:"offset,omitempty" xml:"offset,omitempty"`
+	Limit     *int32  `form:"limit,omitempty" json:"limit,omitempty" xml:"limit,omitempty"`
+	Offset    *int32  `form:"offset,omitempty" json:"offset,omitempty" xml:"offset,omitempty"`
 }
 
 // CreateRequestBody is the type of the "article" service "create" endpoint

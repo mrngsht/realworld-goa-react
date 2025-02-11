@@ -46,6 +46,25 @@ func (s *Article) Get(ctx context.Context, payload *goa.GetPayload) (res *goa.Ge
 	return &goa.GetResult{Article: detail}, nil
 }
 
+func (s *Article) List(ctx context.Context, payload *goa.ListPayload) (res *goa.ListResult, err error) {
+	userIDOptional := myctx.MayGetAuthenticatedUserID(ctx)
+
+	db := s.db
+
+	articleIDs, err := sqlcgen.Q.ListArticleIDsBySearch(ctx, db, sqlcgen.ListArticleIDsBySearchParams{
+		Limit:             payload.Limit,
+		Offset:            payload.Offset,
+		Tag:               payload.Tag,
+		AutherUsername:    payload.Author,
+		FavoritedUsername: payload.Favorited,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return nil, nil
+}
+
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {

@@ -300,8 +300,8 @@ paths:
                         example:
                             author: Non eum.
                             favorited: Et ut aut quasi.
-                            limit: 916
-                            offset: 16815026151906876920
+                            limit: 294
+                            offset: 1767569714
                             tag: Tenetur reiciendis ab voluptas.
             responses:
                 "200":
@@ -880,15 +880,15 @@ components:
                 limit:
                     type: integer
                     default: 20
-                    example: 102
-                    format: int64
+                    example: 231
+                    format: int32
                     minimum: 1
                     maximum: 1000
                 offset:
                     type: integer
                     default: 0
-                    example: 17619103431946301081
-                    format: int64
+                    example: 1954783544
+                    format: int32
                     minimum: 0
                 tag:
                     type: string
@@ -896,8 +896,8 @@ components:
             example:
                 author: Debitis unde maxime et dolores magnam velit.
                 favorited: Quisquam nihil praesentium iusto culpa illo magni.
-                limit: 118
-                offset: 4976581829214705667
+                limit: 932
+                offset: 1158700750
                 tag: Aut repellendus quisquam alias nesciunt.
         ListResponseBody:
             type: object

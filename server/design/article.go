@@ -37,12 +37,12 @@ var _ = Service("article", func() {
 			AttributeWithName("tag", String)
 			AttributeWithName("author", String)
 			AttributeWithName("favorited", String)
-			AttributeWithName("limit", UInt, func() {
+			AttributeWithName("limit", Int32, func() {
 				Default(20)
 				Minimum(1)
 				Maximum(1000)
 			})
-			AttributeWithName("offset", UInt, func() {
+			AttributeWithName("offset", Int32, func() {
 				Default(0)
 				Minimum(0)
 			})

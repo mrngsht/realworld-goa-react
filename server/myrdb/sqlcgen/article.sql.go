@@ -296,6 +296,104 @@ func (q *Queries) IsArticleFavoritedByArticleIDAndUserID(ctx context.Context, db
 	return exists, err
 }
 
+const listArticleContentsByArticleIDs = `-- name: ListArticleContentsByArticleIDs :many
+SELECT 
+  created_at_,
+  updated_at_,
+  article_id_,
+  title_,
+  description_,
+  body_,
+  author_user_id_
+FROM article_content_ 
+WHERE article_id_ = ANY($1::uuid[])
+LIMIT 1
+`
+
+func (q *Queries) ListArticleContentsByArticleIDs(ctx context.Context, db DBTX, articleIds []uuid.UUID) ([]ArticleContent, error) {
+	rows, err := db.Query(ctx, listArticleContentsByArticleIDs, articleIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ArticleContent
+	for rows.Next() {
+		var i ArticleContent
+		if err := rows.Scan(
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ArticleID,
+			&i.Title,
+			&i.Description,
+			&i.Body,
+			&i.AuthorUserID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listArticleIDsBySearch = `-- name: ListArticleIDsBySearch :many
+SELECT ac.article_id_ 
+FROM article_content_ ac
+INNER JOIN user_profile_ author 
+  ON ac.author_user_id_ = author.user_id_ 
+WHERE 
+    CASE WHEN $3::text IS NULL THEN TRUE 
+    ELSE EXISTS (SELECT 1 FROM article_tag_ WHERE article_id_ = ac.article_id_ AND tag_ = $3) END
+  AND 
+    CASE WHEN $4::text THEN TRUE
+    ELSE EXISTS (
+      SELECT 1 FROM article_favorite_ af 
+      INNER JOIN user_profile_ up ON af.user_id_ = up.user_id_ 
+      WHERE af.article_id_ = ac.article_id_ AND up.username_ = $4
+    ) END
+  AND
+    CASE WHEN $5::text IS NULL THEN TRUE 
+    ELSE author.username_ = $5 END
+ORDER BY ac.updated_at_ DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListArticleIDsBySearchParams struct {
+	Limit             int32
+	Offset            int32
+	Tag               *string
+	FavoritedUsername *string
+	AutherUsername    *string
+}
+
+func (q *Queries) ListArticleIDsBySearch(ctx context.Context, db DBTX, arg ListArticleIDsBySearchParams) ([]uuid.UUID, error) {
+	rows, err := db.Query(ctx, listArticleIDsBySearch,
+		arg.Limit,
+		arg.Offset,
+		arg.Tag,
+		arg.FavoritedUsername,
+		arg.AutherUsername,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var article_id_ uuid.UUID
+		if err := rows.Scan(&article_id_); err != nil {
+			return nil, err
+		}
+		items = append(items, article_id_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listArticleTagByArticleID = `-- name: ListArticleTagByArticleID :many
 SELECT 
   tag_

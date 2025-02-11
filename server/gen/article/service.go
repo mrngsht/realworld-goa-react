@@ -133,8 +133,8 @@ type ListPayload struct {
 	Tag       *string
 	Author    *string
 	Favorited *string
-	Limit     uint
-	Offset    uint
+	Limit     int32
+	Offset    int32
 }
 
 // ListResult is the result type of the article service list method.

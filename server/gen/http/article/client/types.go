@@ -18,8 +18,8 @@ type ListRequestBody struct {
 	Tag       *string `form:"tag,omitempty" json:"tag,omitempty" xml:"tag,omitempty"`
 	Author    *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	Favorited *string `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
-	Limit     uint    `form:"limit" json:"limit" xml:"limit"`
-	Offset    uint    `form:"offset" json:"offset" xml:"offset"`
+	Limit     int32   `form:"limit" json:"limit" xml:"limit"`
+	Offset    int32   `form:"offset" json:"offset" xml:"offset"`
 }
 
 // CreateRequestBody is the type of the "article" service "create" endpoint
@@ -156,13 +156,13 @@ func NewListRequestBody(p *article.ListPayload) *ListRequestBody {
 		Offset:    p.Offset,
 	}
 	{
-		var zero uint
+		var zero int32
 		if body.Limit == zero {
 			body.Limit = 20
 		}
 	}
 	{
-		var zero uint
+		var zero int32
 		if body.Offset == zero {
 			body.Offset = 0
 		}

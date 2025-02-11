@@ -323,8 +323,8 @@ Example:
     %[1]s article list --body '{
       "author": "Non eum.",
       "favorited": "Et ut aut quasi.",
-      "limit": 916,
-      "offset": 16815026151906876920,
+      "limit": 294,
+      "offset": 1767569714,
       "tag": "Tenetur reiciendis ab voluptas."
    }'
 `, os.Args[0])

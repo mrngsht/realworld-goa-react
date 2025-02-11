@@ -108,3 +108,36 @@ SELECT EXISTS (
   WHERE article_id_ = $1 AND user_id_ = $2
 );
 
+-- name: ListArticleIDsBySearch :many
+SELECT ac.article_id_ 
+FROM article_content_ ac
+INNER JOIN user_profile_ author 
+  ON ac.author_user_id_ = author.user_id_ 
+WHERE 
+    CASE WHEN sqlc.narg(tag)::text IS NULL THEN TRUE 
+    ELSE EXISTS (SELECT 1 FROM article_tag_ WHERE article_id_ = ac.article_id_ AND tag_ = sqlc.narg(tag)) END
+  AND 
+    CASE WHEN sqlc.narg(favorited_username)::text THEN TRUE
+    ELSE EXISTS (
+      SELECT 1 FROM article_favorite_ af 
+      INNER JOIN user_profile_ up ON af.user_id_ = up.user_id_ 
+      WHERE af.article_id_ = ac.article_id_ AND up.username_ = sqlc.narg(favorited_username)
+    ) END
+  AND
+    CASE WHEN sqlc.narg(auther_username)::text IS NULL THEN TRUE 
+    ELSE author.username_ = sqlc.narg(auther_username) END
+ORDER BY ac.updated_at_ DESC
+LIMIT $1 OFFSET $2;
+
+-- name: ListArticleContentsByArticleIDs :many
+SELECT 
+  created_at_,
+  updated_at_,
+  article_id_,
+  title_,
+  description_,
+  body_,
+  author_user_id_
+FROM article_content_ 
+WHERE article_id_ = ANY(sqlc.arg(article_ids)::uuid[])
+LIMIT 1;
