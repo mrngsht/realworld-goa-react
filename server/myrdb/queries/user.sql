@@ -96,3 +96,19 @@ SELECT EXISTS (
   FROM user_follow_ 
   WHERE user_id_ = $1 AND followed_user_id_ = $2
 );
+
+-- name: ListUserProfilesByUserIDs :many
+SELECT 
+  user_id_,
+  username_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE user_id_ = ANY(sqlc.arg(user_ids)::uuid[]);
+
+-- name: ListFollowedUserIDsByUserIDAndFollowedUserIDs :many
+SELECT 
+  followed_user_id_
+FROM user_follow_ 
+WHERE user_id_ = $1
+  AND followed_user_id_ = ANY(sqlc.arg(followed_user_ids)::uuid[]);

@@ -139,5 +139,26 @@ SELECT
   body_,
   author_user_id_
 FROM article_content_ 
+WHERE article_id_ = ANY(sqlc.arg(article_ids)::uuid[]);
+
+-- name: ListArticleStatsByArticleIDs :many
+SELECT 
+  article_id_,
+  favorites_count_
+FROM article_stats_ 
+WHERE article_id_ = ANY(sqlc.arg(article_ids)::uuid[]);
+
+-- name: ListArticleTagsByArticleIDs :many
+SELECT 
+  article_id_,
+  tag_
+FROM article_tag_
 WHERE article_id_ = ANY(sqlc.arg(article_ids)::uuid[])
-LIMIT 1;
+ORDER BY article_id_, seq_no_ ASC;
+
+-- name: ListFavoritedArticlesByUserIDAndArticleIDs :many
+SELECT 
+  article_id_
+FROM article_favorite_
+WHERE user_id_ = $1
+  AND article_id_ = ANY(sqlc.arg(article_ids)::uuid[]);

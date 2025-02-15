@@ -307,7 +307,6 @@ SELECT
   author_user_id_
 FROM article_content_ 
 WHERE article_id_ = ANY($1::uuid[])
-LIMIT 1
 `
 
 func (q *Queries) ListArticleContentsByArticleIDs(ctx context.Context, db DBTX, articleIds []uuid.UUID) ([]ArticleContent, error) {
@@ -394,6 +393,39 @@ func (q *Queries) ListArticleIDsBySearch(ctx context.Context, db DBTX, arg ListA
 	return items, nil
 }
 
+const listArticleStatsByArticleIDs = `-- name: ListArticleStatsByArticleIDs :many
+SELECT 
+  article_id_,
+  favorites_count_
+FROM article_stats_ 
+WHERE article_id_ = ANY($1::uuid[])
+`
+
+type ListArticleStatsByArticleIDsRow struct {
+	ArticleID      uuid.UUID
+	FavoritesCount int64
+}
+
+func (q *Queries) ListArticleStatsByArticleIDs(ctx context.Context, db DBTX, articleIds []uuid.UUID) ([]ListArticleStatsByArticleIDsRow, error) {
+	rows, err := db.Query(ctx, listArticleStatsByArticleIDs, articleIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListArticleStatsByArticleIDsRow
+	for rows.Next() {
+		var i ListArticleStatsByArticleIDsRow
+		if err := rows.Scan(&i.ArticleID, &i.FavoritesCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listArticleTagByArticleID = `-- name: ListArticleTagByArticleID :many
 SELECT 
   tag_
@@ -415,6 +447,73 @@ func (q *Queries) ListArticleTagByArticleID(ctx context.Context, db DBTX, articl
 			return nil, err
 		}
 		items = append(items, tag_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listArticleTagsByArticleIDs = `-- name: ListArticleTagsByArticleIDs :many
+SELECT 
+  article_id_,
+  tag_
+FROM article_tag_
+WHERE article_id_ = ANY($1::uuid[])
+ORDER BY article_id_, seq_no_ ASC
+`
+
+type ListArticleTagsByArticleIDsRow struct {
+	ArticleID uuid.UUID
+	Tag       string
+}
+
+func (q *Queries) ListArticleTagsByArticleIDs(ctx context.Context, db DBTX, articleIds []uuid.UUID) ([]ListArticleTagsByArticleIDsRow, error) {
+	rows, err := db.Query(ctx, listArticleTagsByArticleIDs, articleIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListArticleTagsByArticleIDsRow
+	for rows.Next() {
+		var i ListArticleTagsByArticleIDsRow
+		if err := rows.Scan(&i.ArticleID, &i.Tag); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listFavoritedArticlesByUserIDAndArticleIDs = `-- name: ListFavoritedArticlesByUserIDAndArticleIDs :many
+SELECT 
+  article_id_
+FROM article_favorite_
+WHERE user_id_ = $1
+  AND article_id_ = ANY($2::uuid[])
+`
+
+type ListFavoritedArticlesByUserIDAndArticleIDsParams struct {
+	UserID     uuid.UUID
+	ArticleIds []uuid.UUID
+}
+
+func (q *Queries) ListFavoritedArticlesByUserIDAndArticleIDs(ctx context.Context, db DBTX, arg ListFavoritedArticlesByUserIDAndArticleIDsParams) ([]uuid.UUID, error) {
+	rows, err := db.Query(ctx, listFavoritedArticlesByUserIDAndArticleIDs, arg.UserID, arg.ArticleIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var article_id_ uuid.UUID
+		if err := rows.Scan(&article_id_); err != nil {
+			return nil, err
+		}
+		items = append(items, article_id_)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

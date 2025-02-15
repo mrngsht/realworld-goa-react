@@ -292,6 +292,81 @@ func (q *Queries) IsUserFollowing(ctx context.Context, db DBTX, arg IsUserFollow
 	return exists, err
 }
 
+const listFollowedUserIDsByUserIDAndFollowedUserIDs = `-- name: ListFollowedUserIDsByUserIDAndFollowedUserIDs :many
+SELECT 
+  followed_user_id_
+FROM user_follow_ 
+WHERE user_id_ = $1
+  AND followed_user_id_ = ANY($2::uuid[])
+`
+
+type ListFollowedUserIDsByUserIDAndFollowedUserIDsParams struct {
+	UserID          uuid.UUID
+	FollowedUserIds []uuid.UUID
+}
+
+func (q *Queries) ListFollowedUserIDsByUserIDAndFollowedUserIDs(ctx context.Context, db DBTX, arg ListFollowedUserIDsByUserIDAndFollowedUserIDsParams) ([]uuid.UUID, error) {
+	rows, err := db.Query(ctx, listFollowedUserIDsByUserIDAndFollowedUserIDs, arg.UserID, arg.FollowedUserIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var followed_user_id_ uuid.UUID
+		if err := rows.Scan(&followed_user_id_); err != nil {
+			return nil, err
+		}
+		items = append(items, followed_user_id_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUserProfilesByUserIDs = `-- name: ListUserProfilesByUserIDs :many
+SELECT 
+  user_id_,
+  username_, 
+  bio_, 
+  image_url_ 
+FROM user_profile_
+WHERE user_id_ = ANY($1::uuid[])
+`
+
+type ListUserProfilesByUserIDsRow struct {
+	UserID   uuid.UUID
+	Username string
+	Bio      string
+	ImageUrl string
+}
+
+func (q *Queries) ListUserProfilesByUserIDs(ctx context.Context, db DBTX, userIds []uuid.UUID) ([]ListUserProfilesByUserIDsRow, error) {
+	rows, err := db.Query(ctx, listUserProfilesByUserIDs, userIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListUserProfilesByUserIDsRow
+	for rows.Next() {
+		var i ListUserProfilesByUserIDsRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.Username,
+			&i.Bio,
+			&i.ImageUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateUserAuthPasswordHash = `-- name: UpdateUserAuthPasswordHash :exec
 UPDATE user_auth_password_
 SET updated_at_ = $2, password_hash_ = $3

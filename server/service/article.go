@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/cockroachdb/errors"
-	"github.com/google/uuid"
 	"github.com/mrngsht/realworld-goa-react/design"
 	"github.com/mrngsht/realworld-goa-react/domain/article"
 	goa "github.com/mrngsht/realworld-goa-react/gen/article"
@@ -14,6 +13,8 @@ import (
 	"github.com/mrngsht/realworld-goa-react/myrdb"
 	"github.com/mrngsht/realworld-goa-react/myrdb/sqlcgen"
 	"github.com/mrngsht/realworld-goa-react/mytime"
+
+	"github.com/google/uuid"
 )
 
 type Article struct {
@@ -60,6 +61,65 @@ func (s *Article) List(ctx context.Context, payload *goa.ListPayload) (res *goa.
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	contents, err := sqlcgen.Q.ListArticleContentsByArticleIDs(ctx, db, articleIDs)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	authorIDs := make([]uuid.UUID, 0, len(contents))
+	{
+		seen := make(map[uuid.UUID]bool)
+		for _, c := range contents {
+			if !seen[c.AuthorUserID] {
+				authorIDs = append(authorIDs, c.AuthorUserID)
+				seen[c.AuthorUserID] = true
+			}
+		}
+	}
+
+	authorProfileMap := make(map[uuid.UUID]sqlcgen.ListUserProfilesByUserIDsRow)
+	{
+		profiles, err := sqlcgen.Q.ListUserProfilesByUserIDs(ctx, db, authorIDs)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		for _, p := range profiles {
+			authorProfileMap[p.UserID] = p
+		}
+	}
+
+	stats, err := sqlcgen.Q.ListArticleStatsByArticleIDs(ctx, db, articleIDs)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	articleTags, err := sqlcgen.Q.ListArticleTagsByArticleIDs(ctx, db, articleIDs)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if userIDOptional != nil {
+		userID := *userIDOptional
+
+		favoritedArticles, err := sqlcgen.Q.ListFavoritedArticlesByUserIDAndArticleIDs(ctx, db,
+			sqlcgen.ListFavoritedArticlesByUserIDAndArticleIDsParams{
+				UserID:     userID,
+				ArticleIds: articleIDs,
+			})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		followedUserIDs, err := sqlcgen.Q.ListFollowedUserIDsByUserIDAndFollowedUserIDs(ctx, db, sqlcgen.ListFollowedUserIDsByUserIDAndFollowedUserIDsParams{
+			UserID:          userID,
+			FollowedUserIds: authorIDs,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
 	}
 
 	return nil, nil
