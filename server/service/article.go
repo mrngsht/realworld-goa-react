@@ -63,66 +63,7 @@ func (s *Article) List(ctx context.Context, payload *goa.ListPayload) (res *goa.
 		return nil, errors.WithStack(err)
 	}
 
-	contents, err := sqlcgen.Q.ListArticleContentsByArticleIDs(ctx, db, articleIDs)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	authorIDs := make([]uuid.UUID, 0, len(contents))
-	{
-		seen := make(map[uuid.UUID]bool)
-		for _, c := range contents {
-			if !seen[c.AuthorUserID] {
-				authorIDs = append(authorIDs, c.AuthorUserID)
-				seen[c.AuthorUserID] = true
-			}
-		}
-	}
-
-	authorProfileMap := make(map[uuid.UUID]sqlcgen.ListUserProfilesByUserIDsRow)
-	{
-		profiles, err := sqlcgen.Q.ListUserProfilesByUserIDs(ctx, db, authorIDs)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		for _, p := range profiles {
-			authorProfileMap[p.UserID] = p
-		}
-	}
-
-	stats, err := sqlcgen.Q.ListArticleStatsByArticleIDs(ctx, db, articleIDs)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	articleTags, err := sqlcgen.Q.ListArticleTagsByArticleIDs(ctx, db, articleIDs)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if userIDOptional != nil {
-		userID := *userIDOptional
-
-		favoritedArticles, err := sqlcgen.Q.ListFavoritedArticlesByUserIDAndArticleIDs(ctx, db,
-			sqlcgen.ListFavoritedArticlesByUserIDAndArticleIDsParams{
-				UserID:     userID,
-				ArticleIds: articleIDs,
-			})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		followedUserIDs, err := sqlcgen.Q.ListFollowedUserIDsByUserIDAndFollowedUserIDs(ctx, db, sqlcgen.ListFollowedUserIDsByUserIDAndFollowedUserIDsParams{
-			UserID:          userID,
-			FollowedUserIds: authorIDs,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-	}
-
-	return nil, nil
+	return s.getArticleList(ctx, articleIDs, userIDOptional)
 }
 
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
@@ -505,63 +446,31 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 func (s *Article) getArticleDetail(
 	ctx context.Context,
 	articleID uuid.UUID,
-	requestUserIDOptional *uuid.UUID,
-	requestUserShouleBeAuthor bool,
+	userIDOptional *uuid.UUID,
+	userShouleBeAuthor bool,
 ) (res *goa.ArticleDetail, err error) {
-	db := s.db
-
-	a, err := sqlcgen.Q.GetArticleContentByArticleID(ctx, db, articleID)
+	props, err := s.getArticleProperties(ctx, []uuid.UUID{articleID}, userIDOptional)
 	if err != nil {
-		if myrdb.IsErrNoRows(err) {
-			return nil, article.ErrArticleNotFound
-		}
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
-	if requestUserShouleBeAuthor {
-		if requestUserIDOptional == nil {
+	a, ok := props.articleContentMap[articleID]
+	if !ok {
+		return nil, article.ErrArticleNotFound
+	}
+
+	if userShouleBeAuthor {
+		if userIDOptional == nil {
 			panic("requestUserIDOptional must be not nil when requestUserShouleBeAuthor is true")
 		}
-		if *requestUserIDOptional != a.AuthorUserID {
+		if *userIDOptional != a.AuthorUserID {
 			return nil, article.ErrRequestUserIsNotAuthor
 		}
 	}
 
-	author, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, a.AuthorUserID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	stats, err := sqlcgen.Q.GetArticleStatsByArticleID(ctx, db, a.ArticleID)
-	if err != nil {
-		// handle ErrNoRows as internal server error
-		return nil, errors.WithStack(err)
-	}
-
-	tags, err := sqlcgen.Q.ListArticleTagByArticleID(ctx, db, a.ArticleID)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	favorited := false
-	authorFollowing := false
-	if requestUserIDOptional != nil {
-		favorited, err = sqlcgen.Q.IsArticleFavoritedByArticleIDAndUserID(ctx, db, sqlcgen.IsArticleFavoritedByArticleIDAndUserIDParams{
-			ArticleID: a.ArticleID,
-			UserID:    *requestUserIDOptional,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		authorFollowing, err = sqlcgen.Q.IsUserFollowing(ctx, db, sqlcgen.IsUserFollowingParams{
-			UserID:         *requestUserIDOptional,
-			FollowedUserID: a.AuthorUserID,
-		})
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
+	author, ok := props.authorProfileMap[a.AuthorUserID]
+	if !ok {
+		panic("author shouldn't be found") // if user profile can be deleted, you should handle this correctly
 	}
 
 	return &goa.ArticleDetail{
@@ -569,16 +478,171 @@ func (s *Article) getArticleDetail(
 		Title:          a.Title,
 		Description:    a.Description,
 		Body:           a.Body,
-		TagList:        tags,
+		TagList:        props.articleTagsMap[articleID], // use zero value as it is
 		CreatedAt:      a.CreatedAt.String(),
 		UpdatedAt:      a.UpdatedAt.String(),
-		Favorited:      favorited,
-		FavoritesCount: uint(stats.FavoritesCount),
+		Favorited:      props.userFavoriteArticleMap[articleID],               // use zero value as it is
+		FavoritesCount: uint(props.articleStatsMap[articleID].FavoritesCount), // use zero value as it is
 		Author: &goa.Profile{
 			Username:  author.Username,
 			Bio:       author.Bio,
 			Image:     author.ImageUrl,
-			Following: authorFollowing,
+			Following: props.userFollowingAuthorMap[author.UserID], // use zero value as it is
 		},
+	}, nil
+}
+
+func (s *Article) getArticleList(
+	ctx context.Context,
+	articleIDs []uuid.UUID,
+	userIDOptional *uuid.UUID,
+) (*goa.ListResult, error) {
+	props, err := s.getArticleProperties(ctx, articleIDs, userIDOptional)
+	if err != nil {
+		return nil, err
+	}
+
+	articles := make([]*goa.ArticleSummary, 0, len(articleIDs))
+	for _, id := range articleIDs {
+		content, ok := props.articleContentMap[id]
+		if !ok {
+			continue
+		}
+		author, ok := props.authorProfileMap[content.AuthorUserID]
+		if !ok {
+			panic("author shouldn't be found") // if user profile can be deleted, you should handle this correctly
+		}
+
+		articles = append(articles, &goa.ArticleSummary{
+			ArticleID:      id.String(),
+			Title:          content.Title,
+			Description:    content.Description,
+			TagList:        props.articleTagsMap[id], // use zero value as it is
+			CreatedAt:      content.CreatedAt.String(),
+			UpdatedAt:      content.UpdatedAt.String(),
+			Favorited:      props.userFavoriteArticleMap[id],               // use zero value as it is
+			FavoritesCount: uint(props.articleStatsMap[id].FavoritesCount), // use zero value as it is
+			Author: &goa.Profile{
+				Username:  author.Username,
+				Bio:       author.Bio,
+				Image:     author.ImageUrl,
+				Following: props.userFollowingAuthorMap[author.UserID], // use zero value as it is
+			},
+		})
+	}
+
+	return &goa.ListResult{Articles: articles}, nil
+}
+
+type articleProperties struct {
+	articleContentMap      map[uuid.UUID]sqlcgen.ArticleContent
+	authorProfileMap       map[uuid.UUID]sqlcgen.ListUserProfilesByUserIDsRow
+	articleStatsMap        map[uuid.UUID]sqlcgen.ListArticleStatsByArticleIDsRow
+	articleTagsMap         map[uuid.UUID][]string
+	userFavoriteArticleMap map[uuid.UUID]bool
+	userFollowingAuthorMap map[uuid.UUID]bool
+}
+
+func (s *Article) getArticleProperties(
+	ctx context.Context,
+	articleIDs []uuid.UUID,
+	userIDOptional *uuid.UUID,
+) (articleProperties, error) {
+	db := s.db
+
+	contents, err := sqlcgen.Q.ListArticleContentsByArticleIDs(ctx, db, articleIDs)
+	if err != nil {
+		return articleProperties{}, errors.WithStack(err)
+	}
+
+	articleContentMap := make(map[uuid.UUID]sqlcgen.ArticleContent)
+	for _, c := range contents {
+		articleContentMap[c.ArticleID] = c
+	}
+
+	authorIDs := make([]uuid.UUID, 0, len(contents))
+	{
+		seen := make(map[uuid.UUID]bool)
+		for _, c := range contents {
+			if !seen[c.AuthorUserID] {
+				authorIDs = append(authorIDs, c.AuthorUserID)
+				seen[c.AuthorUserID] = true
+			}
+		}
+	}
+
+	authorProfileMap := make(map[uuid.UUID]sqlcgen.ListUserProfilesByUserIDsRow)
+	{
+		profiles, err := sqlcgen.Q.ListUserProfilesByUserIDs(ctx, db, authorIDs)
+		if err != nil {
+			return articleProperties{}, errors.WithStack(err)
+		}
+		for _, p := range profiles {
+			authorProfileMap[p.UserID] = p
+		}
+	}
+
+	articleStatsMap := make(map[uuid.UUID]sqlcgen.ListArticleStatsByArticleIDsRow)
+	{
+		stats, err := sqlcgen.Q.ListArticleStatsByArticleIDs(ctx, db, articleIDs)
+		if err != nil {
+			return articleProperties{}, errors.WithStack(err)
+		}
+		for _, s := range stats {
+			articleStatsMap[s.ArticleID] = s
+		}
+	}
+
+	articleTagsMap := make(map[uuid.UUID][]string)
+	{
+		articleTags, err := sqlcgen.Q.ListArticleTagsByArticleIDs(ctx, db, articleIDs)
+		if err != nil {
+			return articleProperties{}, errors.WithStack(err)
+		}
+		for _, at := range articleTags {
+			articleTagsMap[at.ArticleID] = append(articleTagsMap[at.ArticleID], at.Tag)
+		}
+	}
+
+	userFavoriteArticleMap := make(map[uuid.UUID]bool)
+	userFollowingAuthorMap := make(map[uuid.UUID]bool)
+	if userIDOptional != nil {
+		userID := *userIDOptional
+
+		{
+			favoritedArticleIDs, err := sqlcgen.Q.ListFavoritedArticlesByUserIDAndArticleIDs(ctx, db,
+				sqlcgen.ListFavoritedArticlesByUserIDAndArticleIDsParams{
+					UserID:     userID,
+					ArticleIds: articleIDs,
+				})
+			if err != nil {
+				return articleProperties{}, errors.WithStack(err)
+			}
+			for _, id := range favoritedArticleIDs {
+				userFavoriteArticleMap[id] = true
+			}
+		}
+
+		{
+			followingAuthorIDs, err := sqlcgen.Q.ListFollowedUserIDsByUserIDAndFollowedUserIDs(ctx, db, sqlcgen.ListFollowedUserIDsByUserIDAndFollowedUserIDsParams{
+				UserID:          userID,
+				FollowedUserIds: authorIDs,
+			})
+			if err != nil {
+				return articleProperties{}, errors.WithStack(err)
+			}
+			for _, id := range followingAuthorIDs {
+				userFollowingAuthorMap[id] = true
+			}
+		}
+	}
+
+	return articleProperties{
+		articleContentMap:      articleContentMap,
+		authorProfileMap:       authorProfileMap,
+		articleStatsMap:        articleStatsMap,
+		articleTagsMap:         articleTagsMap,
+		userFavoriteArticleMap: userFavoriteArticleMap,
+		userFollowingAuthorMap: userFollowingAuthorMap,
 	}, nil
 }
