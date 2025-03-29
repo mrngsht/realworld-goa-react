@@ -117,7 +117,7 @@ WHERE
     CASE WHEN sqlc.narg(tag)::text IS NULL THEN TRUE 
     ELSE EXISTS (SELECT 1 FROM article_tag_ WHERE article_id_ = ac.article_id_ AND tag_ = sqlc.narg(tag)) END
   AND 
-    CASE WHEN sqlc.narg(favorited_username)::text THEN TRUE
+    CASE WHEN sqlc.narg(favorited_username)::text IS NULL THEN TRUE
     ELSE EXISTS (
       SELECT 1 FROM article_favorite_ af 
       INNER JOIN user_profile_ up ON af.user_id_ = up.user_id_ 

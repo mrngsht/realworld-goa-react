@@ -346,7 +346,7 @@ WHERE
     CASE WHEN $3::text IS NULL THEN TRUE 
     ELSE EXISTS (SELECT 1 FROM article_tag_ WHERE article_id_ = ac.article_id_ AND tag_ = $3) END
   AND 
-    CASE WHEN $4::text THEN TRUE
+    CASE WHEN $4::text IS NULL THEN TRUE
     ELSE EXISTS (
       SELECT 1 FROM article_favorite_ af 
       INNER JOIN user_profile_ up ON af.user_id_ = up.user_id_ 
