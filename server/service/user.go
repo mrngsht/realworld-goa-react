@@ -56,7 +56,7 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 
 	matched, err := user.MatchPassword([]byte(storedPasswordHash), []byte(payload.Password))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	if !matched {
@@ -65,7 +65,7 @@ func (s *User) Login(ctx context.Context, payload *goa.LoginPayload) (res *goa.L
 
 	token, err := user.IssueToken(userID, mytime.Now(ctx))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
@@ -99,7 +99,7 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 
 	passwordHash, err := user.GenPasswordHash([]byte(payload.Password))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	userID := uuid.New()
@@ -164,12 +164,12 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	token, err := user.IssueToken(userID, mytime.Now(ctx))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.RegisterResult{
@@ -186,12 +186,12 @@ func (s *User) Register(ctx context.Context, payload *goa.RegisterPayload) (res 
 func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	user, err := s.getUserByUserID(ctx, s.db, userID)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.GetCurrentResult{User: user}, nil
@@ -200,7 +200,7 @@ func (s *User) GetCurrent(ctx context.Context) (*goa.GetCurrentResult, error) {
 func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa.UpdateResult, err error) {
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	now := mytime.Now(ctx)
@@ -230,7 +230,7 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 		if payload.Password != nil {
 			passwordHash, err := user.GenPasswordHash([]byte(*payload.Password))
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 			if err := sqlcgen.Q.UpdateUserAuthPasswordHash(ctx, db, sqlcgen.UpdateUserAuthPasswordHashParams{
 				UserID:       userID,
@@ -281,12 +281,12 @@ func (s *User) Update(ctx context.Context, payload *goa.UpdatePayload) (res *goa
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	user, err := s.getUserByUserID(ctx, db, userID)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.UpdateResult{User: user}, nil
@@ -307,7 +307,7 @@ func (s *User) getUserByUserID(ctx context.Context, db myrdb.DB, userID uuid.UUI
 
 	token, err := user.IssueToken(userID, mytime.Now(ctx))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.User{

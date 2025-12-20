@@ -40,7 +40,7 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 
 	requestUserID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -83,7 +83,7 @@ func (s *Profile) FollowUser(ctx context.Context, payload *goa.FollowUserPayload
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.FollowUserResult{
@@ -110,7 +110,7 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 
 	requestUserID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -149,7 +149,7 @@ func (s *Profile) UnfollowUser(ctx context.Context, payload *goa.UnfollowUserPay
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.UnfollowUserResult{

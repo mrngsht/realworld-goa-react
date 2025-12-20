@@ -32,7 +32,8 @@ type db struct {
 var _ DB = (*db)(nil)
 
 func (r db) BeginTx(ctx context.Context, opts pgx.TxOptions) (TxDB, error) {
-	return r.Pool.BeginTx(ctx, opts)
+	tx, err := r.Pool.BeginTx(ctx, opts)
+	return tx, errors.WithStack(err)
 }
 
 type DB interface {
@@ -49,7 +50,7 @@ type TxDB interface {
 func Tx(ctx context.Context, db DB, txFunc func(context.Context, TxDB) error) (err error) {
 	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	defer func() {
@@ -59,18 +60,12 @@ func Tx(ctx context.Context, db DB, txFunc func(context.Context, TxDB) error) (e
 
 		if err != nil {
 			if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
-				err = errors.Join(err, rollbackErr)
+				err = errors.Join(err, errors.WithStack(rollbackErr))
 			}
 		} else {
-			if err := tx.Commit(ctx); err != nil {
-				err = errors.WithStack(err)
-			}
+			err = errors.WithStack(tx.Commit(ctx))
 		}
 	}()
 
-	if err := txFunc(ctx, tx); err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
+	return txFunc(ctx, tx)
 }

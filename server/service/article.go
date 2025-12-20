@@ -41,7 +41,7 @@ func (s *Article) Get(ctx context.Context, payload *goa.GetPayload) (res *goa.Ge
 
 	detail, err := s.getArticleDetail(ctx, uuid.MustParse(payload.ArticleID), userIDOptional, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.GetResult{Article: detail}, nil
@@ -69,7 +69,7 @@ func (s *Article) List(ctx context.Context, payload *goa.ListPayload) (res *goa.
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -152,7 +152,7 @@ func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &goa.CreateResult{
@@ -190,7 +190,7 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -198,7 +198,7 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 	articleID := uuid.MustParse(payload.ArticleID)
 	detail, err := s.getArticleDetail(ctx, articleID, &userID, true)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	isUpdated := false
@@ -250,7 +250,7 @@ func (s *Article) Update(ctx context.Context, payload *goa.UpdatePayload) (res *
 
 		return nil
 	}); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return res, nil
@@ -270,7 +270,7 @@ func (s *Article) Delete(ctx context.Context, payload *goa.DeletePayload) (err e
 
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	db := s.db
@@ -278,7 +278,7 @@ func (s *Article) Delete(ctx context.Context, payload *goa.DeletePayload) (err e
 	articleID := uuid.MustParse(payload.ArticleID)
 
 	if _, err = s.getArticleDetail(ctx, articleID, &userID, true); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	now := mytime.Now(ctx)
@@ -298,7 +298,7 @@ func (s *Article) Delete(ctx context.Context, payload *goa.DeletePayload) (err e
 
 		return nil
 	}); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil
@@ -316,7 +316,7 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -324,7 +324,7 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 
 	detail, err := s.getArticleDetail(ctx, articleID, &userID, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	if !detail.Favorited {
@@ -367,7 +367,7 @@ func (s *Article) Favorite(ctx context.Context, payload *goa.FavoritePayload) (r
 
 			return nil
 		}); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 	}
 
@@ -386,7 +386,7 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 
 	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	db := s.db
@@ -394,7 +394,7 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 
 	detail, err := s.getArticleDetail(ctx, articleID, &userID, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	if detail.Favorited {
@@ -436,7 +436,7 @@ func (s *Article) Unfavorite(ctx context.Context, payload *goa.UnfavoritePayload
 
 			return nil
 		}); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 	}
 
