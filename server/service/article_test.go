@@ -261,6 +261,123 @@ func TestArticle_List(t *testing.T) {
 	})
 }
 
+func TestArticle_Feed(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	// limit, offset, tag, author, favoritedby
+	createArticle := func(t *testing.T, ctx context.Context, author servicetest.CreateUserResult, suffix string, tags []string) string {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		payload := &goa.CreatePayload{
+			Title:       "title" + suffix,
+			Description: "description" + suffix,
+			Body:        "body" + suffix,
+			TagList:     tags,
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID
+	}
+	favoriteArticle := func(t *testing.T, ctx context.Context, author servicetest.CreateUserResult, articleID string) {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		_, err := svc.Favorite(ctx, &goa.FavoritePayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
+	}
+	followUser := func(t *testing.T, ctx context.Context, follower, followed servicetest.CreateUserResult) {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, follower.Username)
+		_, err := service.NewProfile(db).FollowUser(ctx, &goaProfile.FollowUserPayload{Username: followed.Username})
+		require.NoError(t, err)
+	}
+
+	author1 := servicetest.CreateUser(t, ctx, db)
+	author2 := servicetest.CreateUser(t, ctx, db)
+	author3 := servicetest.CreateUser(t, ctx, db)
+	viewer1 := servicetest.CreateUser(t, ctx, db)
+
+	createdAt1 := mytime.Now(ctx)
+	ctx = mytimetest.WithFixedNow(t, ctx, createdAt1)
+	articleID1 := createArticle(t, ctx, author1, "1", []string{"tag1"})
+
+	createdAt2_1 := createdAt1.Add(1 * time.Second)
+	ctx = mytimetest.WithFixedNow(t, ctx, createdAt2_1)
+	articleID2_1 := createArticle(t, ctx, author2, "2_1", []string{"tag2_1", "tag2_2"})
+
+	createdAt2_2 := createdAt2_1.Add(1 * time.Second)
+	ctx = mytimetest.WithFixedNow(t, ctx, createdAt2_2)
+	articleID2_2 := createArticle(t, ctx, author2, "2_2", []string{"tag2"})
+
+	createdAt3 := createdAt2_2.Add(1 * time.Second)
+	ctx = mytimetest.WithFixedNow(t, ctx, createdAt3)
+	_ = createArticle(t, ctx, author3, "3", []string{"tag3"})
+
+	favoriteArticle(t, ctx, viewer1, articleID1)
+
+	followUser(t, ctx, viewer1, author1)
+	followUser(t, ctx, viewer1, author2)
+
+	t.Run("list element's fields are expected", func(t *testing.T) {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer1.Username)
+		list, err := svc.Feed(ctx, &goa.FeedPayload{Limit: 100}) // Act
+		require.NoError(t, err)
+
+		{
+			a := list.Articles[slices.IndexFunc(list.Articles, func(e *goa.ArticleSummary) bool {
+				return e.ArticleID == articleID1
+			})]
+			createdAt1_1OnDB := mytimetest.TruncateTimeForDB(createdAt1)
+			assert.Equal(t, "title1", a.Title)
+			assert.Equal(t, "description1", a.Description)
+			assert.Equal(t, []string{"tag1"}, a.TagList)
+			assert.Equal(t, createdAt1_1OnDB.String(), a.CreatedAt)
+			assert.Equal(t, createdAt1_1OnDB.String(), a.UpdatedAt)
+			assert.Equal(t, true, a.Favorited)
+			assert.Equal(t, uint(1), a.FavoritesCount)
+			assert.Equal(t, author1.Username, a.Author.Username)
+			assert.Equal(t, author1.Bio, a.Author.Bio)
+			assert.Equal(t, author1.ImageUrl, a.Author.Image)
+			assert.Equal(t, true, a.Author.Following)
+		}
+
+		{
+			a := list.Articles[slices.IndexFunc(list.Articles, func(e *goa.ArticleSummary) bool {
+				return e.ArticleID == articleID2_1
+			})]
+			assert.Equal(t, []string{"tag2_1", "tag2_2"}, a.TagList) // multiple
+			assert.Equal(t, false, a.Favorited)
+		}
+	})
+
+	t.Run("feed only followed users' articles", func(t *testing.T) {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer1.Username)
+		list, err := svc.Feed(ctx, &goa.FeedPayload{Limit: 100}) // Act
+		require.NoError(t, err)
+
+		require.Len(t, list.Articles, 3)
+		assert.ElementsMatch(t, []string{articleID1, articleID2_1, articleID2_2}, toArticleIDs(list.Articles))
+	})
+
+	t.Run("limit & offset", func(t *testing.T) {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer1.Username)
+
+		{
+			list, err := svc.Feed(ctx, &goa.FeedPayload{Limit: 2, Offset: 0}) // Act
+			require.NoError(t, err)
+			require.Len(t, list.Articles, 2)
+			assert.Equal(t, articleID2_2, list.Articles[0].ArticleID)
+			assert.Equal(t, articleID2_1, list.Articles[1].ArticleID)
+		}
+
+		{
+			list, err := svc.Feed(ctx, &goa.FeedPayload{Limit: 2, Offset: 2}) // Act
+			require.NoError(t, err)
+			require.Len(t, list.Articles, 1)
+			assert.Equal(t, articleID1, list.Articles[0].ArticleID)
+		}
+	})
+}
+
 func TestArticle_Create(t *testing.T) {
 	ctx := servicetest.NewContext()
 	db := rdbtest.OpenDB(t, ctx)
