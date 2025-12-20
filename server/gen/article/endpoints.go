@@ -17,6 +17,7 @@ import (
 type Endpoints struct {
 	Get        goa.Endpoint
 	List       goa.Endpoint
+	Feed       goa.Endpoint
 	Create     goa.Endpoint
 	Update     goa.Endpoint
 	Delete     goa.Endpoint
@@ -29,6 +30,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Get:        NewGetEndpoint(s),
 		List:       NewListEndpoint(s),
+		Feed:       NewFeedEndpoint(s),
 		Create:     NewCreateEndpoint(s),
 		Update:     NewUpdateEndpoint(s),
 		Delete:     NewDeleteEndpoint(s),
@@ -41,6 +43,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.List = m(e.List)
+	e.Feed = m(e.Feed)
 	e.Create = m(e.Create)
 	e.Update = m(e.Update)
 	e.Delete = m(e.Delete)
@@ -63,6 +66,15 @@ func NewListEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*ListPayload)
 		return s.List(ctx, p)
+	}
+}
+
+// NewFeedEndpoint returns an endpoint function that calls the method "feed" of
+// service "article".
+func NewFeedEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*FeedPayload)
+		return s.Feed(ctx, p)
 	}
 }
 

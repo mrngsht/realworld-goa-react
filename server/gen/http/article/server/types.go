@@ -24,6 +24,13 @@ type ListRequestBody struct {
 	Offset    *int32  `form:"offset,omitempty" json:"offset,omitempty" xml:"offset,omitempty"`
 }
 
+// FeedRequestBody is the type of the "article" service "feed" endpoint HTTP
+// request body.
+type FeedRequestBody struct {
+	Limit  *int32 `form:"limit,omitempty" json:"limit,omitempty" xml:"limit,omitempty"`
+	Offset *int32 `form:"offset,omitempty" json:"offset,omitempty" xml:"offset,omitempty"`
+}
+
 // CreateRequestBody is the type of the "article" service "create" endpoint
 // HTTP request body.
 type CreateRequestBody struct {
@@ -50,6 +57,12 @@ type GetResponseBody struct {
 // ListResponseBody is the type of the "article" service "list" endpoint HTTP
 // response body.
 type ListResponseBody struct {
+	Articles []*ArticleSummaryResponseBody `form:"articles" json:"articles" xml:"articles"`
+}
+
+// FeedResponseBody is the type of the "article" service "feed" endpoint HTTP
+// response body.
+type FeedResponseBody struct {
 	Articles []*ArticleSummaryResponseBody `form:"articles" json:"articles" xml:"articles"`
 }
 
@@ -161,6 +174,21 @@ func NewGetResponseBody(res *article.GetResult) *GetResponseBody {
 // "list" endpoint of the "article" service.
 func NewListResponseBody(res *article.ListResult) *ListResponseBody {
 	body := &ListResponseBody{}
+	if res.Articles != nil {
+		body.Articles = make([]*ArticleSummaryResponseBody, len(res.Articles))
+		for i, val := range res.Articles {
+			body.Articles[i] = marshalArticleArticleSummaryToArticleSummaryResponseBody(val)
+		}
+	} else {
+		body.Articles = []*ArticleSummaryResponseBody{}
+	}
+	return body
+}
+
+// NewFeedResponseBody builds the HTTP response body from the result of the
+// "feed" endpoint of the "article" service.
+func NewFeedResponseBody(res *article.FeedResult) *FeedResponseBody {
+	body := &FeedResponseBody{}
 	if res.Articles != nil {
 		body.Articles = make([]*ArticleSummaryResponseBody, len(res.Articles))
 		for i, val := range res.Articles {
@@ -290,6 +318,25 @@ func NewListPayload(body *ListRequestBody) *article.ListPayload {
 	return v
 }
 
+// NewFeedPayload builds a article service feed endpoint payload.
+func NewFeedPayload(body *FeedRequestBody) *article.FeedPayload {
+	v := &article.FeedPayload{}
+	if body.Limit != nil {
+		v.Limit = *body.Limit
+	}
+	if body.Offset != nil {
+		v.Offset = *body.Offset
+	}
+	if body.Limit == nil {
+		v.Limit = 20
+	}
+	if body.Offset == nil {
+		v.Offset = 0
+	}
+
+	return v
+}
+
 // NewCreatePayload builds a article service create endpoint payload.
 func NewCreatePayload(body *CreateRequestBody) *article.CreatePayload {
 	v := &article.CreatePayload{
@@ -343,6 +390,26 @@ func NewUnfavoritePayload(articleID string) *article.UnfavoritePayload {
 
 // ValidateListRequestBody runs the validations defined on ListRequestBody
 func ValidateListRequestBody(body *ListRequestBody) (err error) {
+	if body.Limit != nil {
+		if *body.Limit < 1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.limit", *body.Limit, 1, true))
+		}
+	}
+	if body.Limit != nil {
+		if *body.Limit > 1000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.limit", *body.Limit, 1000, false))
+		}
+	}
+	if body.Offset != nil {
+		if *body.Offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.offset", *body.Offset, 0, true))
+		}
+	}
+	return
+}
+
+// ValidateFeedRequestBody runs the validations defined on FeedRequestBody
+func ValidateFeedRequestBody(body *FeedRequestBody) (err error) {
 	if body.Limit != nil {
 		if *body.Limit < 1 {
 			err = goa.MergeErrors(err, goa.InvalidRangeError("body.limit", *body.Limit, 1, true))

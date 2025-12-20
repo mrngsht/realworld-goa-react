@@ -17,6 +17,7 @@ import (
 type Client struct {
 	GetEndpoint        goa.Endpoint
 	ListEndpoint       goa.Endpoint
+	FeedEndpoint       goa.Endpoint
 	CreateEndpoint     goa.Endpoint
 	UpdateEndpoint     goa.Endpoint
 	DeleteEndpoint     goa.Endpoint
@@ -25,10 +26,11 @@ type Client struct {
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, list, create, update, delete_, favorite, unfavorite goa.Endpoint) *Client {
+func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite goa.Endpoint) *Client {
 	return &Client{
 		GetEndpoint:        get,
 		ListEndpoint:       list,
+		FeedEndpoint:       feed,
 		CreateEndpoint:     create,
 		UpdateEndpoint:     update,
 		DeleteEndpoint:     delete_,
@@ -58,6 +60,16 @@ func (c *Client) List(ctx context.Context, p *ListPayload) (res *ListResult, err
 		return
 	}
 	return ires.(*ListResult), nil
+}
+
+// Feed calls the "feed" endpoint of the "article" service.
+func (c *Client) Feed(ctx context.Context, p *FeedPayload) (res *FeedResult, err error) {
+	var ires any
+	ires, err = c.FeedEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*FeedResult), nil
 }
 
 // Create calls the "create" endpoint of the "article" service.

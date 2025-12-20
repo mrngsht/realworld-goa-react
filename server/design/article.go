@@ -55,6 +55,31 @@ var _ = Service("article", func() {
 		})
 	})
 
+	Method("feed", func() {
+		HTTP(func() {
+			GET("articles/feed")
+			Response(StatusOK)
+		})
+
+		Payload(func() {
+			AttributeWithName("limit", Int32, func() {
+				Default(20)
+				Minimum(1)
+				Maximum(1000)
+			})
+			AttributeWithName("offset", Int32, func() {
+				Default(0)
+				Minimum(0)
+			})
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("articles", ArrayOf(type_ArticleSummary)),
+			)
+		})
+	})
+
 	Method("create", func() {
 		HTTP(func() {
 			POST("article/create")

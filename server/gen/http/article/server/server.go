@@ -21,6 +21,7 @@ type Server struct {
 	Mounts     []*MountPoint
 	Get        http.Handler
 	List       http.Handler
+	Feed       http.Handler
 	Create     http.Handler
 	Update     http.Handler
 	Delete     http.Handler
@@ -57,6 +58,7 @@ func New(
 		Mounts: []*MountPoint{
 			{"Get", "GET", "/api/article/{articleId}"},
 			{"List", "GET", "/api/articles"},
+			{"Feed", "GET", "/api/articles/feed"},
 			{"Create", "POST", "/api/article/create"},
 			{"Update", "POST", "/api/article/{articleId}/update"},
 			{"Delete", "POST", "/api/article/{articleId}/delete"},
@@ -65,6 +67,7 @@ func New(
 		},
 		Get:        NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		List:       NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
+		Feed:       NewFeedHandler(e.Feed, mux, decoder, encoder, errhandler, formatter),
 		Create:     NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
 		Update:     NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		Delete:     NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
@@ -80,6 +83,7 @@ func (s *Server) Service() string { return "article" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.List = m(s.List)
+	s.Feed = m(s.Feed)
 	s.Create = m(s.Create)
 	s.Update = m(s.Update)
 	s.Delete = m(s.Delete)
@@ -94,6 +98,7 @@ func (s *Server) MethodNames() []string { return article.MethodNames[:] }
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountListHandler(mux, h.List)
+	MountFeedHandler(mux, h.Feed)
 	MountCreateHandler(mux, h.Create)
 	MountUpdateHandler(mux, h.Update)
 	MountDeleteHandler(mux, h.Delete)
@@ -187,6 +192,57 @@ func NewListHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "list")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountFeedHandler configures the mux to serve the "article" service "feed"
+// endpoint.
+func MountFeedHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/articles/feed", f)
+}
+
+// NewFeedHandler creates a HTTP handler which loads the HTTP request and calls
+// the "article" service "feed" endpoint.
+func NewFeedHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeFeedRequest(mux, decoder)
+		encodeResponse = EncodeFeedResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "feed")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

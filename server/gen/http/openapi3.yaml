@@ -18,9 +18,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: 9251d418-ce67-4f81-b0df-92f75aed569e
+                    example: af20c538-4a27-4dae-846f-7cecf37baed0
                     format: uuid
-                  example: 16924574-0339-4b7b-b428-2ecdb25945fe
+                  example: dc2de39e-beb1-4ad9-aa9c-2e71951a93d1
             responses:
                 "200":
                     description: OK response.
@@ -30,23 +30,24 @@ paths:
                                 $ref: '#/components/schemas/GetResponseBody'
                             example:
                                 article:
-                                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                                     author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                    body: Eum sed.
-                                    createdAt: "2015-03-05T21:49:25Z"
-                                    description: Quis excepturi et provident.
-                                    favorited: true
-                                    favoritesCount: 17349112180288708852
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                    body: Provident iste eum.
+                                    createdAt: "2000-03-03T11:42:32Z"
+                                    description: Occaecati quas quis excepturi.
+                                    favorited: false
+                                    favoritesCount: 16396543013077051002
                                     tagList:
-                                        - Provident voluptates laborum hic laborum error incidunt.
-                                        - Optio omnis.
-                                        - Autem voluptates harum et neque minus eveniet.
-                                    title: Voluptatem quis occaecati.
-                                    updatedAt: "2000-03-12T11:02:02Z"
+                                        - Ea provident voluptates laborum hic laborum error.
+                                        - Iure optio omnis et autem.
+                                        - Harum et neque minus eveniet vero.
+                                        - Tenetur dolorum quos sunt aut.
+                                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                                    updatedAt: "2002-02-05T08:11:46Z"
                 "400":
                     description: 'ArticleGetArticleBadRequest: Bad Request response.'
                     content:
@@ -54,7 +55,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ArticleGetArticleBadRequest'
                             example:
-                                code: ArticleNotFound
+                                code: Unspecified
     /api/article/{articleId}/delete:
         post:
             tags:
@@ -67,9 +68,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: bb3dd97f-2d7e-4bac-bb5b-f6812937b60b
+                    example: 7cb2e56b-421d-4fde-a234-566d5cf593da
                     format: uuid
-                  example: 06e8045e-457c-4dfb-86fc-e9d18fbe8fae
+                  example: ee03daee-8507-4668-bcb9-4bf2f2b755d3
             responses:
                 "200":
                     description: OK response.
@@ -80,7 +81,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ArticleDeleteArticleBadRequest'
                             example:
-                                code: Unspecified
+                                code: ForbiddenOperation
     /api/article/{articleId}/favorite:
         post:
             tags:
@@ -93,9 +94,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: 38527ce7-de7e-46f0-85b5-b111c5af026f
+                    example: 030612a2-5c8f-464f-8146-43d27aa4e6d5
                     format: uuid
-                  example: 82c44630-67d8-48e1-89df-c863c20c28c2
+                  example: bccf3bbb-69b2-4aa0-a40e-d71b06ab01f2
             responses:
                 "200":
                     description: OK response.
@@ -105,23 +106,24 @@ paths:
                                 $ref: '#/components/schemas/GetResponseBody'
                             example:
                                 article:
-                                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                                     author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                    body: Eum sed.
-                                    createdAt: "2015-03-05T21:49:25Z"
-                                    description: Quis excepturi et provident.
-                                    favorited: true
-                                    favoritesCount: 17349112180288708852
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                    body: Provident iste eum.
+                                    createdAt: "2000-03-03T11:42:32Z"
+                                    description: Occaecati quas quis excepturi.
+                                    favorited: false
+                                    favoritesCount: 16396543013077051002
                                     tagList:
-                                        - Provident voluptates laborum hic laborum error incidunt.
-                                        - Optio omnis.
-                                        - Autem voluptates harum et neque minus eveniet.
-                                    title: Voluptatem quis occaecati.
-                                    updatedAt: "2000-03-12T11:02:02Z"
+                                        - Ea provident voluptates laborum hic laborum error.
+                                        - Iure optio omnis et autem.
+                                        - Harum et neque minus eveniet vero.
+                                        - Tenetur dolorum quos sunt aut.
+                                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                                    updatedAt: "2002-02-05T08:11:46Z"
                 "400":
                     description: 'ArticleFavoriteArticleBadRequest: Bad Request response.'
                     content:
@@ -142,9 +144,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: bc2413eb-0b28-4264-9d02-e54c9e6ad058
+                    example: e8fb9d75-4f58-42fd-9399-69d77632936b
                     format: uuid
-                  example: 1c4cdebd-bf6b-45ad-9a08-6258220d11fd
+                  example: 77be2da4-4952-4c51-bd3a-e2db9c909a98
             responses:
                 "200":
                     description: OK response.
@@ -154,23 +156,24 @@ paths:
                                 $ref: '#/components/schemas/GetResponseBody'
                             example:
                                 article:
-                                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                                     author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                    body: Eum sed.
-                                    createdAt: "2015-03-05T21:49:25Z"
-                                    description: Quis excepturi et provident.
-                                    favorited: true
-                                    favoritesCount: 17349112180288708852
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                    body: Provident iste eum.
+                                    createdAt: "2000-03-03T11:42:32Z"
+                                    description: Occaecati quas quis excepturi.
+                                    favorited: false
+                                    favoritesCount: 16396543013077051002
                                     tagList:
-                                        - Provident voluptates laborum hic laborum error incidunt.
-                                        - Optio omnis.
-                                        - Autem voluptates harum et neque minus eveniet.
-                                    title: Voluptatem quis occaecati.
-                                    updatedAt: "2000-03-12T11:02:02Z"
+                                        - Ea provident voluptates laborum hic laborum error.
+                                        - Iure optio omnis et autem.
+                                        - Harum et neque minus eveniet vero.
+                                        - Tenetur dolorum quos sunt aut.
+                                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                                    updatedAt: "2002-02-05T08:11:46Z"
                 "400":
                     description: 'ArticleUnfavoriteArticleBadRequest: Bad Request response.'
                     content:
@@ -191,9 +194,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: b56685b6-a289-4be1-a625-ec02c83bcd0b
+                    example: 4da5b771-2cc2-40f2-97e0-561f3d6f6413
                     format: uuid
-                  example: dd904644-43ce-44a6-834c-bd8b535bc078
+                  example: 89392f1a-5359-46f2-90fb-2562406c4880
             requestBody:
                 required: true
                 content:
@@ -201,9 +204,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateRequestBody'
                         example:
-                            body: Saepe autem et sit in repellat debitis.
-                            description: Aut dolores et veniam.
-                            title: 87u
+                            body: Et veniam.
+                            description: Voluptas rerum beatae enim aut.
+                            title: c8n
             responses:
                 "200":
                     description: OK response.
@@ -213,23 +216,24 @@ paths:
                                 $ref: '#/components/schemas/GetResponseBody'
                             example:
                                 article:
-                                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                                     author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                    body: Eum sed.
-                                    createdAt: "2015-03-05T21:49:25Z"
-                                    description: Quis excepturi et provident.
-                                    favorited: true
-                                    favoritesCount: 17349112180288708852
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                    body: Provident iste eum.
+                                    createdAt: "2000-03-03T11:42:32Z"
+                                    description: Occaecati quas quis excepturi.
+                                    favorited: false
+                                    favoritesCount: 16396543013077051002
                                     tagList:
-                                        - Provident voluptates laborum hic laborum error incidunt.
-                                        - Optio omnis.
-                                        - Autem voluptates harum et neque minus eveniet.
-                                    title: Voluptatem quis occaecati.
-                                    updatedAt: "2000-03-12T11:02:02Z"
+                                        - Ea provident voluptates laborum hic laborum error.
+                                        - Iure optio omnis et autem.
+                                        - Harum et neque minus eveniet vero.
+                                        - Tenetur dolorum quos sunt aut.
+                                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                                    updatedAt: "2002-02-05T08:11:46Z"
                 "400":
                     description: 'ArticleUpdateArticleBadRequest: Bad Request response.'
                     content:
@@ -251,14 +255,13 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateRequestBody'
                         example:
-                            body: Dolore qui facilis eligendi.
-                            description: Asperiores pariatur et.
+                            body: Voluptas non excepturi et sapiente aut.
+                            description: Eligendi placeat occaecati.
                             tagList:
-                                - Et voluptas non excepturi et.
-                                - Aut necessitatibus molestiae aut in ut non.
-                                - Rerum cumque id animi nesciunt inventore nulla.
-                                - Impedit dolorem est eligendi voluptatem expedita.
-                            title: sa6
+                                - Aut in ut non quam rerum.
+                                - Id animi.
+                                - Inventore nulla soluta impedit dolorem.
+                            title: hzs
             responses:
                 "200":
                     description: OK response.
@@ -268,23 +271,24 @@ paths:
                                 $ref: '#/components/schemas/GetResponseBody'
                             example:
                                 article:
-                                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                                     author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                    body: Eum sed.
-                                    createdAt: "2015-03-05T21:49:25Z"
-                                    description: Quis excepturi et provident.
-                                    favorited: true
-                                    favoritesCount: 17349112180288708852
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                    body: Provident iste eum.
+                                    createdAt: "2000-03-03T11:42:32Z"
+                                    description: Occaecati quas quis excepturi.
+                                    favorited: false
+                                    favoritesCount: 16396543013077051002
                                     tagList:
-                                        - Provident voluptates laborum hic laborum error incidunt.
-                                        - Optio omnis.
-                                        - Autem voluptates harum et neque minus eveniet.
-                                    title: Voluptatem quis occaecati.
-                                    updatedAt: "2000-03-12T11:02:02Z"
+                                        - Ea provident voluptates laborum hic laborum error.
+                                        - Iure optio omnis et autem.
+                                        - Harum et neque minus eveniet vero.
+                                        - Tenetur dolorum quos sunt aut.
+                                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                                    updatedAt: "2002-02-05T08:11:46Z"
     /api/articles:
         get:
             tags:
@@ -298,11 +302,11 @@ paths:
                         schema:
                             $ref: '#/components/schemas/ListRequestBody'
                         example:
-                            author: Non eum.
-                            favorited: Et ut aut quasi.
-                            limit: 294
-                            offset: 1767569714
-                            tag: Tenetur reiciendis ab voluptas.
+                            author: Omnis quos voluptates quas corrupti iure tenetur.
+                            favorited: Sunt earum dolorem quas quos vitae iure.
+                            limit: 490
+                            offset: 1895965557
+                            tag: Aut quasi.
             responses:
                 "200":
                     description: OK response.
@@ -312,74 +316,120 @@ paths:
                                 $ref: '#/components/schemas/ListResponseBody'
                             example:
                                 articles:
-                                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                                       author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                      createdAt: "1991-04-16T16:43:09Z"
-                                      description: Aut quae.
-                                      favorited: false
-                                      favoritesCount: 16360663715398191383
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
                                       tagList:
-                                        - Fugit est qui ut soluta.
-                                        - Optio quia sint sequi ut.
-                                        - Ea mollitia facere ut inventore voluptatem.
-                                        - A perferendis quo pariatur nulla.
-                                      title: Qui quia et odit omnis non.
-                                      updatedAt: "2004-10-31T14:29:11Z"
-                                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                                       author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                      createdAt: "1991-04-16T16:43:09Z"
-                                      description: Aut quae.
-                                      favorited: false
-                                      favoritesCount: 16360663715398191383
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
                                       tagList:
-                                        - Fugit est qui ut soluta.
-                                        - Optio quia sint sequi ut.
-                                        - Ea mollitia facere ut inventore voluptatem.
-                                        - A perferendis quo pariatur nulla.
-                                      title: Qui quia et odit omnis non.
-                                      updatedAt: "2004-10-31T14:29:11Z"
-                                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
+    /api/articles/feed:
+        get:
+            tags:
+                - article
+            summary: feed article
+            operationId: article#feed
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FeedRequestBody'
+                        example:
+                            limit: 806
+                            offset: 865861144
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListResponseBody'
+                            example:
+                                articles:
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                                       author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                      createdAt: "1991-04-16T16:43:09Z"
-                                      description: Aut quae.
-                                      favorited: false
-                                      favoritesCount: 16360663715398191383
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
                                       tagList:
-                                        - Fugit est qui ut soluta.
-                                        - Optio quia sint sequi ut.
-                                        - Ea mollitia facere ut inventore voluptatem.
-                                        - A perferendis quo pariatur nulla.
-                                      title: Qui quia et odit omnis non.
-                                      updatedAt: "2004-10-31T14:29:11Z"
-                                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                                       author:
-                                        bio: Cupiditate qui.
-                                        following: false
-                                        image: Voluptate minima incidunt hic quis.
-                                        username: Vel perferendis aut consequatur eos est suscipit.
-                                      createdAt: "1991-04-16T16:43:09Z"
-                                      description: Aut quae.
-                                      favorited: false
-                                      favoritesCount: 16360663715398191383
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
                                       tagList:
-                                        - Fugit est qui ut soluta.
-                                        - Optio quia sint sequi ut.
-                                        - Ea mollitia facere ut inventore voluptatem.
-                                        - A perferendis quo pariatur nulla.
-                                      title: Qui quia et odit omnis non.
-                                      updatedAt: "2004-10-31T14:29:11Z"
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
+                                      author:
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
+                                      tagList:
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
+                                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
+                                      author:
+                                        bio: Quas architecto voluptas.
+                                        following: true
+                                        image: Reiciendis ab voluptas adipisci non.
+                                        username: Nostrum voluptate minima incidunt hic quis.
+                                      createdAt: "2014-08-01T11:05:33Z"
+                                      description: Ea mollitia facere ut inventore voluptatem.
+                                      favorited: true
+                                      favoritesCount: 14126625635488546158
+                                      tagList:
+                                        - Perferendis quo pariatur nulla velit doloribus.
+                                        - Ullam autem libero molestiae error.
+                                      title: Voluptas optio quia sint sequi ut.
+                                      updatedAt: "1976-02-29T20:46:09Z"
     /api/profile/follow_user:
         post:
             tags:
@@ -393,7 +443,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: M603
+                            username: zbSo
             responses:
                 "200":
                     description: OK response.
@@ -403,10 +453,10 @@ paths:
                                 $ref: '#/components/schemas/FollowUserResponseBody'
                             example:
                                 profile:
-                                    bio: Cupiditate qui.
-                                    following: false
-                                    image: Voluptate minima incidunt hic quis.
-                                    username: Vel perferendis aut consequatur eos est suscipit.
+                                    bio: Quas architecto voluptas.
+                                    following: true
+                                    image: Reiciendis ab voluptas adipisci non.
+                                    username: Nostrum voluptate minima incidunt hic quis.
                 "400":
                     description: 'ProfileFollowUserBadRequest: Bad Request response.'
                     content:
@@ -428,7 +478,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/FollowUserRequestBody'
                         example:
-                            username: WoZ
+                            username: vM6lJMo
             responses:
                 "200":
                     description: OK response.
@@ -438,10 +488,10 @@ paths:
                                 $ref: '#/components/schemas/FollowUserResponseBody'
                             example:
                                 profile:
-                                    bio: Cupiditate qui.
-                                    following: false
-                                    image: Voluptate minima incidunt hic quis.
-                                    username: Vel perferendis aut consequatur eos est suscipit.
+                                    bio: Quas architecto voluptas.
+                                    following: true
+                                    image: Reiciendis ab voluptas adipisci non.
+                                    username: Nostrum voluptate minima incidunt hic quis.
                 "400":
                     description: 'ProfileUnfollowUserBadRequest: Bad Request response.'
                     content:
@@ -449,7 +499,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ProfileUnfollowUserBadRequest'
                             example:
-                                code: Unspecified
+                                code: UserNotFollowing
     /api/user/current:
         get:
             tags:
@@ -483,7 +533,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/LoginRequestBody'
                         example:
-                            email: liliane.schuster@bauch.name
+                            email: efren_runte@schmeler.name
                             password: x46
             responses:
                 "200":
@@ -789,44 +839,62 @@ components:
             properties:
                 body:
                     type: string
-                    example: Laborum et veniam.
+                    example: Distinctio nihil voluptates illo qui ut voluptatum.
                 description:
                     type: string
-                    example: Ut et eius.
+                    example: Laborum et veniam.
                 tagList:
                     type: array
                     items:
                         type: string
-                        example: Distinctio nihil voluptates illo qui ut voluptatum.
+                        example: Voluptatem occaecati iure ut consequatur assumenda.
                     example:
-                        - Occaecati iure ut consequatur assumenda fugit nihil.
-                        - Aliquam at quisquam ad blanditiis.
+                        - Nam aliquam at quisquam ad blanditiis.
+                        - Quam quae inventore enim quam voluptatem non.
                 title:
                     type: string
-                    example: n0g
+                    example: 5eg
                     maxLength: 128
             example:
-                body: Porro quod quia ratione neque quia.
-                description: Quam voluptatem non numquam tenetur non et.
+                body: Et perspiciatis magni officia.
+                description: Porro quod quia ratione neque quia.
                 tagList:
-                    - Perspiciatis magni officia quo voluptate dolor ea.
-                    - Est aliquid labore corporis expedita quaerat iste.
-                    - Ipsum repellendus voluptatem cum qui sed.
-                title: sfe
+                    - Dolor ea optio est.
+                    - Labore corporis.
+                title: x9g
             required:
                 - title
                 - description
                 - body
                 - tagList
+        FeedRequestBody:
+            type: object
+            properties:
+                limit:
+                    type: integer
+                    default: 20
+                    example: 454
+                    format: int32
+                    minimum: 1
+                    maximum: 1000
+                offset:
+                    type: integer
+                    default: 0
+                    example: 2143389105
+                    format: int32
+                    minimum: 0
+            example:
+                limit: 681
+                offset: 753035449
         FollowUserRequestBody:
             type: object
             properties:
                 username:
                     type: string
-                    example: Q0b5
+                    example: VWi
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                username: 00w
+                username: teBy
             required:
                 - username
         FollowUserResponseBody:
@@ -836,10 +904,10 @@ components:
                     $ref: '#/components/schemas/Profile'
             example:
                 profile:
-                    bio: Cupiditate qui.
-                    following: false
-                    image: Voluptate minima incidunt hic quis.
-                    username: Vel perferendis aut consequatur eos est suscipit.
+                    bio: Quas architecto voluptas.
+                    following: true
+                    image: Reiciendis ab voluptas adipisci non.
+                    username: Nostrum voluptate minima incidunt hic quis.
             required:
                 - profile
         GetResponseBody:
@@ -849,23 +917,24 @@ components:
                     $ref: '#/components/schemas/ArticleDetail'
             example:
                 article:
-                    articleId: 97b53191-7d07-4fdb-8490-6cf075bea391
+                    articleId: 702ce4ba-5930-428e-b06c-f0ac6b249188
                     author:
-                        bio: Cupiditate qui.
-                        following: false
-                        image: Voluptate minima incidunt hic quis.
-                        username: Vel perferendis aut consequatur eos est suscipit.
-                    body: Eum sed.
-                    createdAt: "2015-03-05T21:49:25Z"
-                    description: Quis excepturi et provident.
-                    favorited: true
-                    favoritesCount: 17349112180288708852
+                        bio: Quas architecto voluptas.
+                        following: true
+                        image: Reiciendis ab voluptas adipisci non.
+                        username: Nostrum voluptate minima incidunt hic quis.
+                    body: Provident iste eum.
+                    createdAt: "2000-03-03T11:42:32Z"
+                    description: Occaecati quas quis excepturi.
+                    favorited: false
+                    favoritesCount: 16396543013077051002
                     tagList:
-                        - Provident voluptates laborum hic laborum error incidunt.
-                        - Optio omnis.
-                        - Autem voluptates harum et neque minus eveniet.
-                    title: Voluptatem quis occaecati.
-                    updatedAt: "2000-03-12T11:02:02Z"
+                        - Ea provident voluptates laborum hic laborum error.
+                        - Iure optio omnis et autem.
+                        - Harum et neque minus eveniet vero.
+                        - Tenetur dolorum quos sunt aut.
+                    title: Excepturi possimus molestiae laudantium libero veniam voluptatem.
+                    updatedAt: "2002-02-05T08:11:46Z"
             required:
                 - article
         ListRequestBody:
@@ -907,93 +976,83 @@ components:
                     items:
                         $ref: '#/components/schemas/ArticleSummary'
                     example:
-                        - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                        - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                           author:
-                            bio: Cupiditate qui.
-                            following: false
-                            image: Voluptate minima incidunt hic quis.
-                            username: Vel perferendis aut consequatur eos est suscipit.
-                          createdAt: "1991-04-16T16:43:09Z"
-                          description: Aut quae.
-                          favorited: false
-                          favoritesCount: 16360663715398191383
+                            bio: Quas architecto voluptas.
+                            following: true
+                            image: Reiciendis ab voluptas adipisci non.
+                            username: Nostrum voluptate minima incidunt hic quis.
+                          createdAt: "2014-08-01T11:05:33Z"
+                          description: Ea mollitia facere ut inventore voluptatem.
+                          favorited: true
+                          favoritesCount: 14126625635488546158
                           tagList:
-                            - Fugit est qui ut soluta.
-                            - Optio quia sint sequi ut.
-                            - Ea mollitia facere ut inventore voluptatem.
-                            - A perferendis quo pariatur nulla.
-                          title: Qui quia et odit omnis non.
-                          updatedAt: "2004-10-31T14:29:11Z"
-                        - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                            - Perferendis quo pariatur nulla velit doloribus.
+                            - Ullam autem libero molestiae error.
+                          title: Voluptas optio quia sint sequi ut.
+                          updatedAt: "1976-02-29T20:46:09Z"
+                        - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                           author:
-                            bio: Cupiditate qui.
-                            following: false
-                            image: Voluptate minima incidunt hic quis.
-                            username: Vel perferendis aut consequatur eos est suscipit.
-                          createdAt: "1991-04-16T16:43:09Z"
-                          description: Aut quae.
-                          favorited: false
-                          favoritesCount: 16360663715398191383
+                            bio: Quas architecto voluptas.
+                            following: true
+                            image: Reiciendis ab voluptas adipisci non.
+                            username: Nostrum voluptate minima incidunt hic quis.
+                          createdAt: "2014-08-01T11:05:33Z"
+                          description: Ea mollitia facere ut inventore voluptatem.
+                          favorited: true
+                          favoritesCount: 14126625635488546158
                           tagList:
-                            - Fugit est qui ut soluta.
-                            - Optio quia sint sequi ut.
-                            - Ea mollitia facere ut inventore voluptatem.
-                            - A perferendis quo pariatur nulla.
-                          title: Qui quia et odit omnis non.
-                          updatedAt: "2004-10-31T14:29:11Z"
-                        - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                            - Perferendis quo pariatur nulla velit doloribus.
+                            - Ullam autem libero molestiae error.
+                          title: Voluptas optio quia sint sequi ut.
+                          updatedAt: "1976-02-29T20:46:09Z"
+                        - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                           author:
-                            bio: Cupiditate qui.
-                            following: false
-                            image: Voluptate minima incidunt hic quis.
-                            username: Vel perferendis aut consequatur eos est suscipit.
-                          createdAt: "1991-04-16T16:43:09Z"
-                          description: Aut quae.
-                          favorited: false
-                          favoritesCount: 16360663715398191383
+                            bio: Quas architecto voluptas.
+                            following: true
+                            image: Reiciendis ab voluptas adipisci non.
+                            username: Nostrum voluptate minima incidunt hic quis.
+                          createdAt: "2014-08-01T11:05:33Z"
+                          description: Ea mollitia facere ut inventore voluptatem.
+                          favorited: true
+                          favoritesCount: 14126625635488546158
                           tagList:
-                            - Fugit est qui ut soluta.
-                            - Optio quia sint sequi ut.
-                            - Ea mollitia facere ut inventore voluptatem.
-                            - A perferendis quo pariatur nulla.
-                          title: Qui quia et odit omnis non.
-                          updatedAt: "2004-10-31T14:29:11Z"
+                            - Perferendis quo pariatur nulla velit doloribus.
+                            - Ullam autem libero molestiae error.
+                          title: Voluptas optio quia sint sequi ut.
+                          updatedAt: "1976-02-29T20:46:09Z"
             example:
                 articles:
-                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                       author:
-                        bio: Cupiditate qui.
-                        following: false
-                        image: Voluptate minima incidunt hic quis.
-                        username: Vel perferendis aut consequatur eos est suscipit.
-                      createdAt: "1991-04-16T16:43:09Z"
-                      description: Aut quae.
-                      favorited: false
-                      favoritesCount: 16360663715398191383
+                        bio: Quas architecto voluptas.
+                        following: true
+                        image: Reiciendis ab voluptas adipisci non.
+                        username: Nostrum voluptate minima incidunt hic quis.
+                      createdAt: "2014-08-01T11:05:33Z"
+                      description: Ea mollitia facere ut inventore voluptatem.
+                      favorited: true
+                      favoritesCount: 14126625635488546158
                       tagList:
-                        - Fugit est qui ut soluta.
-                        - Optio quia sint sequi ut.
-                        - Ea mollitia facere ut inventore voluptatem.
-                        - A perferendis quo pariatur nulla.
-                      title: Qui quia et odit omnis non.
-                      updatedAt: "2004-10-31T14:29:11Z"
-                    - articleId: 5ce21afc-6659-418d-9807-5be44aaccc1e
+                        - Perferendis quo pariatur nulla velit doloribus.
+                        - Ullam autem libero molestiae error.
+                      title: Voluptas optio quia sint sequi ut.
+                      updatedAt: "1976-02-29T20:46:09Z"
+                    - articleId: 80d221a2-bb24-4f8f-983f-e77db5737a41
                       author:
-                        bio: Cupiditate qui.
-                        following: false
-                        image: Voluptate minima incidunt hic quis.
-                        username: Vel perferendis aut consequatur eos est suscipit.
-                      createdAt: "1991-04-16T16:43:09Z"
-                      description: Aut quae.
-                      favorited: false
-                      favoritesCount: 16360663715398191383
+                        bio: Quas architecto voluptas.
+                        following: true
+                        image: Reiciendis ab voluptas adipisci non.
+                        username: Nostrum voluptate minima incidunt hic quis.
+                      createdAt: "2014-08-01T11:05:33Z"
+                      description: Ea mollitia facere ut inventore voluptatem.
+                      favorited: true
+                      favoritesCount: 14126625635488546158
                       tagList:
-                        - Fugit est qui ut soluta.
-                        - Optio quia sint sequi ut.
-                        - Ea mollitia facere ut inventore voluptatem.
-                        - A perferendis quo pariatur nulla.
-                      title: Qui quia et odit omnis non.
-                      updatedAt: "2004-10-31T14:29:11Z"
+                        - Perferendis quo pariatur nulla velit doloribus.
+                        - Ullam autem libero molestiae error.
+                      title: Voluptas optio quia sint sequi ut.
+                      updatedAt: "1976-02-29T20:46:09Z"
             required:
                 - articles
         LoginRequestBody:
@@ -1001,16 +1060,16 @@ components:
             properties:
                 email:
                     type: string
-                    example: nickolas.wisoky@lynch.info
+                    example: dewayne@luettgen.net
                     format: email
                 password:
                     type: string
-                    example: "161"
+                    example: j0p
                     minLength: 6
                     maxLength: 128
             example:
-                email: kirsten_kerluke@turner.com
-                password: 3ei
+                email: emmitt@gislason.org
+                password: 4un
             required:
                 - email
                 - password
@@ -1087,21 +1146,21 @@ components:
             properties:
                 email:
                     type: string
-                    example: logan@klein.net
+                    example: noelia.cruickshank@johns.info
                     format: email
                 password:
                     type: string
-                    example: 2i6
+                    example: 7qx
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: pL1o
+                    example: CaB
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                email: alycia_bergstrom@luettgen.biz
-                password: s07
-                username: yg0j1
+                email: alek@okunevaspencer.com
+                password: 9jv
+                username: BF8Uz
             required:
                 - username
                 - email
@@ -1111,48 +1170,48 @@ components:
             properties:
                 body:
                     type: string
-                    example: Sed fugit dolor aut et consectetur.
+                    example: Qui sed adipisci autem in.
                 description:
                     type: string
-                    example: Magnam ipsum.
+                    example: Repellendus voluptatem.
                 title:
                     type: string
-                    example: zz3
+                    example: 6oc
                     maxLength: 128
             example:
-                body: Cupiditate et similique aut numquam accusamus.
-                description: Beatae harum quo molestias dolores esse.
-                title: z23
+                body: Ut omnis dolores.
+                description: Sed fugit dolor aut et consectetur.
+                title: nle
         UpdateRequestBody2:
             type: object
             properties:
                 bio:
                     type: string
-                    example: 74y
+                    example: 0gw
                     maxLength: 4096
                 email:
                     type: string
-                    example: willy.lubowitz@friesenmann.info
+                    example: abdul_thiel@dietrichweimann.name
                     format: email
                 image:
                     type: string
-                    example: http://u
+                    example: http://1z
                     pattern: ^https?://.+$
                 password:
                     type: string
-                    example: 3vn
+                    example: l1e
                     minLength: 6
                     maxLength: 128
                 username:
                     type: string
-                    example: rX1
+                    example: 3AR
                     pattern: ^[a-zA-Z0-9_]{3,32}$
             example:
-                bio: 3wu
-                email: estefania_conroy@stanton.com
-                image: http://y4
-                password: e7o
-                username: d_hy
+                bio: aym
+                email: clara@farrell.info
+                image: http://h5
+                password: 1ej
+                username: iLH
         User:
             type: object
             properties:

@@ -23,6 +23,9 @@ type Client struct {
 	// List Doer is the HTTP client used to make requests to the list endpoint.
 	ListDoer goahttp.Doer
 
+	// Feed Doer is the HTTP client used to make requests to the feed endpoint.
+	FeedDoer goahttp.Doer
+
 	// Create Doer is the HTTP client used to make requests to the create endpoint.
 	CreateDoer goahttp.Doer
 
@@ -62,6 +65,7 @@ func NewClient(
 	return &Client{
 		GetDoer:             doer,
 		ListDoer:            doer,
+		FeedDoer:            doer,
 		CreateDoer:          doer,
 		UpdateDoer:          doer,
 		DeleteDoer:          doer,
@@ -113,6 +117,30 @@ func (c *Client) List() goa.Endpoint {
 		resp, err := c.ListDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "list", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Feed returns an endpoint that makes HTTP requests to the article service
+// feed server.
+func (c *Client) Feed() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeFeedRequest(c.encoder)
+		decodeResponse = DecodeFeedResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildFeedRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.FeedDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "feed", err)
 		}
 		return decodeResponse(resp)
 	}

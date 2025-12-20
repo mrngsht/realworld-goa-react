@@ -21,6 +21,11 @@ func ListArticlePath() string {
 	return "/api/articles"
 }
 
+// FeedArticlePath returns the URL path to the article service feed HTTP endpoint.
+func FeedArticlePath() string {
+	return "/api/articles/feed"
+}
+
 // CreateArticlePath returns the URL path to the article service create HTTP endpoint.
 func CreateArticlePath() string {
 	return "/api/article/create"

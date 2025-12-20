@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article (get|list|create|update|delete|favorite|unfavorite)
+	return `article (get|list|feed|create|update|delete|favorite|unfavorite)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,12 +32,12 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "be40ddef-f79b-4c47-8169-85bc9866bb3b"` + "\n" +
+	return os.Args[0] + ` article get --article-id "3ca908e9-4139-4c8c-b774-a5e538f8a9ee"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "M603"
+      "username": "zbSo"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "liliane.schuster@bauch.name",
+      "email": "efren_runte@schmeler.name",
       "password": "x46"
    }'` + "\n" +
 		""
@@ -60,6 +60,9 @@ func ParseEndpoint(
 
 		articleListFlags    = flag.NewFlagSet("list", flag.ExitOnError)
 		articleListBodyFlag = articleListFlags.String("body", "REQUIRED", "")
+
+		articleFeedFlags    = flag.NewFlagSet("feed", flag.ExitOnError)
+		articleFeedBodyFlag = articleFeedFlags.String("body", "REQUIRED", "")
 
 		articleCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
 		articleCreateBodyFlag = articleCreateFlags.String("body", "REQUIRED", "")
@@ -101,6 +104,7 @@ func ParseEndpoint(
 	articleFlags.Usage = articleUsage
 	articleGetFlags.Usage = articleGetUsage
 	articleListFlags.Usage = articleListUsage
+	articleFeedFlags.Usage = articleFeedUsage
 	articleCreateFlags.Usage = articleCreateUsage
 	articleUpdateFlags.Usage = articleUpdateUsage
 	articleDeleteFlags.Usage = articleDeleteUsage
@@ -160,6 +164,9 @@ func ParseEndpoint(
 
 			case "list":
 				epf = articleListFlags
+
+			case "feed":
+				epf = articleFeedFlags
 
 			case "create":
 				epf = articleCreateFlags
@@ -233,6 +240,9 @@ func ParseEndpoint(
 			case "list":
 				endpoint = c.List()
 				data, err = articlec.BuildListPayload(*articleListBodyFlag)
+			case "feed":
+				endpoint = c.Feed()
+				data, err = articlec.BuildFeedPayload(*articleFeedBodyFlag)
 			case "create":
 				endpoint = c.Create()
 				data, err = articlec.BuildCreatePayload(*articleCreateBodyFlag)
@@ -292,6 +302,7 @@ Usage:
 COMMAND:
     get: Get implements get.
     list: List implements list.
+    feed: Feed implements feed.
     create: Create implements create.
     update: Update implements update.
     delete: Delete implements delete.
@@ -309,7 +320,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "be40ddef-f79b-4c47-8169-85bc9866bb3b"
+    %[1]s article get --article-id "3ca908e9-4139-4c8c-b774-a5e538f8a9ee"
 `, os.Args[0])
 }
 
@@ -321,11 +332,25 @@ List implements list.
 
 Example:
     %[1]s article list --body '{
-      "author": "Non eum.",
-      "favorited": "Et ut aut quasi.",
-      "limit": 294,
-      "offset": 1767569714,
-      "tag": "Tenetur reiciendis ab voluptas."
+      "author": "Omnis quos voluptates quas corrupti iure tenetur.",
+      "favorited": "Sunt earum dolorem quas quos vitae iure.",
+      "limit": 490,
+      "offset": 1895965557,
+      "tag": "Aut quasi."
+   }'
+`, os.Args[0])
+}
+
+func articleFeedUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article feed -body JSON
+
+Feed implements feed.
+    -body JSON: 
+
+Example:
+    %[1]s article feed --body '{
+      "limit": 806,
+      "offset": 865861144
    }'
 `, os.Args[0])
 }
@@ -338,15 +363,14 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Dolore qui facilis eligendi.",
-      "description": "Asperiores pariatur et.",
+      "body": "Voluptas non excepturi et sapiente aut.",
+      "description": "Eligendi placeat occaecati.",
       "tagList": [
-         "Et voluptas non excepturi et.",
-         "Aut necessitatibus molestiae aut in ut non.",
-         "Rerum cumque id animi nesciunt inventore nulla.",
-         "Impedit dolorem est eligendi voluptatem expedita."
+         "Aut in ut non quam rerum.",
+         "Id animi.",
+         "Inventore nulla soluta impedit dolorem."
       ],
-      "title": "sa6"
+      "title": "hzs"
    }'
 `, os.Args[0])
 }
@@ -360,10 +384,10 @@ Update implements update.
 
 Example:
     %[1]s article update --body '{
-      "body": "Saepe autem et sit in repellat debitis.",
-      "description": "Aut dolores et veniam.",
-      "title": "87u"
-   }' --article-id "ea6743bd-aa9a-4947-9d39-a76289794720"
+      "body": "Et veniam.",
+      "description": "Voluptas rerum beatae enim aut.",
+      "title": "c8n"
+   }' --article-id "4f74584d-a491-408a-b68a-3ebc5987ba2b"
 `, os.Args[0])
 }
 
@@ -374,7 +398,7 @@ Delete implements delete.
     -article-id STRING: 
 
 Example:
-    %[1]s article delete --article-id "5eceb58d-264c-47c5-bd8d-02dbc269a0fd"
+    %[1]s article delete --article-id "b35ad699-694a-442d-b150-6fbf74a1dd13"
 `, os.Args[0])
 }
 
@@ -385,7 +409,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "d3737600-1a05-40e7-a5c6-44f90bdda62d"
+    %[1]s article favorite --article-id "d0145769-e3a4-4616-9997-2d16aebea4c8"
 `, os.Args[0])
 }
 
@@ -396,7 +420,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "4d515442-63fb-4bff-8cf1-7dc8b5ccfb90"
+    %[1]s article unfavorite --article-id "2216b8d2-dc52-4bd1-b6d1-76b21debc3c4"
 `, os.Args[0])
 }
 
@@ -422,7 +446,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "M603"
+      "username": "zbSo"
    }'
 `, os.Args[0])
 }
@@ -435,7 +459,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "WoZ"
+      "username": "vM6lJMo"
    }'
 `, os.Args[0])
 }
@@ -464,7 +488,7 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "liliane.schuster@bauch.name",
+      "email": "efren_runte@schmeler.name",
       "password": "x46"
    }'
 `, os.Args[0])

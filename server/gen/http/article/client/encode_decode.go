@@ -171,6 +171,77 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 	}
 }
 
+// BuildFeedRequest instantiates a HTTP request object with method and path set
+// to call the "article" service "feed" endpoint
+func (c *Client) BuildFeedRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: FeedArticlePath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "feed", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeFeedRequest returns an encoder for requests sent to the article feed
+// server.
+func EncodeFeedRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*article.FeedPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("article", "feed", "*article.FeedPayload", v)
+		}
+		body := NewFeedRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("article", "feed", err)
+		}
+		return nil
+	}
+}
+
+// DecodeFeedResponse returns a decoder for responses returned by the article
+// feed endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeFeedResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body FeedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "feed", err)
+			}
+			err = ValidateFeedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "feed", err)
+			}
+			res := NewFeedResultOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "feed", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildCreateRequest instantiates a HTTP request object with method and path
 // set to call the "article" service "create" endpoint
 func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, error) {
