@@ -337,6 +337,42 @@ func (q *Queries) ListArticleContentsByArticleIDs(ctx context.Context, db DBTX, 
 	return items, nil
 }
 
+const listArticleIDsByFeed = `-- name: ListArticleIDsByFeed :many
+SELECT ac.article_id_ 
+FROM article_content_ ac
+INNER JOIN user_follow_ follow 
+  ON ac.author_user_id_ = follow.followed_user_id_
+WHERE follow.user_id_ = $3
+ORDER BY ac.updated_at_ DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListArticleIDsByFeedParams struct {
+	Limit  int32
+	Offset int32
+	UserID uuid.UUID
+}
+
+func (q *Queries) ListArticleIDsByFeed(ctx context.Context, db DBTX, arg ListArticleIDsByFeedParams) ([]uuid.UUID, error) {
+	rows, err := db.Query(ctx, listArticleIDsByFeed, arg.Limit, arg.Offset, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var article_id_ uuid.UUID
+		if err := rows.Scan(&article_id_); err != nil {
+			return nil, err
+		}
+		items = append(items, article_id_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listArticleIDsBySearch = `-- name: ListArticleIDsBySearch :many
 SELECT ac.article_id_ 
 FROM article_content_ ac

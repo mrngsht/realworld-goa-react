@@ -63,7 +63,37 @@ func (s *Article) List(ctx context.Context, payload *goa.ListPayload) (res *goa.
 		return nil, errors.WithStack(err)
 	}
 
-	return s.getArticleList(ctx, articleIDs, userIDOptional)
+	articles, err := s.getArticleList(ctx, articleIDs, userIDOptional)
+	if err != nil {
+		return nil, err
+	}
+
+	return &goa.ListResult{Articles: articles}, nil
+}
+
+func (s *Article) Feed(ctx context.Context, payload *goa.FeedPayload) (res *goa.FeedResult, err error) {
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	db := s.db
+
+	articleIDs, err := sqlcgen.Q.ListArticleIDsByFeed(ctx, db, sqlcgen.ListArticleIDsByFeedParams{
+		Limit:  payload.Limit,
+		Offset: payload.Offset,
+		UserID: userID,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	articles, err := s.getArticleList(ctx, articleIDs, &userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &goa.FeedResult{Articles: articles}, nil
 }
 
 func (s *Article) Create(ctx context.Context, payload *goa.CreatePayload) (res *goa.CreateResult, err error) {
@@ -496,7 +526,7 @@ func (s *Article) getArticleList(
 	ctx context.Context,
 	articleIDs []uuid.UUID,
 	userIDOptional *uuid.UUID,
-) (*goa.ListResult, error) {
+) ([]*goa.ArticleSummary, error) {
 	props, err := s.getArticleProperties(ctx, articleIDs, userIDOptional)
 	if err != nil {
 		return nil, err
@@ -531,7 +561,7 @@ func (s *Article) getArticleList(
 		})
 	}
 
-	return &goa.ListResult{Articles: articles}, nil
+	return articles, nil
 }
 
 type articleProperties struct {

@@ -129,6 +129,15 @@ WHERE
 ORDER BY ac.updated_at_ DESC
 LIMIT $1 OFFSET $2;
 
+-- name: ListArticleIDsByFeed :many
+SELECT ac.article_id_ 
+FROM article_content_ ac
+INNER JOIN user_follow_ follow 
+  ON ac.author_user_id_ = follow.followed_user_id_
+WHERE follow.user_id_ = $3
+ORDER BY ac.updated_at_ DESC
+LIMIT $1 OFFSET $2;
+
 -- name: ListArticleContentsByArticleIDs :many
 SELECT 
   created_at_,
