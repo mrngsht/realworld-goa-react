@@ -100,6 +100,12 @@ type AddCommentsResponseBody struct {
 	Comment *CommentResponseBody `form:"comment,omitempty" json:"comment,omitempty" xml:"comment,omitempty"`
 }
 
+// GetCommentsResponseBody is the type of the "article" service "getComments"
+// endpoint HTTP response body.
+type GetCommentsResponseBody struct {
+	Comments []*CommentResponseBody `form:"comments,omitempty" json:"comments,omitempty" xml:"comments,omitempty"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -139,6 +145,13 @@ type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
 // "article" service "addComments" endpoint HTTP response body for the
 // "ArticleAddCommentsBadRequest" error.
 type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
+// GetCommentsArticleGetCommentsBadRequestResponseBody is the type of the
+// "article" service "getComments" endpoint HTTP response body for the
+// "ArticleGetCommentsBadRequest" error.
+type GetCommentsArticleGetCommentsBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
@@ -410,6 +423,28 @@ func NewAddCommentsArticleAddCommentsBadRequest(body *AddCommentsArticleAddComme
 	return v
 }
 
+// NewGetCommentsResultOK builds a "article" service "getComments" endpoint
+// result from a HTTP "OK" response.
+func NewGetCommentsResultOK(body *GetCommentsResponseBody) *article.GetCommentsResult {
+	v := &article.GetCommentsResult{}
+	v.Comments = make([]*article.Comment, len(body.Comments))
+	for i, val := range body.Comments {
+		v.Comments[i] = unmarshalCommentResponseBodyToArticleComment(val)
+	}
+
+	return v
+}
+
+// NewGetCommentsArticleGetCommentsBadRequest builds a article service
+// getComments endpoint ArticleGetCommentsBadRequest error.
+func NewGetCommentsArticleGetCommentsBadRequest(body *GetCommentsArticleGetCommentsBadRequestResponseBody) *article.ArticleGetCommentsBadRequest {
+	v := &article.ArticleGetCommentsBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article == nil {
@@ -521,6 +556,22 @@ func ValidateAddCommentsResponseBody(body *AddCommentsResponseBody) (err error) 
 	return
 }
 
+// ValidateGetCommentsResponseBody runs the validations defined on
+// GetCommentsResponseBody
+func ValidateGetCommentsResponseBody(body *GetCommentsResponseBody) (err error) {
+	if body.Comments == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("comments", "body"))
+	}
+	for _, e := range body.Comments {
+		if e != nil {
+			if err2 := ValidateCommentResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ValidateGetArticleGetArticleBadRequestResponseBody runs the validations
 // defined on get_ArticleGetArticleBadRequest_response_body
 func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArticleBadRequestResponseBody) (err error) {
@@ -596,6 +647,20 @@ func ValidateUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(body *Unfa
 // ValidateAddCommentsArticleAddCommentsBadRequestResponseBody runs the
 // validations defined on addComments_ArticleAddCommentsBadRequest_response_body
 func ValidateAddCommentsArticleAddCommentsBadRequestResponseBody(body *AddCommentsArticleAddCommentsBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		}
+	}
+	return
+}
+
+// ValidateGetCommentsArticleGetCommentsBadRequestResponseBody runs the
+// validations defined on getComments_ArticleGetCommentsBadRequest_response_body
+func ValidateGetCommentsArticleGetCommentsBadRequestResponseBody(body *GetCommentsArticleGetCommentsBadRequestResponseBody) (err error) {
 	if body.Code == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}

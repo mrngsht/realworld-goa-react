@@ -28,6 +28,7 @@ type Server struct {
 	Favorite    http.Handler
 	Unfavorite  http.Handler
 	AddComments http.Handler
+	GetComments http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -66,6 +67,7 @@ func New(
 			{"Favorite", "POST", "/api/article/{articleId}/favorite"},
 			{"Unfavorite", "POST", "/api/article/{articleId}/unfavorite"},
 			{"AddComments", "POST", "/api/article/{articleId}/addComments"},
+			{"GetComments", "GET", "/api/article/{articleId}/comments"},
 		},
 		Get:         NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		List:        NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
@@ -76,6 +78,7 @@ func New(
 		Favorite:    NewFavoriteHandler(e.Favorite, mux, decoder, encoder, errhandler, formatter),
 		Unfavorite:  NewUnfavoriteHandler(e.Unfavorite, mux, decoder, encoder, errhandler, formatter),
 		AddComments: NewAddCommentsHandler(e.AddComments, mux, decoder, encoder, errhandler, formatter),
+		GetComments: NewGetCommentsHandler(e.GetComments, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -93,6 +96,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Favorite = m(s.Favorite)
 	s.Unfavorite = m(s.Unfavorite)
 	s.AddComments = m(s.AddComments)
+	s.GetComments = m(s.GetComments)
 }
 
 // MethodNames returns the methods served.
@@ -109,6 +113,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountFavoriteHandler(mux, h.Favorite)
 	MountUnfavoriteHandler(mux, h.Unfavorite)
 	MountAddCommentsHandler(mux, h.AddComments)
+	MountGetCommentsHandler(mux, h.GetComments)
 }
 
 // Mount configures the mux to serve the article endpoints.
@@ -554,6 +559,57 @@ func NewAddCommentsHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "addComments")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetCommentsHandler configures the mux to serve the "article" service
+// "getComments" endpoint.
+func MountGetCommentsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/article/{articleId}/comments", f)
+}
+
+// NewGetCommentsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "article" service "getComments" endpoint.
+func NewGetCommentsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetCommentsRequest(mux, decoder)
+		encodeResponse = EncodeGetCommentsResponse(encoder)
+		encodeError    = EncodeGetCommentsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "getComments")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

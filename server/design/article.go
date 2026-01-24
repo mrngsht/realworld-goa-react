@@ -209,6 +209,28 @@ var _ = Service("article", func() {
 			)
 		})
 	})
+
+	Method("getComments", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleGetCommentsBadRequest)
+
+		HTTP(func() {
+			GET("article/{articleId}/comments")
+			Response(StatusOK)
+			Response(errorBadRequest, StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+			)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("comments", ArrayOf(type_Comment)),
+			)
+		})
+	})
 })
 
 var (
@@ -298,6 +320,9 @@ var (
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 	errType_ArticleAddCommentsBadRequest = myErrorType("ArticleAddCommentsBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+	}, nil)
+	errType_ArticleGetCommentsBadRequest = myErrorType("ArticleGetCommentsBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 )

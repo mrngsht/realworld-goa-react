@@ -31,6 +31,8 @@ type Service interface {
 	Unfavorite(context.Context, *UnfavoritePayload) (res *UnfavoriteResult, err error)
 	// AddComments implements addComments.
 	AddComments(context.Context, *AddCommentsPayload) (res *AddCommentsResult, err error)
+	// GetComments implements getComments.
+	GetComments(context.Context, *GetCommentsPayload) (res *GetCommentsResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -47,7 +49,7 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [9]string{"get", "list", "feed", "create", "update", "delete", "favorite", "unfavorite", "addComments"}
+var MethodNames = [10]string{"get", "list", "feed", "create", "update", "delete", "favorite", "unfavorite", "addComments", "getComments"}
 
 // AddCommentsPayload is the payload type of the article service addComments
 // method.
@@ -88,6 +90,10 @@ type ArticleFavoriteArticleBadRequest struct {
 }
 
 type ArticleGetArticleBadRequest struct {
+	Code string
+}
+
+type ArticleGetCommentsBadRequest struct {
 	Code string
 }
 
@@ -156,6 +162,18 @@ type FeedPayload struct {
 // FeedResult is the result type of the article service feed method.
 type FeedResult struct {
 	Articles []*ArticleSummary
+}
+
+// GetCommentsPayload is the payload type of the article service getComments
+// method.
+type GetCommentsPayload struct {
+	ArticleID string
+}
+
+// GetCommentsResult is the result type of the article service getComments
+// method.
+type GetCommentsResult struct {
+	Comments []*Comment
 }
 
 // GetPayload is the payload type of the article service get method.
@@ -279,6 +297,23 @@ func (e *ArticleGetArticleBadRequest) ErrorName() string {
 // GoaErrorName returns "ArticleGetArticleBadRequest".
 func (e *ArticleGetArticleBadRequest) GoaErrorName() string {
 	return "ArticleGetArticleBadRequest"
+}
+
+// Error returns an error description.
+func (e *ArticleGetCommentsBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleGetCommentsBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleGetCommentsBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleGetCommentsBadRequest".
+func (e *ArticleGetCommentsBadRequest) GoaErrorName() string {
+	return "ArticleGetCommentsBadRequest"
 }
 
 // Error returns an error description.

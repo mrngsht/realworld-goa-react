@@ -24,6 +24,7 @@ type Endpoints struct {
 	Favorite    goa.Endpoint
 	Unfavorite  goa.Endpoint
 	AddComments goa.Endpoint
+	GetComments goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "article" service with endpoints.
@@ -38,6 +39,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Favorite:    NewFavoriteEndpoint(s),
 		Unfavorite:  NewUnfavoriteEndpoint(s),
 		AddComments: NewAddCommentsEndpoint(s),
+		GetComments: NewGetCommentsEndpoint(s),
 	}
 }
 
@@ -52,6 +54,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Favorite = m(e.Favorite)
 	e.Unfavorite = m(e.Unfavorite)
 	e.AddComments = m(e.AddComments)
+	e.GetComments = m(e.GetComments)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -132,5 +135,14 @@ func NewAddCommentsEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*AddCommentsPayload)
 		return s.AddComments(ctx, p)
+	}
+}
+
+// NewGetCommentsEndpoint returns an endpoint function that calls the method
+// "getComments" of service "article".
+func NewGetCommentsEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*GetCommentsPayload)
+		return s.GetComments(ctx, p)
 	}
 }

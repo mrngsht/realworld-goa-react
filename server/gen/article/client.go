@@ -24,10 +24,11 @@ type Client struct {
 	FavoriteEndpoint    goa.Endpoint
 	UnfavoriteEndpoint  goa.Endpoint
 	AddCommentsEndpoint goa.Endpoint
+	GetCommentsEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, addComments goa.Endpoint) *Client {
+func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, addComments, getComments goa.Endpoint) *Client {
 	return &Client{
 		GetEndpoint:         get,
 		ListEndpoint:        list,
@@ -38,6 +39,7 @@ func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, a
 		FavoriteEndpoint:    favorite,
 		UnfavoriteEndpoint:  unfavorite,
 		AddCommentsEndpoint: addComments,
+		GetCommentsEndpoint: getComments,
 	}
 }
 
@@ -143,4 +145,17 @@ func (c *Client) AddComments(ctx context.Context, p *AddCommentsPayload) (res *A
 		return
 	}
 	return ires.(*AddCommentsResult), nil
+}
+
+// GetComments calls the "getComments" endpoint of the "article" service.
+// GetComments may return the following errors:
+//   - "ArticleGetCommentsBadRequest" (type *ArticleGetCommentsBadRequest)
+//   - error: internal error
+func (c *Client) GetComments(ctx context.Context, p *GetCommentsPayload) (res *GetCommentsResult, err error) {
+	var ires any
+	ires, err = c.GetCommentsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*GetCommentsResult), nil
 }

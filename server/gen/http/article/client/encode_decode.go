@@ -742,6 +742,88 @@ func DecodeAddCommentsResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildGetCommentsRequest instantiates a HTTP request object with method and
+// path set to call the "article" service "getComments" endpoint
+func (c *Client) BuildGetCommentsRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.GetCommentsPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "getComments", "*article.GetCommentsPayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetCommentsArticlePath(articleID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "getComments", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeGetCommentsResponse returns a decoder for responses returned by the
+// article getComments endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeGetCommentsResponse may return the following errors:
+//   - "ArticleGetCommentsBadRequest" (type *article.ArticleGetCommentsBadRequest): http.StatusBadRequest
+//   - error: internal error
+func DecodeGetCommentsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetCommentsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "getComments", err)
+			}
+			err = ValidateGetCommentsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "getComments", err)
+			}
+			res := NewGetCommentsResultOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body GetCommentsArticleGetCommentsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "getComments", err)
+			}
+			err = ValidateGetCommentsArticleGetCommentsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "getComments", err)
+			}
+			return nil, NewGetCommentsArticleGetCommentsBadRequest(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "getComments", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalArticleDetailResponseBodyToArticleArticleDetail builds a value of
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {

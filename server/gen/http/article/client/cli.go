@@ -42,7 +42,7 @@ func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleListBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"In ut non quam.\",\n      \"favorited\": \"Cumque id animi nesciunt inventore.\",\n      \"limit\": 184,\n      \"offset\": 459640474,\n      \"tag\": \"Sapiente aut necessitatibus molestiae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Neque nemo sunt ullam.\",\n      \"favorited\": \"Dolor quae eligendi incidunt quis et.\",\n      \"limit\": 995,\n      \"offset\": 468191918,\n      \"tag\": \"Vero et inventore necessitatibus similique.\"\n   }'")
 		}
 	}
 	v := &article.ListPayload{
@@ -76,7 +76,7 @@ func BuildFeedPayload(articleFeedBody string) (*article.FeedPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleFeedBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 967,\n      \"offset\": 1533460795\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 35,\n      \"offset\": 1819389581\n   }'")
 		}
 	}
 	v := &article.FeedPayload{
@@ -107,7 +107,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Eos libero aut.\",\n      \"description\": \"Pariatur rerum amet nihil.\",\n      \"tagList\": [\n         \"Ipsam quibusdam.\",\n         \"Et quidem voluptatem ut totam sed rerum.\",\n         \"Tempore est ipsum labore rerum similique voluptas.\",\n         \"Hic minima quas sapiente reprehenderit sed autem.\"\n      ],\n      \"title\": \"pv0\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Minima quas sapiente reprehenderit sed autem id.\",\n      \"description\": \"Labore rerum similique voluptas molestiae.\",\n      \"tagList\": [\n         \"Numquam odio blanditiis eligendi qui tenetur.\",\n         \"Facilis in alias.\",\n         \"Totam voluptatibus velit quis assumenda est deserunt.\",\n         \"Tenetur quia sunt.\"\n      ],\n      \"title\": \"9lk\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -144,7 +144,7 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 	{
 		err = json.Unmarshal([]byte(articleUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Repellat error eaque.\",\n      \"description\": \"Ad voluptates ut.\",\n      \"title\": \"kje\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Omnis eos facere est qui odio nostrum.\",\n      \"description\": \"Amet id perferendis voluptas nihil tempora consequatur.\",\n      \"title\": \"jd7\"\n   }'")
 		}
 		if body.Title != nil {
 			if utf8.RuneCountInString(*body.Title) > 128 {
@@ -235,7 +235,7 @@ func BuildAddCommentsPayload(articleAddCommentsBody string, articleAddCommentsAr
 	{
 		err = json.Unmarshal([]byte(articleAddCommentsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Expedita omnis nesciunt reiciendis voluptates.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Optio distinctio ut qui ipsam quia.\"\n   }'")
 		}
 	}
 	var articleID string
@@ -249,6 +249,24 @@ func BuildAddCommentsPayload(articleAddCommentsBody string, articleAddCommentsAr
 	v := &article.AddCommentsPayload{
 		Body: body.Body,
 	}
+	v.ArticleID = articleID
+
+	return v, nil
+}
+
+// BuildGetCommentsPayload builds the payload for the article getComments
+// endpoint from CLI flags.
+func BuildGetCommentsPayload(articleGetCommentsArticleID string) (*article.GetCommentsPayload, error) {
+	var err error
+	var articleID string
+	{
+		articleID = articleGetCommentsArticleID
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &article.GetCommentsPayload{}
 	v.ArticleID = articleID
 
 	return v, nil

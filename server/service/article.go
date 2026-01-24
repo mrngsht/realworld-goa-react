@@ -758,3 +758,92 @@ func (s *Article) AddComments(ctx context.Context, payload *goa.AddCommentsPaylo
 		},
 	}, nil
 }
+
+func (s *Article) GetComments(ctx context.Context, payload *goa.GetCommentsPayload) (res *goa.GetCommentsResult, err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleGetCommentsBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userIDOptional := myctx.MayGetAuthenticatedUserID(ctx)
+
+	db := s.db
+	articleID := uuid.MustParse(payload.ArticleID)
+
+	// Check if article exists
+	_, err = s.getArticleDetail(ctx, articleID, userIDOptional, false)
+	if err != nil {
+		return nil, err
+	}
+
+	commentContents, err := sqlcgen.Q.ListArticleCommentContentsByArticleID(ctx, db, articleID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if len(commentContents) == 0 {
+		return &goa.GetCommentsResult{Comments: []*goa.Comment{}}, nil
+	}
+
+	userIDs := make([]uuid.UUID, 0, len(commentContents))
+	seenUserIDs := make(map[uuid.UUID]bool)
+	for _, c := range commentContents {
+		if !seenUserIDs[c.UserID] {
+			userIDs = append(userIDs, c.UserID)
+			seenUserIDs[c.UserID] = true
+		}
+	}
+
+	userProfiles := make(map[uuid.UUID]sqlcgen.ListUserProfilesByUserIDsRow)
+	if len(userIDs) > 0 {
+		profiles, err := sqlcgen.Q.ListUserProfilesByUserIDs(ctx, db, userIDs)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		for _, p := range profiles {
+			userProfiles[p.UserID] = p
+		}
+	}
+
+	userFollowMap := make(map[uuid.UUID]bool)
+	if userIDOptional != nil {
+		followingAuthorIDs, err := sqlcgen.Q.ListFollowedUserIDsByUserIDAndFollowedUserIDs(ctx, db, sqlcgen.ListFollowedUserIDsByUserIDAndFollowedUserIDsParams{
+			UserID:          *userIDOptional,
+			FollowedUserIds: userIDs,
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		for _, id := range followingAuthorIDs {
+			userFollowMap[id] = true
+		}
+	}
+
+	resComments := make([]*goa.Comment, 0, len(commentContents))
+	for _, c := range commentContents {
+		author, ok := userProfiles[c.UserID]
+		if !ok {
+			// Should not happen if data consistency is maintained
+			continue
+		}
+
+		resComments = append(resComments, &goa.Comment{
+			ID:        c.ArticleCommentID.String(),
+			CreatedAt: c.CreatedAt.String(),
+			UpdatedAt: c.CreatedAt.String(),
+			Body:      c.Body,
+			Author: &goa.Profile{
+				Username:  author.Username,
+				Bio:       author.Bio,
+				Image:     author.ImageUrl,
+				Following: userFollowMap[c.UserID],
+			},
+		})
+	}
+
+	return &goa.GetCommentsResult{Comments: resComments}, nil
+}

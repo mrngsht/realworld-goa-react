@@ -186,3 +186,14 @@ SELECT
 FROM article_favorite_
 WHERE user_id_ = $1
   AND article_id_ = ANY(sqlc.arg(article_ids)::uuid[]);
+
+-- name: ListArticleCommentContentsByArticleID :many
+SELECT 
+  created_at_,
+  article_comment_id_,
+  article_id_,
+  body_,
+  user_id_
+FROM article_comment_content_
+WHERE article_id_ = $1
+ORDER BY created_at_ DESC;

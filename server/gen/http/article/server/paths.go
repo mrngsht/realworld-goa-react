@@ -55,3 +55,8 @@ func UnfavoriteArticlePath(articleID string) string {
 func AddCommentsArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/addComments", articleID)
 }
+
+// GetCommentsArticlePath returns the URL path to the article service getComments HTTP endpoint.
+func GetCommentsArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/comments", articleID)
+}

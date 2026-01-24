@@ -362,6 +362,44 @@ func (q *Queries) IsArticleFavoritedByArticleIDAndUserID(ctx context.Context, db
 	return exists, err
 }
 
+const listArticleCommentContentsByArticleID = `-- name: ListArticleCommentContentsByArticleID :many
+SELECT 
+  created_at_,
+  article_comment_id_,
+  article_id_,
+  body_,
+  user_id_
+FROM article_comment_content_
+WHERE article_id_ = $1
+ORDER BY created_at_ DESC
+`
+
+func (q *Queries) ListArticleCommentContentsByArticleID(ctx context.Context, db DBTX, articleID uuid.UUID) ([]ArticleCommentContent, error) {
+	rows, err := db.Query(ctx, listArticleCommentContentsByArticleID, articleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ArticleCommentContent
+	for rows.Next() {
+		var i ArticleCommentContent
+		if err := rows.Scan(
+			&i.CreatedAt,
+			&i.ArticleCommentID,
+			&i.ArticleID,
+			&i.Body,
+			&i.UserID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listArticleContentsByArticleIDs = `-- name: ListArticleContentsByArticleIDs :many
 SELECT 
   created_at_,

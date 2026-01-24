@@ -863,6 +863,102 @@ func TestArticle_AddComments(t *testing.T) {
 	})
 }
 
+func TestArticle_GetComments(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context, author servicetest.CreateUserResult) string {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID
+	}
+	addComment := func(t *testing.T, ctx context.Context, articleID string, author servicetest.CreateUserResult, body string) *goa.Comment {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		res, err := svc.AddComments(ctx, &goa.AddCommentsPayload{
+			ArticleID: articleID,
+			Body:      body,
+		})
+		require.NoError(t, err)
+		return res.Comment
+	}
+
+	t.Run("succeed", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		commenter1 := servicetest.CreateUser(t, ctx, db)
+		commenter2 := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		articleID := createArticle(t, ctx, author)
+
+		createdAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, createdAt)
+
+		c1 := addComment(t, ctx, articleID, commenter1, "comment1")
+
+		createdAt2 := createdAt.Add(1 * time.Second)
+		ctx = mytimetest.WithFixedNow(t, ctx, createdAt2)
+		c2 := addComment(t, ctx, articleID, commenter2, "comment2")
+
+		// viewer follows commenter1
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		_, err := service.NewProfile(db).FollowUser(ctx, &goaProfile.FollowUserPayload{Username: commenter1.Username})
+		require.NoError(t, err)
+
+		res, err := svc.GetComments(ctx, &goa.GetCommentsPayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
+
+		require.Len(t, res.Comments, 2)
+		// Ordered by created_at DESC (newest first)
+		{
+			c := res.Comments[0]
+			assert.Equal(t, c2.ID, c.ID)
+			assert.Equal(t, "comment2", c.Body)
+			assert.Equal(t, commenter2.Username, c.Author.Username)
+			assert.Equal(t, false, c.Author.Following)
+		}
+		{
+			c := res.Comments[1]
+			assert.Equal(t, c1.ID, c.ID)
+			assert.Equal(t, "comment1", c.Body)
+			assert.Equal(t, commenter1.Username, c.Author.Username)
+			assert.Equal(t, true, c.Author.Following)
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		articleID := createArticle(t, ctx, author)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		res, err := svc.GetComments(ctx, &goa.GetCommentsPayload{ArticleID: articleID}) // Act
+		require.NoError(t, err)
+		require.Len(t, res.Comments, 0)
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		_, err := svc.GetComments(ctx, &goa.GetCommentsPayload{ArticleID: uuid.NewString()}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleGetCommentsBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+}
+
 func TestArticle_Unfavoite(t *testing.T) {
 	ctx := servicetest.NewContext()
 	db := rdbtest.OpenDB(t, ctx)

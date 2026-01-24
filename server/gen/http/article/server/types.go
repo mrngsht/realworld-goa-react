@@ -102,6 +102,12 @@ type AddCommentsResponseBody struct {
 	Comment *CommentResponseBody `form:"comment" json:"comment" xml:"comment"`
 }
 
+// GetCommentsResponseBody is the type of the "article" service "getComments"
+// endpoint HTTP response body.
+type GetCommentsResponseBody struct {
+	Comments []*CommentResponseBody `form:"comments" json:"comments" xml:"comments"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -141,6 +147,13 @@ type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
 // "article" service "addComments" endpoint HTTP response body for the
 // "ArticleAddCommentsBadRequest" error.
 type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// GetCommentsArticleGetCommentsBadRequestResponseBody is the type of the
+// "article" service "getComments" endpoint HTTP response body for the
+// "ArticleGetCommentsBadRequest" error.
+type GetCommentsArticleGetCommentsBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -278,6 +291,21 @@ func NewAddCommentsResponseBody(res *article.AddCommentsResult) *AddCommentsResp
 	return body
 }
 
+// NewGetCommentsResponseBody builds the HTTP response body from the result of
+// the "getComments" endpoint of the "article" service.
+func NewGetCommentsResponseBody(res *article.GetCommentsResult) *GetCommentsResponseBody {
+	body := &GetCommentsResponseBody{}
+	if res.Comments != nil {
+		body.Comments = make([]*CommentResponseBody, len(res.Comments))
+		for i, val := range res.Comments {
+			body.Comments[i] = marshalArticleCommentToCommentResponseBody(val)
+		}
+	} else {
+		body.Comments = []*CommentResponseBody{}
+	}
+	return body
+}
+
 // NewGetArticleGetArticleBadRequestResponseBody builds the HTTP response body
 // from the result of the "get" endpoint of the "article" service.
 func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticleBadRequest) *GetArticleGetArticleBadRequestResponseBody {
@@ -330,6 +358,16 @@ func NewUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(res *article.Ar
 // service.
 func NewAddCommentsArticleAddCommentsBadRequestResponseBody(res *article.ArticleAddCommentsBadRequest) *AddCommentsArticleAddCommentsBadRequestResponseBody {
 	body := &AddCommentsArticleAddCommentsBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
+// NewGetCommentsArticleGetCommentsBadRequestResponseBody builds the HTTP
+// response body from the result of the "getComments" endpoint of the "article"
+// service.
+func NewGetCommentsArticleGetCommentsBadRequestResponseBody(res *article.ArticleGetCommentsBadRequest) *GetCommentsArticleGetCommentsBadRequestResponseBody {
+	body := &GetCommentsArticleGetCommentsBadRequestResponseBody{
 		Code: res.Code,
 	}
 	return body
@@ -441,6 +479,14 @@ func NewAddCommentsPayload(body *AddCommentsRequestBody, articleID string) *arti
 	v := &article.AddCommentsPayload{
 		Body: *body.Body,
 	}
+	v.ArticleID = articleID
+
+	return v
+}
+
+// NewGetCommentsPayload builds a article service getComments endpoint payload.
+func NewGetCommentsPayload(articleID string) *article.GetCommentsPayload {
+	v := &article.GetCommentsPayload{}
 	v.ArticleID = articleID
 
 	return v
