@@ -125,6 +125,72 @@ func (q *Queries) InsertArticle(ctx context.Context, db DBTX, arg InsertArticleP
 	return err
 }
 
+const insertArticleComment = `-- name: InsertArticleComment :exec
+INSERT INTO article_comment_
+(created_at_, id_) 
+VALUES ($1, $2)
+`
+
+type InsertArticleCommentParams struct {
+	CreatedAt time.Time
+	ID        uuid.UUID
+}
+
+func (q *Queries) InsertArticleComment(ctx context.Context, db DBTX, arg InsertArticleCommentParams) error {
+	_, err := db.Exec(ctx, insertArticleComment, arg.CreatedAt, arg.ID)
+	return err
+}
+
+const insertArticleCommentContent = `-- name: InsertArticleCommentContent :exec
+INSERT INTO article_comment_content_
+(created_at_, article_comment_id_, article_id_, body_, user_id_) 
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertArticleCommentContentParams struct {
+	CreatedAt        time.Time
+	ArticleCommentID uuid.UUID
+	ArticleID        uuid.UUID
+	Body             string
+	UserID           uuid.UUID
+}
+
+func (q *Queries) InsertArticleCommentContent(ctx context.Context, db DBTX, arg InsertArticleCommentContentParams) error {
+	_, err := db.Exec(ctx, insertArticleCommentContent,
+		arg.CreatedAt,
+		arg.ArticleCommentID,
+		arg.ArticleID,
+		arg.Body,
+		arg.UserID,
+	)
+	return err
+}
+
+const insertArticleCommentContentMutation = `-- name: InsertArticleCommentContentMutation :exec
+INSERT INTO article_comment_content_mutation_
+(created_at_, article_comment_id_, article_id_, body_, user_id_) 
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertArticleCommentContentMutationParams struct {
+	CreatedAt        time.Time
+	ArticleCommentID uuid.UUID
+	ArticleID        uuid.UUID
+	Body             string
+	UserID           uuid.UUID
+}
+
+func (q *Queries) InsertArticleCommentContentMutation(ctx context.Context, db DBTX, arg InsertArticleCommentContentMutationParams) error {
+	_, err := db.Exec(ctx, insertArticleCommentContentMutation,
+		arg.CreatedAt,
+		arg.ArticleCommentID,
+		arg.ArticleID,
+		arg.Body,
+		arg.UserID,
+	)
+	return err
+}
+
 const insertArticleContent = `-- name: InsertArticleContent :exec
 INSERT INTO article_content_
 (created_at_, updated_at_, article_id_, title_, description_, body_, author_user_id_) 

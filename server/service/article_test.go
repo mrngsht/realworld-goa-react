@@ -800,6 +800,69 @@ func TestArticle_Favoite(t *testing.T) {
 	})
 }
 
+func TestArticle_AddComments(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context) string {
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID
+	}
+
+	t.Run("succeed", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		articleID := createArticle(t, ctx)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		executedAt := mytime.Now(ctx)
+		ctx = mytimetest.WithFixedNow(t, ctx, executedAt)
+
+		payload := &goa.AddCommentsPayload{
+			ArticleID: articleID,
+			Body:      "comment body",
+		}
+		res, err := svc.AddComments(ctx, payload) // Act
+		require.NoError(t, err)
+
+		assert.NotEmpty(t, res.Comment.ID)
+		assert.Equal(t, executedAt.String(), res.Comment.CreatedAt)
+		assert.Equal(t, executedAt.String(), res.Comment.UpdatedAt)
+		assert.Equal(t, payload.Body, res.Comment.Body)
+		assert.Equal(t, viewer.Username, res.Comment.Author.Username)
+		assert.Equal(t, viewer.Bio, res.Comment.Author.Bio)
+		assert.Equal(t, viewer.ImageUrl, res.Comment.Author.Image)
+		assert.Equal(t, false, res.Comment.Author.Following)
+	})
+
+	t.Run("article not exists", func(t *testing.T) {
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		payload := &goa.AddCommentsPayload{
+			ArticleID: uuid.NewString(),
+			Body:      "comment body",
+		}
+		_, err := svc.AddComments(ctx, payload) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleAddCommentsBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+}
+
 func TestArticle_Unfavoite(t *testing.T) {
 	ctx := servicetest.NewContext()
 	db := rdbtest.OpenDB(t, ctx)

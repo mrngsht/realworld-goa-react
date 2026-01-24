@@ -46,6 +46,12 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// AddCommentsRequestBody is the type of the "article" service "addComments"
+// endpoint HTTP request body.
+type AddCommentsRequestBody struct {
+	Body string `form:"body" json:"body" xml:"body"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -88,6 +94,12 @@ type UnfavoriteResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article,omitempty" json:"article,omitempty" xml:"article,omitempty"`
 }
 
+// AddCommentsResponseBody is the type of the "article" service "addComments"
+// endpoint HTTP response body.
+type AddCommentsResponseBody struct {
+	Comment *CommentResponseBody `form:"comment,omitempty" json:"comment,omitempty" xml:"comment,omitempty"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -120,6 +132,13 @@ type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
 // "article" service "unfavorite" endpoint HTTP response body for the
 // "ArticleUnfavoriteArticleBadRequest" error.
 type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
+// AddCommentsArticleAddCommentsBadRequestResponseBody is the type of the
+// "article" service "addComments" endpoint HTTP response body for the
+// "ArticleAddCommentsBadRequest" error.
+type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
@@ -156,6 +175,15 @@ type ArticleSummaryResponseBody struct {
 	Favorited      *bool                `form:"favorited,omitempty" json:"favorited,omitempty" xml:"favorited,omitempty"`
 	FavoritesCount *uint                `form:"favoritesCount,omitempty" json:"favoritesCount,omitempty" xml:"favoritesCount,omitempty"`
 	Author         *ProfileResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+}
+
+// CommentResponseBody is used to define fields on response body types.
+type CommentResponseBody struct {
+	ID        *string              `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	CreatedAt *string              `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt *string              `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	Body      *string              `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	Author    *ProfileResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 }
 
 // NewListRequestBody builds the HTTP request body from the payload of the
@@ -231,6 +259,15 @@ func NewUpdateRequestBody(p *article.UpdatePayload) *UpdateRequestBody {
 		Title:       p.Title,
 		Description: p.Description,
 		Body:        p.Body,
+	}
+	return body
+}
+
+// NewAddCommentsRequestBody builds the HTTP request body from the payload of
+// the "addComments" endpoint of the "article" service.
+func NewAddCommentsRequestBody(p *article.AddCommentsPayload) *AddCommentsRequestBody {
+	body := &AddCommentsRequestBody{
+		Body: p.Body,
 	}
 	return body
 }
@@ -354,6 +391,25 @@ func NewUnfavoriteArticleUnfavoriteArticleBadRequest(body *UnfavoriteArticleUnfa
 	return v
 }
 
+// NewAddCommentsResultOK builds a "article" service "addComments" endpoint
+// result from a HTTP "OK" response.
+func NewAddCommentsResultOK(body *AddCommentsResponseBody) *article.AddCommentsResult {
+	v := &article.AddCommentsResult{}
+	v.Comment = unmarshalCommentResponseBodyToArticleComment(body.Comment)
+
+	return v
+}
+
+// NewAddCommentsArticleAddCommentsBadRequest builds a article service
+// addComments endpoint ArticleAddCommentsBadRequest error.
+func NewAddCommentsArticleAddCommentsBadRequest(body *AddCommentsArticleAddCommentsBadRequestResponseBody) *article.ArticleAddCommentsBadRequest {
+	v := &article.ArticleAddCommentsBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	if body.Article == nil {
@@ -451,6 +507,20 @@ func ValidateUnfavoriteResponseBody(body *UnfavoriteResponseBody) (err error) {
 	return
 }
 
+// ValidateAddCommentsResponseBody runs the validations defined on
+// AddCommentsResponseBody
+func ValidateAddCommentsResponseBody(body *AddCommentsResponseBody) (err error) {
+	if body.Comment == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("comment", "body"))
+	}
+	if body.Comment != nil {
+		if err2 := ValidateCommentResponseBody(body.Comment); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
 // ValidateGetArticleGetArticleBadRequestResponseBody runs the validations
 // defined on get_ArticleGetArticleBadRequest_response_body
 func ValidateGetArticleGetArticleBadRequestResponseBody(body *GetArticleGetArticleBadRequestResponseBody) (err error) {
@@ -512,6 +582,20 @@ func ValidateFavoriteArticleFavoriteArticleBadRequestResponseBody(body *Favorite
 // validations defined on
 // unfavorite_ArticleUnfavoriteArticleBadRequest_response_body
 func ValidateUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(body *UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		}
+	}
+	return
+}
+
+// ValidateAddCommentsArticleAddCommentsBadRequestResponseBody runs the
+// validations defined on addComments_ArticleAddCommentsBadRequest_response_body
+func ValidateAddCommentsArticleAddCommentsBadRequestResponseBody(body *AddCommentsArticleAddCommentsBadRequestResponseBody) (err error) {
 	if body.Code == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
@@ -623,6 +707,41 @@ func ValidateArticleSummaryResponseBody(body *ArticleSummaryResponseBody) (err e
 	}
 	if body.ArticleID != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.articleId", *body.ArticleID, goa.FormatUUID))
+	}
+	if body.CreatedAt != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.createdAt", *body.CreatedAt, goa.FormatDateTime))
+	}
+	if body.UpdatedAt != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.updatedAt", *body.UpdatedAt, goa.FormatDateTime))
+	}
+	if body.Author != nil {
+		if err2 := ValidateProfileResponseBody(body.Author); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateCommentResponseBody runs the validations defined on
+// CommentResponseBody
+func ValidateCommentResponseBody(body *CommentResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.ID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
 	}
 	if body.CreatedAt != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.createdAt", *body.CreatedAt, goa.FormatDateTime))

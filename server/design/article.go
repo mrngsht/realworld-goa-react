@@ -186,6 +186,29 @@ var _ = Service("article", func() {
 			)
 		})
 	})
+
+	Method("addComments", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleAddCommentsBadRequest)
+
+		HTTP(func() {
+			POST("article/{articleId}/addComments")
+			Response(StatusOK)
+			Response(errorBadRequest, StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+				AttributeWithName("body", String),
+			)
+		})
+
+		Result(func() {
+			Required(
+				AttributeWithName("comment", type_Comment),
+			)
+		})
+	})
 })
 
 var (
@@ -238,6 +261,22 @@ var (
 			AttributeWithName("author", type_Profile),
 		)
 	})
+
+	type_Comment = Type("Comment", func() {
+		Required(
+			AttributeWithName("id", String, func() {
+				Format(FormatUUID)
+			}),
+			AttributeWithName("createdAt", String, func() {
+				Format(FormatDateTime)
+			}),
+			AttributeWithName("updatedAt", String, func() {
+				Format(FormatDateTime)
+			}),
+			AttributeWithName("body", String),
+			AttributeWithName("author", type_Profile),
+		)
+	})
 )
 
 var (
@@ -256,6 +295,9 @@ var (
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 	errType_ArticleUnfavoriteArticleBadRequest = myErrorType("ArticleUnfavoriteArticleBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+	}, nil)
+	errType_ArticleAddCommentsBadRequest = myErrorType("ArticleAddCommentsBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
 	}, nil)
 )

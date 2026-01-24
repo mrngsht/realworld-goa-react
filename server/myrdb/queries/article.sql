@@ -64,6 +64,21 @@ INSERT INTO article_deleted_
 (created_at_, article_id_)
 VALUES ($1, $2);
 
+-- name: InsertArticleComment :exec
+INSERT INTO article_comment_
+(created_at_, id_) 
+VALUES ($1, $2);
+
+-- name: InsertArticleCommentContent :exec
+INSERT INTO article_comment_content_
+(created_at_, article_comment_id_, article_id_, body_, user_id_) 
+VALUES ($1, $2, $3, $4, $5);
+
+-- name: InsertArticleCommentContentMutation :exec
+INSERT INTO article_comment_content_mutation_
+(created_at_, article_comment_id_, article_id_, body_, user_id_) 
+VALUES ($1, $2, $3, $4, $5);
+
 -- name: GetArticleContentByArticleID :one
 SELECT 
   created_at_,

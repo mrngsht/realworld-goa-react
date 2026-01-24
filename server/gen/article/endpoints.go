@@ -15,27 +15,29 @@ import (
 
 // Endpoints wraps the "article" service endpoints.
 type Endpoints struct {
-	Get        goa.Endpoint
-	List       goa.Endpoint
-	Feed       goa.Endpoint
-	Create     goa.Endpoint
-	Update     goa.Endpoint
-	Delete     goa.Endpoint
-	Favorite   goa.Endpoint
-	Unfavorite goa.Endpoint
+	Get         goa.Endpoint
+	List        goa.Endpoint
+	Feed        goa.Endpoint
+	Create      goa.Endpoint
+	Update      goa.Endpoint
+	Delete      goa.Endpoint
+	Favorite    goa.Endpoint
+	Unfavorite  goa.Endpoint
+	AddComments goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "article" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Get:        NewGetEndpoint(s),
-		List:       NewListEndpoint(s),
-		Feed:       NewFeedEndpoint(s),
-		Create:     NewCreateEndpoint(s),
-		Update:     NewUpdateEndpoint(s),
-		Delete:     NewDeleteEndpoint(s),
-		Favorite:   NewFavoriteEndpoint(s),
-		Unfavorite: NewUnfavoriteEndpoint(s),
+		Get:         NewGetEndpoint(s),
+		List:        NewListEndpoint(s),
+		Feed:        NewFeedEndpoint(s),
+		Create:      NewCreateEndpoint(s),
+		Update:      NewUpdateEndpoint(s),
+		Delete:      NewDeleteEndpoint(s),
+		Favorite:    NewFavoriteEndpoint(s),
+		Unfavorite:  NewUnfavoriteEndpoint(s),
+		AddComments: NewAddCommentsEndpoint(s),
 	}
 }
 
@@ -49,6 +51,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Delete = m(e.Delete)
 	e.Favorite = m(e.Favorite)
 	e.Unfavorite = m(e.Unfavorite)
+	e.AddComments = m(e.AddComments)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -120,5 +123,14 @@ func NewUnfavoriteEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*UnfavoritePayload)
 		return s.Unfavorite(ctx, p)
+	}
+}
+
+// NewAddCommentsEndpoint returns an endpoint function that calls the method
+// "addComments" of service "article".
+func NewAddCommentsEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*AddCommentsPayload)
+		return s.AddComments(ctx, p)
 	}
 }

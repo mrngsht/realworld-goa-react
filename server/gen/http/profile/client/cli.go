@@ -23,7 +23,7 @@ func BuildFollowUserPayload(profileFollowUserBody string) (*profile.FollowUserPa
 	{
 		err = json.Unmarshal([]byte(profileFollowUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"zbSo\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"rHZot\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 		if err != nil {
@@ -45,7 +45,7 @@ func BuildUnfollowUserPayload(profileUnfollowUserBody string) (*profile.Unfollow
 	{
 		err = json.Unmarshal([]byte(profileUnfollowUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"vM6lJMo\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"username\": \"Ug1\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.username", body.Username, "^[a-zA-Z0-9_]{3,32}$"))
 		if err != nil {

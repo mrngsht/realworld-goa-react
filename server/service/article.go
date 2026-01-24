@@ -676,3 +676,85 @@ func (s *Article) getArticleProperties(
 		userFollowingAuthorMap: userFollowingAuthorMap,
 	}, nil
 }
+
+func (s *Article) AddComments(ctx context.Context, payload *goa.AddCommentsPayload) (res *goa.AddCommentsResult, err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleAddCommentsBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	db := s.db
+	articleID := uuid.MustParse(payload.ArticleID)
+
+	_, err = s.getArticleDetail(ctx, articleID, &userID, false)
+	if err != nil {
+		return nil, err
+	}
+
+	profile, err := sqlcgen.Q.GetUserProfileByUserID(ctx, db, userID)
+	if err != nil {
+		// handle ErrNoRows as internal server error
+		return nil, errors.WithStack(err)
+	}
+
+	now := mytime.Now(ctx)
+	commentID := uuid.New()
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
+
+		if err := sqlcgen.Q.InsertArticleComment(ctx, db, sqlcgen.InsertArticleCommentParams{
+			CreatedAt: now,
+			ID:        commentID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := sqlcgen.Q.InsertArticleCommentContent(ctx, db, sqlcgen.InsertArticleCommentContentParams{
+			CreatedAt:        now,
+			ArticleCommentID: commentID,
+			ArticleID:        articleID,
+			Body:             payload.Body,
+			UserID:           userID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := sqlcgen.Q.InsertArticleCommentContentMutation(ctx, db, sqlcgen.InsertArticleCommentContentMutationParams{
+			CreatedAt:        now,
+			ArticleCommentID: commentID,
+			ArticleID:        articleID,
+			Body:             payload.Body,
+			UserID:           userID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return &goa.AddCommentsResult{
+		Comment: &goa.Comment{
+			ID:        commentID.String(),
+			CreatedAt: now.String(),
+			UpdatedAt: now.String(),
+			Body:      payload.Body,
+			Author: &goa.Profile{
+				Username:  profile.Username,
+				Bio:       profile.Bio,
+				Image:     profile.ImageUrl,
+				Following: false, // author of the comment is the current user, so following is false (or true if they follow themselves? usually false in this context or self-follow check unimplemented here, simply false is safe for "you can't follow yourself")
+			},
+		},
+	}, nil
+}

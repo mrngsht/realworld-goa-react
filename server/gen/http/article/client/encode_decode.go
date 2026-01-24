@@ -644,6 +644,104 @@ func DecodeUnfavoriteResponse(decoder func(*http.Response) goahttp.Decoder, rest
 	}
 }
 
+// BuildAddCommentsRequest instantiates a HTTP request object with method and
+// path set to call the "article" service "addComments" endpoint
+func (c *Client) BuildAddCommentsRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.AddCommentsPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "addComments", "*article.AddCommentsPayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddCommentsArticlePath(articleID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "addComments", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAddCommentsRequest returns an encoder for requests sent to the article
+// addComments server.
+func EncodeAddCommentsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*article.AddCommentsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("article", "addComments", "*article.AddCommentsPayload", v)
+		}
+		body := NewAddCommentsRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("article", "addComments", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAddCommentsResponse returns a decoder for responses returned by the
+// article addComments endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeAddCommentsResponse may return the following errors:
+//   - "ArticleAddCommentsBadRequest" (type *article.ArticleAddCommentsBadRequest): http.StatusBadRequest
+//   - error: internal error
+func DecodeAddCommentsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AddCommentsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "addComments", err)
+			}
+			err = ValidateAddCommentsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "addComments", err)
+			}
+			res := NewAddCommentsResultOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body AddCommentsArticleAddCommentsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "addComments", err)
+			}
+			err = ValidateAddCommentsArticleAddCommentsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "addComments", err)
+			}
+			return nil, NewAddCommentsArticleAddCommentsBadRequest(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "addComments", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalArticleDetailResponseBodyToArticleArticleDetail builds a value of
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {
@@ -695,6 +793,20 @@ func unmarshalArticleSummaryResponseBodyToArticleArticleSummary(v *ArticleSummar
 	res.TagList = make([]string, len(v.TagList))
 	for i, val := range v.TagList {
 		res.TagList[i] = val
+	}
+	res.Author = unmarshalProfileResponseBodyToArticleProfile(v.Author)
+
+	return res
+}
+
+// unmarshalCommentResponseBodyToArticleComment builds a value of type
+// *article.Comment from a value of type *CommentResponseBody.
+func unmarshalCommentResponseBodyToArticleComment(v *CommentResponseBody) *article.Comment {
+	res := &article.Comment{
+		ID:        *v.ID,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
+		Body:      *v.Body,
 	}
 	res.Author = unmarshalProfileResponseBodyToArticleProfile(v.Author)
 

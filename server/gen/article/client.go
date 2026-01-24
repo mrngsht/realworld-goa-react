@@ -15,27 +15,29 @@ import (
 
 // Client is the "article" service client.
 type Client struct {
-	GetEndpoint        goa.Endpoint
-	ListEndpoint       goa.Endpoint
-	FeedEndpoint       goa.Endpoint
-	CreateEndpoint     goa.Endpoint
-	UpdateEndpoint     goa.Endpoint
-	DeleteEndpoint     goa.Endpoint
-	FavoriteEndpoint   goa.Endpoint
-	UnfavoriteEndpoint goa.Endpoint
+	GetEndpoint         goa.Endpoint
+	ListEndpoint        goa.Endpoint
+	FeedEndpoint        goa.Endpoint
+	CreateEndpoint      goa.Endpoint
+	UpdateEndpoint      goa.Endpoint
+	DeleteEndpoint      goa.Endpoint
+	FavoriteEndpoint    goa.Endpoint
+	UnfavoriteEndpoint  goa.Endpoint
+	AddCommentsEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite goa.Endpoint) *Client {
+func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, addComments goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint:        get,
-		ListEndpoint:       list,
-		FeedEndpoint:       feed,
-		CreateEndpoint:     create,
-		UpdateEndpoint:     update,
-		DeleteEndpoint:     delete_,
-		FavoriteEndpoint:   favorite,
-		UnfavoriteEndpoint: unfavorite,
+		GetEndpoint:         get,
+		ListEndpoint:        list,
+		FeedEndpoint:        feed,
+		CreateEndpoint:      create,
+		UpdateEndpoint:      update,
+		DeleteEndpoint:      delete_,
+		FavoriteEndpoint:    favorite,
+		UnfavoriteEndpoint:  unfavorite,
+		AddCommentsEndpoint: addComments,
 	}
 }
 
@@ -128,4 +130,17 @@ func (c *Client) Unfavorite(ctx context.Context, p *UnfavoritePayload) (res *Unf
 		return
 	}
 	return ires.(*UnfavoriteResult), nil
+}
+
+// AddComments calls the "addComments" endpoint of the "article" service.
+// AddComments may return the following errors:
+//   - "ArticleAddCommentsBadRequest" (type *ArticleAddCommentsBadRequest)
+//   - error: internal error
+func (c *Client) AddComments(ctx context.Context, p *AddCommentsPayload) (res *AddCommentsResult, err error) {
+	var ires any
+	ires, err = c.AddCommentsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*AddCommentsResult), nil
 }

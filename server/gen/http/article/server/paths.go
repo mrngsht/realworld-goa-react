@@ -50,3 +50,8 @@ func FavoriteArticlePath(articleID string) string {
 func UnfavoriteArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/unfavorite", articleID)
 }
+
+// AddCommentsArticlePath returns the URL path to the article service addComments HTTP endpoint.
+func AddCommentsArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/addComments", articleID)
+}

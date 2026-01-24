@@ -48,6 +48,12 @@ type UpdateRequestBody struct {
 	Body        *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// AddCommentsRequestBody is the type of the "article" service "addComments"
+// endpoint HTTP request body.
+type AddCommentsRequestBody struct {
+	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -90,6 +96,12 @@ type UnfavoriteResponseBody struct {
 	Article *ArticleDetailResponseBody `form:"article" json:"article" xml:"article"`
 }
 
+// AddCommentsResponseBody is the type of the "article" service "addComments"
+// endpoint HTTP response body.
+type AddCommentsResponseBody struct {
+	Comment *CommentResponseBody `form:"comment" json:"comment" xml:"comment"`
+}
+
 // GetArticleGetArticleBadRequestResponseBody is the type of the "article"
 // service "get" endpoint HTTP response body for the
 // "ArticleGetArticleBadRequest" error.
@@ -122,6 +134,13 @@ type FavoriteArticleFavoriteArticleBadRequestResponseBody struct {
 // "article" service "unfavorite" endpoint HTTP response body for the
 // "ArticleUnfavoriteArticleBadRequest" error.
 type UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// AddCommentsArticleAddCommentsBadRequestResponseBody is the type of the
+// "article" service "addComments" endpoint HTTP response body for the
+// "ArticleAddCommentsBadRequest" error.
+type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -158,6 +177,15 @@ type ArticleSummaryResponseBody struct {
 	Favorited      bool                 `form:"favorited" json:"favorited" xml:"favorited"`
 	FavoritesCount uint                 `form:"favoritesCount" json:"favoritesCount" xml:"favoritesCount"`
 	Author         *ProfileResponseBody `form:"author" json:"author" xml:"author"`
+}
+
+// CommentResponseBody is used to define fields on response body types.
+type CommentResponseBody struct {
+	ID        string               `form:"id" json:"id" xml:"id"`
+	CreatedAt string               `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	UpdatedAt string               `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
+	Body      string               `form:"body" json:"body" xml:"body"`
+	Author    *ProfileResponseBody `form:"author" json:"author" xml:"author"`
 }
 
 // NewGetResponseBody builds the HTTP response body from the result of the
@@ -240,6 +268,16 @@ func NewUnfavoriteResponseBody(res *article.UnfavoriteResult) *UnfavoriteRespons
 	return body
 }
 
+// NewAddCommentsResponseBody builds the HTTP response body from the result of
+// the "addComments" endpoint of the "article" service.
+func NewAddCommentsResponseBody(res *article.AddCommentsResult) *AddCommentsResponseBody {
+	body := &AddCommentsResponseBody{}
+	if res.Comment != nil {
+		body.Comment = marshalArticleCommentToCommentResponseBody(res.Comment)
+	}
+	return body
+}
+
 // NewGetArticleGetArticleBadRequestResponseBody builds the HTTP response body
 // from the result of the "get" endpoint of the "article" service.
 func NewGetArticleGetArticleBadRequestResponseBody(res *article.ArticleGetArticleBadRequest) *GetArticleGetArticleBadRequestResponseBody {
@@ -282,6 +320,16 @@ func NewFavoriteArticleFavoriteArticleBadRequestResponseBody(res *article.Articl
 // service.
 func NewUnfavoriteArticleUnfavoriteArticleBadRequestResponseBody(res *article.ArticleUnfavoriteArticleBadRequest) *UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody {
 	body := &UnfavoriteArticleUnfavoriteArticleBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
+// NewAddCommentsArticleAddCommentsBadRequestResponseBody builds the HTTP
+// response body from the result of the "addComments" endpoint of the "article"
+// service.
+func NewAddCommentsArticleAddCommentsBadRequestResponseBody(res *article.ArticleAddCommentsBadRequest) *AddCommentsArticleAddCommentsBadRequestResponseBody {
+	body := &AddCommentsArticleAddCommentsBadRequestResponseBody{
 		Code: res.Code,
 	}
 	return body
@@ -388,6 +436,16 @@ func NewUnfavoritePayload(articleID string) *article.UnfavoritePayload {
 	return v
 }
 
+// NewAddCommentsPayload builds a article service addComments endpoint payload.
+func NewAddCommentsPayload(body *AddCommentsRequestBody, articleID string) *article.AddCommentsPayload {
+	v := &article.AddCommentsPayload{
+		Body: *body.Body,
+	}
+	v.ArticleID = articleID
+
+	return v
+}
+
 // ValidateListRequestBody runs the validations defined on ListRequestBody
 func ValidateListRequestBody(body *ListRequestBody) (err error) {
 	if body.Limit != nil {
@@ -456,6 +514,15 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 		if utf8.RuneCountInString(*body.Title) > 128 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.title", *body.Title, utf8.RuneCountInString(*body.Title), 128, false))
 		}
+	}
+	return
+}
+
+// ValidateAddCommentsRequestBody runs the validations defined on
+// AddCommentsRequestBody
+func ValidateAddCommentsRequestBody(body *AddCommentsRequestBody) (err error) {
+	if body.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
 	}
 	return
 }
