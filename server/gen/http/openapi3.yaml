@@ -230,7 +230,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ArticleDeleteCommentsBadRequest'
                             example:
-                                code: Unspecified
+                                code: ForbiddenOperation
     /api/article/{articleId}/favorite:
         post:
             tags:
@@ -841,13 +841,14 @@ components:
             properties:
                 code:
                     type: string
-                    example: ForbiddenOperation
+                    example: ArticleNotFound
                     enum:
                         - Unspecified
                         - ArticleNotFound
+                        - ArticleCommentNotFound
                         - ForbiddenOperation
             example:
-                code: ForbiddenOperation
+                code: ArticleNotFound
             required:
                 - code
         ArticleDetail:

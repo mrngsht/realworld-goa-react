@@ -594,9 +594,10 @@ definitions:
                 enum:
                     - Unspecified
                     - ArticleNotFound
+                    - ArticleCommentNotFound
                     - ForbiddenOperation
         example:
-            code: ArticleNotFound
+            code: ArticleCommentNotFound
         required:
             - code
     ArticleDeleteCommentsRequestBody:

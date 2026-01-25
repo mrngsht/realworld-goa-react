@@ -854,6 +854,8 @@ func (s *Article) DeleteComments(ctx context.Context, payload *goa.DeleteComment
 			switch apErr {
 			case article.ErrArticleNotFound:
 				err = &goa.ArticleDeleteCommentsBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			case article.ErrArticleCommentNotFound:
+				err = &goa.ArticleDeleteCommentsBadRequest{Code: design.ErrCode_Article_ArticleCommentNotFound}
 			case article.ErrRequestUserIsNotAuthor:
 				err = &goa.ArticleDeleteCommentsBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
 			}
@@ -878,9 +880,7 @@ func (s *Article) DeleteComments(ctx context.Context, payload *goa.DeleteComment
 	comment, err := sqlcgen.Q.GetArticleCommentContentByCommentID(ctx, db, commentID)
 	if err != nil {
 		if myrdb.IsErrNoRows(err) {
-			// If comment not found, treat as ArticleNotFound (or should we use a specific CommentNotFound? Spec says 200 OK generally but usually 404 if path param not found).
-			// Design has ArticleNotFound. Let's use that.
-			return article.ErrArticleNotFound
+			return article.ErrArticleCommentNotFound
 		}
 		return errors.WithStack(err)
 	}

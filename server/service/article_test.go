@@ -1048,7 +1048,7 @@ func TestArticle_DeleteComments(t *testing.T) {
 
 		var badRequest *goa.ArticleDeleteCommentsBadRequest
 		require.ErrorAs(t, err, &badRequest)
-		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+		assert.Equal(t, design.ErrCode_Article_ArticleCommentNotFound, badRequest.Code)
 	})
 }
 

@@ -346,11 +346,13 @@ var (
 	}, nil)
 	errType_ArticleDeleteCommentsBadRequest = myErrorType("ArticleDeleteCommentsBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
+		ErrCode_Article_ArticleCommentNotFound,
 		ErrCode_Article_ForbiddenOperation,
 	}, nil)
 )
 
 const (
-	ErrCode_Article_ArticleNotFound    = "ArticleNotFound"
-	ErrCode_Article_ForbiddenOperation = "ForbiddenOperation"
+	ErrCode_Article_ArticleNotFound        = "ArticleNotFound"
+	ErrCode_Article_ArticleCommentNotFound = "ArticleCommentNotFound"
+	ErrCode_Article_ForbiddenOperation     = "ForbiddenOperation"
 )

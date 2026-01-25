@@ -712,8 +712,8 @@ func ValidateDeleteCommentsArticleDeleteCommentsBadRequestResponseBody(body *Del
 		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
 	}
 	if body.Code != nil {
-		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound" || *body.Code == "ForbiddenOperation") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound", "ForbiddenOperation"}))
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound" || *body.Code == "ArticleCommentNotFound" || *body.Code == "ForbiddenOperation") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound", "ArticleCommentNotFound", "ForbiddenOperation"}))
 		}
 	}
 	return
