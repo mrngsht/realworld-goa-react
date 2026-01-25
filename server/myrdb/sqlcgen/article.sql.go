@@ -412,6 +412,32 @@ func (q *Queries) IsArticleFavoritedByArticleIDAndUserID(ctx context.Context, db
 	return exists, err
 }
 
+const listAllTags = `-- name: ListAllTags :many
+SELECT DISTINCT tag_
+FROM article_tag_
+ORDER BY tag_ ASC
+`
+
+func (q *Queries) ListAllTags(ctx context.Context, db DBTX) ([]string, error) {
+	rows, err := db.Query(ctx, listAllTags)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var tag_ string
+		if err := rows.Scan(&tag_); err != nil {
+			return nil, err
+		}
+		items = append(items, tag_)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listArticleCommentContentsByArticleID = `-- name: ListArticleCommentContentsByArticleID :many
 SELECT 
   created_at_,

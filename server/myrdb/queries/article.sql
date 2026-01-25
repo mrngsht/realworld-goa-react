@@ -216,3 +216,8 @@ WHERE article_comment_id_ = $1;
 INSERT INTO article_comment_deleted_
 (created_at_, article_comment_id_)
 VALUES ($1, $2);
+
+-- name: ListAllTags :many
+SELECT DISTINCT tag_
+FROM article_tag_
+ORDER BY tag_ ASC;

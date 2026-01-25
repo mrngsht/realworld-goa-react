@@ -15,6 +15,7 @@ import (
 
 	articlec "github.com/mrngsht/realworld-goa-react/gen/http/article/client"
 	profilec "github.com/mrngsht/realworld-goa-react/gen/http/profile/client"
+	tagc "github.com/mrngsht/realworld-goa-react/gen/http/tag/client"
 	userc "github.com/mrngsht/realworld-goa-react/gen/http/user/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -25,6 +26,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `article (get|list|feed|create|update|delete|favorite|unfavorite|add-comments|get-comments|delete-comments)
+tag get-tags
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,13 +34,14 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "b08d9acc-20b3-4ea6-ac87-e8a08232ee37"` + "\n" +
+	return os.Args[0] + ` article get --article-id "ba7fcda4-cab9-4f16-8640-fe0fe0ab3cfd"` + "\n" +
+		os.Args[0] + ` tag get-tags` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "TKQ"
+      "username": "tSDL"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "marilyne_legros@will.com",
-      "password": "iqh"
+      "email": "johathan_halvorson@johns.com",
+      "password": "iub"
    }'` + "\n" +
 		""
 }
@@ -91,6 +94,10 @@ func ParseEndpoint(
 		articleDeleteCommentsBodyFlag      = articleDeleteCommentsFlags.String("body", "REQUIRED", "")
 		articleDeleteCommentsArticleIDFlag = articleDeleteCommentsFlags.String("article-id", "REQUIRED", "")
 
+		tagFlags = flag.NewFlagSet("tag", flag.ContinueOnError)
+
+		tagGetTagsFlags = flag.NewFlagSet("get-tags", flag.ExitOnError)
+
 		profileFlags = flag.NewFlagSet("profile", flag.ContinueOnError)
 
 		profileFollowUserFlags    = flag.NewFlagSet("follow-user", flag.ExitOnError)
@@ -125,6 +132,9 @@ func ParseEndpoint(
 	articleGetCommentsFlags.Usage = articleGetCommentsUsage
 	articleDeleteCommentsFlags.Usage = articleDeleteCommentsUsage
 
+	tagFlags.Usage = tagUsage
+	tagGetTagsFlags.Usage = tagGetTagsUsage
+
 	profileFlags.Usage = profileUsage
 	profileFollowUserFlags.Usage = profileFollowUserUsage
 	profileUnfollowUserFlags.Usage = profileUnfollowUserUsage
@@ -152,6 +162,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "article":
 			svcf = articleFlags
+		case "tag":
+			svcf = tagFlags
 		case "profile":
 			svcf = profileFlags
 		case "user":
@@ -205,6 +217,13 @@ func ParseEndpoint(
 
 			case "delete-comments":
 				epf = articleDeleteCommentsFlags
+
+			}
+
+		case "tag":
+			switch epn {
+			case "get-tags":
+				epf = tagGetTagsFlags
 
 			}
 
@@ -291,6 +310,12 @@ func ParseEndpoint(
 				endpoint = c.DeleteComments()
 				data, err = articlec.BuildDeleteCommentsPayload(*articleDeleteCommentsBodyFlag, *articleDeleteCommentsArticleIDFlag)
 			}
+		case "tag":
+			c := tagc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get-tags":
+				endpoint = c.GetTags()
+			}
 		case "profile":
 			c := profilec.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -355,7 +380,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "b08d9acc-20b3-4ea6-ac87-e8a08232ee37"
+    %[1]s article get --article-id "ba7fcda4-cab9-4f16-8640-fe0fe0ab3cfd"
 `, os.Args[0])
 }
 
@@ -367,11 +392,11 @@ List implements list.
 
 Example:
     %[1]s article list --body '{
-      "author": "Qui dignissimos et et architecto fugiat.",
-      "favorited": "Quis aut ea rerum.",
-      "limit": 390,
-      "offset": 1181800705,
-      "tag": "Cupiditate mollitia dolores ad magni blanditiis."
+      "author": "Quia qui qui.",
+      "favorited": "Maiores soluta tempore minima aperiam sit delectus.",
+      "limit": 598,
+      "offset": 1386170037,
+      "tag": "Sapiente ut voluptatem soluta porro consequatur est."
    }'
 `, os.Args[0])
 }
@@ -384,8 +409,8 @@ Feed implements feed.
 
 Example:
     %[1]s article feed --body '{
-      "limit": 752,
-      "offset": 843303561
+      "limit": 880,
+      "offset": 174690089
    }'
 `, os.Args[0])
 }
@@ -398,13 +423,13 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Officia perferendis tempore et rerum.",
-      "description": "Et sit.",
+      "body": "Enim dignissimos aliquid.",
+      "description": "Consectetur natus non mollitia ut.",
       "tagList": [
-         "Eaque totam cum et repellat.",
-         "Earum quasi quam ducimus voluptatibus cum assumenda."
+         "Eaque vitae quaerat provident et assumenda.",
+         "Itaque tempore est rem fugiat occaecati."
       ],
-      "title": "djb"
+      "title": "k5t"
    }'
 `, os.Args[0])
 }
@@ -418,10 +443,10 @@ Update implements update.
 
 Example:
     %[1]s article update --body '{
-      "body": "Voluptas cupiditate doloremque et.",
-      "description": "Dolorem ratione aperiam quam consectetur sint.",
-      "title": "bkq"
-   }' --article-id "475e0f70-3c00-4eef-a92e-9a572ecb6262"
+      "body": "Iusto ut.",
+      "description": "Rerum voluptas optio mollitia nihil.",
+      "title": "eqt"
+   }' --article-id "f546522d-379c-473e-a250-28f942340cad"
 `, os.Args[0])
 }
 
@@ -432,7 +457,7 @@ Delete implements delete.
     -article-id STRING: 
 
 Example:
-    %[1]s article delete --article-id "c6a7e0dc-4cf7-4b76-a09a-66c175120a37"
+    %[1]s article delete --article-id "b0713144-35f9-43c7-aedb-12508ff0d6d1"
 `, os.Args[0])
 }
 
@@ -443,7 +468,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "ee4d0512-0b17-4053-804d-ac141b4676c2"
+    %[1]s article favorite --article-id "be95a6bc-99e1-4c71-bec3-9ae7fcf88ee6"
 `, os.Args[0])
 }
 
@@ -454,7 +479,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "15f14959-d701-40f9-a187-5c683285c822"
+    %[1]s article unfavorite --article-id "8bdad035-591a-4b55-8f57-bd397f4993d9"
 `, os.Args[0])
 }
 
@@ -467,8 +492,8 @@ AddComments implements addComments.
 
 Example:
     %[1]s article add-comments --body '{
-      "body": "Nihil molestias repudiandae esse doloremque numquam sed."
-   }' --article-id "06f49885-8ed4-422e-8e05-4004ea75baaa"
+      "body": "Quis inventore provident et sed aliquid eum."
+   }' --article-id "af79ab30-6ec5-46e6-9a98-6a317ce99151"
 `, os.Args[0])
 }
 
@@ -479,7 +504,7 @@ GetComments implements getComments.
     -article-id STRING: 
 
 Example:
-    %[1]s article get-comments --article-id "1bb63286-2cb0-4ca1-b72f-fd9a5a63d561"
+    %[1]s article get-comments --article-id "68786ac9-6a8e-4230-b5a8-e5ac9a651828"
 `, os.Args[0])
 }
 
@@ -492,8 +517,31 @@ DeleteComments implements deleteComments.
 
 Example:
     %[1]s article delete-comments --body '{
-      "commentId": "5050fde3-719e-44fc-a205-67462414b0dc"
-   }' --article-id "15196057-5387-4219-b4d3-c93b09ad0975"
+      "commentId": "cf2a3834-472c-4d5a-8c72-075f7f22488f"
+   }' --article-id "9e7bdc5d-ad3e-4e22-a673-d0425f2ea5ec"
+`, os.Args[0])
+}
+
+// tagUsage displays the usage of the tag command and its subcommands.
+func tagUsage() {
+	fmt.Fprintf(os.Stderr, `tag
+Usage:
+    %[1]s [globalflags] tag COMMAND [flags]
+
+COMMAND:
+    get-tags: GetTags implements getTags.
+
+Additional help:
+    %[1]s tag COMMAND --help
+`, os.Args[0])
+}
+func tagGetTagsUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tag get-tags
+
+GetTags implements getTags.
+
+Example:
+    %[1]s tag get-tags
 `, os.Args[0])
 }
 
@@ -519,7 +567,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "TKQ"
+      "username": "tSDL"
    }'
 `, os.Args[0])
 }
@@ -532,7 +580,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "e4u"
+      "username": "RbX"
    }'
 `, os.Args[0])
 }
@@ -561,8 +609,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "marilyne_legros@will.com",
-      "password": "iqh"
+      "email": "johathan_halvorson@johns.com",
+      "password": "iub"
    }'
 `, os.Args[0])
 }
@@ -575,9 +623,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "heath@berge.com",
-      "password": "mfs",
-      "username": "8lAk7"
+      "email": "wilfredo@hagenes.org",
+      "password": "92c",
+      "username": "HnVh"
    }'
 `, os.Args[0])
 }
@@ -600,11 +648,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "h8g",
-      "email": "ignatius@corwinbarrows.name",
-      "image": "http://zg",
-      "password": "ldk",
-      "username": "Ywo"
+      "bio": "ssg",
+      "email": "marietta@schroeder.biz",
+      "image": "http://r",
+      "password": "2v9",
+      "username": "7lI"
    }'
 `, os.Args[0])
 }

@@ -42,7 +42,7 @@ func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleListBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Qui dignissimos et et architecto fugiat.\",\n      \"favorited\": \"Quis aut ea rerum.\",\n      \"limit\": 390,\n      \"offset\": 1181800705,\n      \"tag\": \"Cupiditate mollitia dolores ad magni blanditiis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Quia qui qui.\",\n      \"favorited\": \"Maiores soluta tempore minima aperiam sit delectus.\",\n      \"limit\": 598,\n      \"offset\": 1386170037,\n      \"tag\": \"Sapiente ut voluptatem soluta porro consequatur est.\"\n   }'")
 		}
 	}
 	v := &article.ListPayload{
@@ -76,7 +76,7 @@ func BuildFeedPayload(articleFeedBody string) (*article.FeedPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleFeedBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 752,\n      \"offset\": 843303561\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 880,\n      \"offset\": 174690089\n   }'")
 		}
 	}
 	v := &article.FeedPayload{
@@ -107,7 +107,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Officia perferendis tempore et rerum.\",\n      \"description\": \"Et sit.\",\n      \"tagList\": [\n         \"Eaque totam cum et repellat.\",\n         \"Earum quasi quam ducimus voluptatibus cum assumenda.\"\n      ],\n      \"title\": \"djb\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Enim dignissimos aliquid.\",\n      \"description\": \"Consectetur natus non mollitia ut.\",\n      \"tagList\": [\n         \"Eaque vitae quaerat provident et assumenda.\",\n         \"Itaque tempore est rem fugiat occaecati.\"\n      ],\n      \"title\": \"k5t\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -144,7 +144,7 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 	{
 		err = json.Unmarshal([]byte(articleUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Voluptas cupiditate doloremque et.\",\n      \"description\": \"Dolorem ratione aperiam quam consectetur sint.\",\n      \"title\": \"bkq\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Iusto ut.\",\n      \"description\": \"Rerum voluptas optio mollitia nihil.\",\n      \"title\": \"eqt\"\n   }'")
 		}
 		if body.Title != nil {
 			if utf8.RuneCountInString(*body.Title) > 128 {
@@ -235,7 +235,7 @@ func BuildAddCommentsPayload(articleAddCommentsBody string, articleAddCommentsAr
 	{
 		err = json.Unmarshal([]byte(articleAddCommentsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Nihil molestias repudiandae esse doloremque numquam sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quis inventore provident et sed aliquid eum.\"\n   }'")
 		}
 	}
 	var articleID string
@@ -280,7 +280,7 @@ func BuildDeleteCommentsPayload(articleDeleteCommentsBody string, articleDeleteC
 	{
 		err = json.Unmarshal([]byte(articleDeleteCommentsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"commentId\": \"5050fde3-719e-44fc-a205-67462414b0dc\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"commentId\": \"cf2a3834-472c-4d5a-8c72-075f7f22488f\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.commentId", body.CommentID, goa.FormatUUID))
 		if err != nil {
