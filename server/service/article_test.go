@@ -118,7 +118,33 @@ func TestArticle_Get(t *testing.T) {
 	})
 
 	t.Run("article deleted", func(t *testing.T) {
-		// TODO:
+		author := servicetest.CreateUser(t, ctx, db)
+		viewer := servicetest.CreateUser(t, ctx, db)
+
+		ctx := servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		
+		// Create article
+		createRes, err := svc.Create(ctx, &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1", "tag2"},
+		})
+		require.NoError(t, err)
+		articleID := createRes.Article.ArticleID
+
+		// Delete the article
+		err = svc.Delete(ctx, &goa.DeletePayload{ArticleID: articleID})
+		require.NoError(t, err)
+
+		// Try to get deleted article
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, viewer.Username)
+		_, err = svc.Get(ctx, &goa.GetPayload{ArticleID: articleID}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleGetArticleBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
 	})
 }
 
