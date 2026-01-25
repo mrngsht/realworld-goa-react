@@ -52,6 +52,12 @@ type AddCommentsRequestBody struct {
 	Body string `form:"body" json:"body" xml:"body"`
 }
 
+// DeleteCommentsRequestBody is the type of the "article" service
+// "deleteComments" endpoint HTTP request body.
+type DeleteCommentsRequestBody struct {
+	CommentID string `form:"commentId" json:"commentId" xml:"commentId"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -152,6 +158,13 @@ type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
 // "article" service "getComments" endpoint HTTP response body for the
 // "ArticleGetCommentsBadRequest" error.
 type GetCommentsArticleGetCommentsBadRequestResponseBody struct {
+	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
+}
+
+// DeleteCommentsArticleDeleteCommentsBadRequestResponseBody is the type of the
+// "article" service "deleteComments" endpoint HTTP response body for the
+// "ArticleDeleteCommentsBadRequest" error.
+type DeleteCommentsArticleDeleteCommentsBadRequestResponseBody struct {
 	Code *string `form:"code,omitempty" json:"code,omitempty" xml:"code,omitempty"`
 }
 
@@ -281,6 +294,15 @@ func NewUpdateRequestBody(p *article.UpdatePayload) *UpdateRequestBody {
 func NewAddCommentsRequestBody(p *article.AddCommentsPayload) *AddCommentsRequestBody {
 	body := &AddCommentsRequestBody{
 		Body: p.Body,
+	}
+	return body
+}
+
+// NewDeleteCommentsRequestBody builds the HTTP request body from the payload
+// of the "deleteComments" endpoint of the "article" service.
+func NewDeleteCommentsRequestBody(p *article.DeleteCommentsPayload) *DeleteCommentsRequestBody {
+	body := &DeleteCommentsRequestBody{
+		CommentID: p.CommentID,
 	}
 	return body
 }
@@ -439,6 +461,16 @@ func NewGetCommentsResultOK(body *GetCommentsResponseBody) *article.GetCommentsR
 // getComments endpoint ArticleGetCommentsBadRequest error.
 func NewGetCommentsArticleGetCommentsBadRequest(body *GetCommentsArticleGetCommentsBadRequestResponseBody) *article.ArticleGetCommentsBadRequest {
 	v := &article.ArticleGetCommentsBadRequest{
+		Code: *body.Code,
+	}
+
+	return v
+}
+
+// NewDeleteCommentsArticleDeleteCommentsBadRequest builds a article service
+// deleteComments endpoint ArticleDeleteCommentsBadRequest error.
+func NewDeleteCommentsArticleDeleteCommentsBadRequest(body *DeleteCommentsArticleDeleteCommentsBadRequestResponseBody) *article.ArticleDeleteCommentsBadRequest {
+	v := &article.ArticleDeleteCommentsBadRequest{
 		Code: *body.Code,
 	}
 
@@ -667,6 +699,21 @@ func ValidateGetCommentsArticleGetCommentsBadRequestResponseBody(body *GetCommen
 	if body.Code != nil {
 		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound") {
 			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound"}))
+		}
+	}
+	return
+}
+
+// ValidateDeleteCommentsArticleDeleteCommentsBadRequestResponseBody runs the
+// validations defined on
+// deleteComments_ArticleDeleteCommentsBadRequest_response_body
+func ValidateDeleteCommentsArticleDeleteCommentsBadRequestResponseBody(body *DeleteCommentsArticleDeleteCommentsBadRequestResponseBody) (err error) {
+	if body.Code == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("code", "body"))
+	}
+	if body.Code != nil {
+		if !(*body.Code == "Unspecified" || *body.Code == "ArticleNotFound" || *body.Code == "ForbiddenOperation") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.code", *body.Code, []any{"Unspecified", "ArticleNotFound", "ForbiddenOperation"}))
 		}
 	}
 	return

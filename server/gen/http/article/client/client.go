@@ -51,6 +51,10 @@ type Client struct {
 	// endpoint.
 	GetCommentsDoer goahttp.Doer
 
+	// DeleteComments Doer is the HTTP client used to make requests to the
+	// deleteComments endpoint.
+	DeleteCommentsDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -81,6 +85,7 @@ func NewClient(
 		UnfavoriteDoer:      doer,
 		AddCommentsDoer:     doer,
 		GetCommentsDoer:     doer,
+		DeleteCommentsDoer:  doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -299,6 +304,30 @@ func (c *Client) GetComments() goa.Endpoint {
 		resp, err := c.GetCommentsDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("article", "getComments", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteComments returns an endpoint that makes HTTP requests to the article
+// service deleteComments server.
+func (c *Client) DeleteComments() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteCommentsRequest(c.encoder)
+		decodeResponse = DecodeDeleteCommentsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildDeleteCommentsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteCommentsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("article", "deleteComments", err)
 		}
 		return decodeResponse(resp)
 	}

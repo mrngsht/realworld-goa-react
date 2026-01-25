@@ -231,6 +231,25 @@ var _ = Service("article", func() {
 			)
 		})
 	})
+
+	Method("deleteComments", func() {
+		errorBadRequest := ErrorByErrorType(errType_ArticleDeleteCommentsBadRequest)
+
+		HTTP(func() {
+			POST("article/{articleId}/deleteComments")
+			Response(StatusOK)
+			Response(errorBadRequest, StatusBadRequest)
+		})
+
+		Payload(func() {
+			Required(
+				AttributeWithName("articleId", String, def_Article_RequestArticleID),
+				AttributeWithName("commentId", String, func() {
+					Format(FormatUUID)
+				}),
+			)
+		})
+	})
 })
 
 var (
@@ -324,6 +343,10 @@ var (
 	}, nil)
 	errType_ArticleGetCommentsBadRequest = myErrorType("ArticleGetCommentsBadRequest", []any{
 		ErrCode_Article_ArticleNotFound,
+	}, nil)
+	errType_ArticleDeleteCommentsBadRequest = myErrorType("ArticleDeleteCommentsBadRequest", []any{
+		ErrCode_Article_ArticleNotFound,
+		ErrCode_Article_ForbiddenOperation,
 	}, nil)
 )
 

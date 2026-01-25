@@ -18,17 +18,18 @@ import (
 
 // Server lists the article service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	Get         http.Handler
-	List        http.Handler
-	Feed        http.Handler
-	Create      http.Handler
-	Update      http.Handler
-	Delete      http.Handler
-	Favorite    http.Handler
-	Unfavorite  http.Handler
-	AddComments http.Handler
-	GetComments http.Handler
+	Mounts         []*MountPoint
+	Get            http.Handler
+	List           http.Handler
+	Feed           http.Handler
+	Create         http.Handler
+	Update         http.Handler
+	Delete         http.Handler
+	Favorite       http.Handler
+	Unfavorite     http.Handler
+	AddComments    http.Handler
+	GetComments    http.Handler
+	DeleteComments http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -68,17 +69,19 @@ func New(
 			{"Unfavorite", "POST", "/api/article/{articleId}/unfavorite"},
 			{"AddComments", "POST", "/api/article/{articleId}/addComments"},
 			{"GetComments", "GET", "/api/article/{articleId}/comments"},
+			{"DeleteComments", "POST", "/api/article/{articleId}/deleteComments"},
 		},
-		Get:         NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		List:        NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
-		Feed:        NewFeedHandler(e.Feed, mux, decoder, encoder, errhandler, formatter),
-		Create:      NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
-		Update:      NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		Delete:      NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		Favorite:    NewFavoriteHandler(e.Favorite, mux, decoder, encoder, errhandler, formatter),
-		Unfavorite:  NewUnfavoriteHandler(e.Unfavorite, mux, decoder, encoder, errhandler, formatter),
-		AddComments: NewAddCommentsHandler(e.AddComments, mux, decoder, encoder, errhandler, formatter),
-		GetComments: NewGetCommentsHandler(e.GetComments, mux, decoder, encoder, errhandler, formatter),
+		Get:            NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		List:           NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
+		Feed:           NewFeedHandler(e.Feed, mux, decoder, encoder, errhandler, formatter),
+		Create:         NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
+		Update:         NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Delete:         NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		Favorite:       NewFavoriteHandler(e.Favorite, mux, decoder, encoder, errhandler, formatter),
+		Unfavorite:     NewUnfavoriteHandler(e.Unfavorite, mux, decoder, encoder, errhandler, formatter),
+		AddComments:    NewAddCommentsHandler(e.AddComments, mux, decoder, encoder, errhandler, formatter),
+		GetComments:    NewGetCommentsHandler(e.GetComments, mux, decoder, encoder, errhandler, formatter),
+		DeleteComments: NewDeleteCommentsHandler(e.DeleteComments, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -97,6 +100,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Unfavorite = m(s.Unfavorite)
 	s.AddComments = m(s.AddComments)
 	s.GetComments = m(s.GetComments)
+	s.DeleteComments = m(s.DeleteComments)
 }
 
 // MethodNames returns the methods served.
@@ -114,6 +118,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountUnfavoriteHandler(mux, h.Unfavorite)
 	MountAddCommentsHandler(mux, h.AddComments)
 	MountGetCommentsHandler(mux, h.GetComments)
+	MountDeleteCommentsHandler(mux, h.DeleteComments)
 }
 
 // Mount configures the mux to serve the article endpoints.
@@ -610,6 +615,57 @@ func NewGetCommentsHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "getComments")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteCommentsHandler configures the mux to serve the "article" service
+// "deleteComments" endpoint.
+func MountDeleteCommentsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/article/{articleId}/deleteComments", f)
+}
+
+// NewDeleteCommentsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "article" service "deleteComments" endpoint.
+func NewDeleteCommentsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteCommentsRequest(mux, decoder)
+		encodeResponse = EncodeDeleteCommentsResponse(encoder)
+		encodeError    = EncodeDeleteCommentsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "deleteComments")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "article")
 		payload, err := decodeRequest(r)
 		if err != nil {

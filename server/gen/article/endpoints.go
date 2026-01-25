@@ -15,31 +15,33 @@ import (
 
 // Endpoints wraps the "article" service endpoints.
 type Endpoints struct {
-	Get         goa.Endpoint
-	List        goa.Endpoint
-	Feed        goa.Endpoint
-	Create      goa.Endpoint
-	Update      goa.Endpoint
-	Delete      goa.Endpoint
-	Favorite    goa.Endpoint
-	Unfavorite  goa.Endpoint
-	AddComments goa.Endpoint
-	GetComments goa.Endpoint
+	Get            goa.Endpoint
+	List           goa.Endpoint
+	Feed           goa.Endpoint
+	Create         goa.Endpoint
+	Update         goa.Endpoint
+	Delete         goa.Endpoint
+	Favorite       goa.Endpoint
+	Unfavorite     goa.Endpoint
+	AddComments    goa.Endpoint
+	GetComments    goa.Endpoint
+	DeleteComments goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "article" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Get:         NewGetEndpoint(s),
-		List:        NewListEndpoint(s),
-		Feed:        NewFeedEndpoint(s),
-		Create:      NewCreateEndpoint(s),
-		Update:      NewUpdateEndpoint(s),
-		Delete:      NewDeleteEndpoint(s),
-		Favorite:    NewFavoriteEndpoint(s),
-		Unfavorite:  NewUnfavoriteEndpoint(s),
-		AddComments: NewAddCommentsEndpoint(s),
-		GetComments: NewGetCommentsEndpoint(s),
+		Get:            NewGetEndpoint(s),
+		List:           NewListEndpoint(s),
+		Feed:           NewFeedEndpoint(s),
+		Create:         NewCreateEndpoint(s),
+		Update:         NewUpdateEndpoint(s),
+		Delete:         NewDeleteEndpoint(s),
+		Favorite:       NewFavoriteEndpoint(s),
+		Unfavorite:     NewUnfavoriteEndpoint(s),
+		AddComments:    NewAddCommentsEndpoint(s),
+		GetComments:    NewGetCommentsEndpoint(s),
+		DeleteComments: NewDeleteCommentsEndpoint(s),
 	}
 }
 
@@ -55,6 +57,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Unfavorite = m(e.Unfavorite)
 	e.AddComments = m(e.AddComments)
 	e.GetComments = m(e.GetComments)
+	e.DeleteComments = m(e.DeleteComments)
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
@@ -144,5 +147,14 @@ func NewGetCommentsEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*GetCommentsPayload)
 		return s.GetComments(ctx, p)
+	}
+}
+
+// NewDeleteCommentsEndpoint returns an endpoint function that calls the method
+// "deleteComments" of service "article".
+func NewDeleteCommentsEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*DeleteCommentsPayload)
+		return nil, s.DeleteComments(ctx, p)
 	}
 }

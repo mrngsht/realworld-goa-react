@@ -24,6 +24,21 @@ func (q *Queries) GetArticleByID(ctx context.Context, db DBTX, id uuid.UUID) (Ar
 	return i, err
 }
 
+const getArticleCommentDeletedByCommentID = `-- name: GetArticleCommentDeletedByCommentID :one
+SELECT 
+  created_at_,
+  article_comment_id_
+FROM article_comment_deleted_
+WHERE article_comment_id_ = $1
+`
+
+func (q *Queries) GetArticleCommentDeletedByCommentID(ctx context.Context, db DBTX, articleCommentID uuid.UUID) (ArticleCommentDeleted, error) {
+	row := db.QueryRow(ctx, getArticleCommentDeletedByCommentID, articleCommentID)
+	var i ArticleCommentDeleted
+	err := row.Scan(&i.CreatedAt, &i.ArticleCommentID)
+	return i, err
+}
+
 const getArticleContentByArticleID = `-- name: GetArticleContentByArticleID :one
 SELECT created_at_, updated_at_, article_id_, title_, description_, body_, author_user_id_ FROM article_content_
 WHERE article_id_ = $1

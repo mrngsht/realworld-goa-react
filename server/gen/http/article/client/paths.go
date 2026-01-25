@@ -60,3 +60,8 @@ func AddCommentsArticlePath(articleID string) string {
 func GetCommentsArticlePath(articleID string) string {
 	return fmt.Sprintf("/api/article/%v/comments", articleID)
 }
+
+// DeleteCommentsArticlePath returns the URL path to the article service deleteComments HTTP endpoint.
+func DeleteCommentsArticlePath(articleID string) string {
+	return fmt.Sprintf("/api/article/%v/deleteComments", articleID)
+}

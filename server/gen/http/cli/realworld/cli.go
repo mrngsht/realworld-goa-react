@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `article (get|list|feed|create|update|delete|favorite|unfavorite|add-comments|get-comments)
+	return `article (get|list|feed|create|update|delete|favorite|unfavorite|add-comments|get-comments|delete-comments)
 profile (follow-user|unfollow-user)
 user (login|register|get-current|update)
 `
@@ -32,13 +32,13 @@ user (login|register|get-current|update)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` article get --article-id "8367d26f-6cea-4231-ad3b-cd6396480a70"` + "\n" +
+	return os.Args[0] + ` article get --article-id "b08d9acc-20b3-4ea6-ac87-e8a08232ee37"` + "\n" +
 		os.Args[0] + ` profile follow-user --body '{
-      "username": "yxu"
+      "username": "TKQ"
    }'` + "\n" +
 		os.Args[0] + ` user login --body '{
-      "email": "willard@gibsonrodriguez.net",
-      "password": "yg2"
+      "email": "marilyne_legros@will.com",
+      "password": "iqh"
    }'` + "\n" +
 		""
 }
@@ -87,6 +87,10 @@ func ParseEndpoint(
 		articleGetCommentsFlags         = flag.NewFlagSet("get-comments", flag.ExitOnError)
 		articleGetCommentsArticleIDFlag = articleGetCommentsFlags.String("article-id", "REQUIRED", "")
 
+		articleDeleteCommentsFlags         = flag.NewFlagSet("delete-comments", flag.ExitOnError)
+		articleDeleteCommentsBodyFlag      = articleDeleteCommentsFlags.String("body", "REQUIRED", "")
+		articleDeleteCommentsArticleIDFlag = articleDeleteCommentsFlags.String("article-id", "REQUIRED", "")
+
 		profileFlags = flag.NewFlagSet("profile", flag.ContinueOnError)
 
 		profileFollowUserFlags    = flag.NewFlagSet("follow-user", flag.ExitOnError)
@@ -119,6 +123,7 @@ func ParseEndpoint(
 	articleUnfavoriteFlags.Usage = articleUnfavoriteUsage
 	articleAddCommentsFlags.Usage = articleAddCommentsUsage
 	articleGetCommentsFlags.Usage = articleGetCommentsUsage
+	articleDeleteCommentsFlags.Usage = articleDeleteCommentsUsage
 
 	profileFlags.Usage = profileUsage
 	profileFollowUserFlags.Usage = profileFollowUserUsage
@@ -197,6 +202,9 @@ func ParseEndpoint(
 
 			case "get-comments":
 				epf = articleGetCommentsFlags
+
+			case "delete-comments":
+				epf = articleDeleteCommentsFlags
 
 			}
 
@@ -279,6 +287,9 @@ func ParseEndpoint(
 			case "get-comments":
 				endpoint = c.GetComments()
 				data, err = articlec.BuildGetCommentsPayload(*articleGetCommentsArticleIDFlag)
+			case "delete-comments":
+				endpoint = c.DeleteComments()
+				data, err = articlec.BuildDeleteCommentsPayload(*articleDeleteCommentsBodyFlag, *articleDeleteCommentsArticleIDFlag)
 			}
 		case "profile":
 			c := profilec.NewClient(scheme, host, doer, enc, dec, restore)
@@ -331,6 +342,7 @@ COMMAND:
     unfavorite: Unfavorite implements unfavorite.
     add-comments: AddComments implements addComments.
     get-comments: GetComments implements getComments.
+    delete-comments: DeleteComments implements deleteComments.
 
 Additional help:
     %[1]s article COMMAND --help
@@ -343,7 +355,7 @@ Get implements get.
     -article-id STRING: 
 
 Example:
-    %[1]s article get --article-id "8367d26f-6cea-4231-ad3b-cd6396480a70"
+    %[1]s article get --article-id "b08d9acc-20b3-4ea6-ac87-e8a08232ee37"
 `, os.Args[0])
 }
 
@@ -355,11 +367,11 @@ List implements list.
 
 Example:
     %[1]s article list --body '{
-      "author": "Neque nemo sunt ullam.",
-      "favorited": "Dolor quae eligendi incidunt quis et.",
-      "limit": 995,
-      "offset": 468191918,
-      "tag": "Vero et inventore necessitatibus similique."
+      "author": "Qui dignissimos et et architecto fugiat.",
+      "favorited": "Quis aut ea rerum.",
+      "limit": 390,
+      "offset": 1181800705,
+      "tag": "Cupiditate mollitia dolores ad magni blanditiis."
    }'
 `, os.Args[0])
 }
@@ -372,8 +384,8 @@ Feed implements feed.
 
 Example:
     %[1]s article feed --body '{
-      "limit": 35,
-      "offset": 1819389581
+      "limit": 752,
+      "offset": 843303561
    }'
 `, os.Args[0])
 }
@@ -386,15 +398,13 @@ Create implements create.
 
 Example:
     %[1]s article create --body '{
-      "body": "Minima quas sapiente reprehenderit sed autem id.",
-      "description": "Labore rerum similique voluptas molestiae.",
+      "body": "Officia perferendis tempore et rerum.",
+      "description": "Et sit.",
       "tagList": [
-         "Numquam odio blanditiis eligendi qui tenetur.",
-         "Facilis in alias.",
-         "Totam voluptatibus velit quis assumenda est deserunt.",
-         "Tenetur quia sunt."
+         "Eaque totam cum et repellat.",
+         "Earum quasi quam ducimus voluptatibus cum assumenda."
       ],
-      "title": "9lk"
+      "title": "djb"
    }'
 `, os.Args[0])
 }
@@ -408,10 +418,10 @@ Update implements update.
 
 Example:
     %[1]s article update --body '{
-      "body": "Omnis eos facere est qui odio nostrum.",
-      "description": "Amet id perferendis voluptas nihil tempora consequatur.",
-      "title": "jd7"
-   }' --article-id "d529d9f4-486b-44be-94e8-e8e8431a012b"
+      "body": "Voluptas cupiditate doloremque et.",
+      "description": "Dolorem ratione aperiam quam consectetur sint.",
+      "title": "bkq"
+   }' --article-id "475e0f70-3c00-4eef-a92e-9a572ecb6262"
 `, os.Args[0])
 }
 
@@ -422,7 +432,7 @@ Delete implements delete.
     -article-id STRING: 
 
 Example:
-    %[1]s article delete --article-id "13a1c329-ad2e-43da-968f-11a02b6eadc1"
+    %[1]s article delete --article-id "c6a7e0dc-4cf7-4b76-a09a-66c175120a37"
 `, os.Args[0])
 }
 
@@ -433,7 +443,7 @@ Favorite implements favorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article favorite --article-id "2ae506d2-3e51-4d15-af0d-661d88dbb566"
+    %[1]s article favorite --article-id "ee4d0512-0b17-4053-804d-ac141b4676c2"
 `, os.Args[0])
 }
 
@@ -444,7 +454,7 @@ Unfavorite implements unfavorite.
     -article-id STRING: 
 
 Example:
-    %[1]s article unfavorite --article-id "b412f25f-9875-4d63-9c7e-48ff649593cf"
+    %[1]s article unfavorite --article-id "15f14959-d701-40f9-a187-5c683285c822"
 `, os.Args[0])
 }
 
@@ -457,8 +467,8 @@ AddComments implements addComments.
 
 Example:
     %[1]s article add-comments --body '{
-      "body": "Optio distinctio ut qui ipsam quia."
-   }' --article-id "33e8a62e-cf67-442e-9a9a-a136d860390f"
+      "body": "Nihil molestias repudiandae esse doloremque numquam sed."
+   }' --article-id "06f49885-8ed4-422e-8e05-4004ea75baaa"
 `, os.Args[0])
 }
 
@@ -469,7 +479,21 @@ GetComments implements getComments.
     -article-id STRING: 
 
 Example:
-    %[1]s article get-comments --article-id "e382abc5-1071-44bc-ae46-8d2fd761abf7"
+    %[1]s article get-comments --article-id "1bb63286-2cb0-4ca1-b72f-fd9a5a63d561"
+`, os.Args[0])
+}
+
+func articleDeleteCommentsUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] article delete-comments -body JSON -article-id STRING
+
+DeleteComments implements deleteComments.
+    -body JSON: 
+    -article-id STRING: 
+
+Example:
+    %[1]s article delete-comments --body '{
+      "commentId": "5050fde3-719e-44fc-a205-67462414b0dc"
+   }' --article-id "15196057-5387-4219-b4d3-c93b09ad0975"
 `, os.Args[0])
 }
 
@@ -495,7 +519,7 @@ FollowUser implements followUser.
 
 Example:
     %[1]s profile follow-user --body '{
-      "username": "yxu"
+      "username": "TKQ"
    }'
 `, os.Args[0])
 }
@@ -508,7 +532,7 @@ UnfollowUser implements unfollowUser.
 
 Example:
     %[1]s profile unfollow-user --body '{
-      "username": "EMhOuobHMo"
+      "username": "e4u"
    }'
 `, os.Args[0])
 }
@@ -537,8 +561,8 @@ Login implements login.
 
 Example:
     %[1]s user login --body '{
-      "email": "willard@gibsonrodriguez.net",
-      "password": "yg2"
+      "email": "marilyne_legros@will.com",
+      "password": "iqh"
    }'
 `, os.Args[0])
 }
@@ -551,9 +575,9 @@ Register implements register.
 
 Example:
     %[1]s user register --body '{
-      "email": "eli_donnelly@swaniawski.com",
-      "password": "kup",
-      "username": "pNh"
+      "email": "heath@berge.com",
+      "password": "mfs",
+      "username": "8lAk7"
    }'
 `, os.Args[0])
 }
@@ -576,11 +600,11 @@ Update implements update.
 
 Example:
     %[1]s user update --body '{
-      "bio": "igc",
-      "email": "enoch.schaden@gorczanyhyatt.name",
-      "image": "http://x",
-      "password": "u4n",
-      "username": "9s8"
+      "bio": "h8g",
+      "email": "ignatius@corwinbarrows.name",
+      "image": "http://zg",
+      "password": "ldk",
+      "username": "Ywo"
    }'
 `, os.Args[0])
 }

@@ -33,6 +33,8 @@ type Service interface {
 	AddComments(context.Context, *AddCommentsPayload) (res *AddCommentsResult, err error)
 	// GetComments implements getComments.
 	GetComments(context.Context, *GetCommentsPayload) (res *GetCommentsResult, err error)
+	// DeleteComments implements deleteComments.
+	DeleteComments(context.Context, *DeleteCommentsPayload) (err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -49,7 +51,7 @@ const ServiceName = "article"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [10]string{"get", "list", "feed", "create", "update", "delete", "favorite", "unfavorite", "addComments", "getComments"}
+var MethodNames = [11]string{"get", "list", "feed", "create", "update", "delete", "favorite", "unfavorite", "addComments", "getComments", "deleteComments"}
 
 // AddCommentsPayload is the payload type of the article service addComments
 // method.
@@ -69,6 +71,10 @@ type ArticleAddCommentsBadRequest struct {
 }
 
 type ArticleDeleteArticleBadRequest struct {
+	Code string
+}
+
+type ArticleDeleteCommentsBadRequest struct {
 	Code string
 }
 
@@ -136,6 +142,13 @@ type CreatePayload struct {
 // CreateResult is the result type of the article service create method.
 type CreateResult struct {
 	Article *ArticleDetail
+}
+
+// DeleteCommentsPayload is the payload type of the article service
+// deleteComments method.
+type DeleteCommentsPayload struct {
+	ArticleID string
+	CommentID string
 }
 
 // DeletePayload is the payload type of the article service delete method.
@@ -263,6 +276,23 @@ func (e *ArticleDeleteArticleBadRequest) ErrorName() string {
 // GoaErrorName returns "ArticleDeleteArticleBadRequest".
 func (e *ArticleDeleteArticleBadRequest) GoaErrorName() string {
 	return "ArticleDeleteArticleBadRequest"
+}
+
+// Error returns an error description.
+func (e *ArticleDeleteCommentsBadRequest) Error() string {
+	return ""
+}
+
+// ErrorName returns "ArticleDeleteCommentsBadRequest".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *ArticleDeleteCommentsBadRequest) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "ArticleDeleteCommentsBadRequest".
+func (e *ArticleDeleteCommentsBadRequest) GoaErrorName() string {
+	return "ArticleDeleteCommentsBadRequest"
 }
 
 // Error returns an error description.

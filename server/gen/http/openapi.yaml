@@ -125,6 +125,36 @@ paths:
                             - code
             schemes:
                 - http
+    /api/article/{articleId}/deleteComments:
+        post:
+            tags:
+                - article
+            summary: deleteComments article
+            operationId: article#deleteComments
+            parameters:
+                - name: articleId
+                  in: path
+                  required: true
+                  type: string
+                  format: uuid
+                - name: DeleteCommentsRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ArticleDeleteCommentsRequestBody'
+                    required:
+                        - commentId
+            responses:
+                "200":
+                    description: OK response.
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/ArticleDeleteCommentsBadRequest'
+                        required:
+                            - code
+            schemes:
+                - http
     /api/article/{articleId}/favorite:
         post:
             tags:
@@ -446,7 +476,7 @@ definitions:
                     - Unspecified
                     - ArticleNotFound
         example:
-            code: ArticleNotFound
+            code: Unspecified
         required:
             - code
     ArticleAddCommentsRequestBody:
@@ -455,9 +485,9 @@ definitions:
         properties:
             body:
                 type: string
-                example: Sed corporis aut distinctio ipsa.
+                example: Perspiciatis eos quasi soluta voluptatem repudiandae.
         example:
-            body: Totam ut architecto.
+            body: Ullam dolores.
         required:
             - body
     ArticleAddCommentsResponseBody:
@@ -469,14 +499,14 @@ definitions:
         example:
             comment:
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Rerum aut nemo sunt sit.
-                createdAt: "1982-11-24T16:19:50Z"
-                id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                updatedAt: "1970-06-18T17:38:12Z"
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Nam officiis quas eum perferendis quaerat eum.
+                createdAt: "2008-02-14T13:15:51Z"
+                id: 37854643-bb8c-463e-b842-84228b908a42
+                updatedAt: "1982-02-07T01:26:22Z"
         required:
             - comment
     ArticleCreateRequestBody:
@@ -485,31 +515,29 @@ definitions:
         properties:
             body:
                 type: string
-                example: Dolore at ea.
+                example: Architecto veritatis et ut quasi deserunt.
             description:
                 type: string
-                example: Quia quaerat aut.
+                example: Rerum ab nihil dolores.
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Dolorem in facilis non.
+                    example: Perferendis dolores officiis dolorum enim.
                 example:
-                    - Voluptatem placeat.
-                    - Vitae accusantium praesentium doloremque.
-                    - Dignissimos quidem possimus.
+                    - Nobis aut non quasi id quo.
+                    - Assumenda praesentium.
             title:
                 type: string
-                example: 6v2
+                example: wvf
                 maxLength: 128
         example:
-            body: Velit et eaque et aut facilis.
-            description: Quia cum animi voluptate fugit soluta.
+            body: Occaecati molestiae exercitationem itaque.
+            description: Hic repudiandae asperiores.
             tagList:
-                - Corrupti consequatur.
-                - In odio ut hic.
-                - Velit aut.
-            title: a7j
+                - Praesentium reiciendis esse laborum ad et.
+                - Eveniet ut ea dolores praesentium a aut.
+            title: i02
         required:
             - title
             - description
@@ -523,26 +551,41 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: e68dbbc1-6e77-4914-b0b9-3a57030389c1
+                articleId: 42565c6e-bd38-4e2b-9b0b-b6ee9b1f803e
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Accusamus assumenda.
-                createdAt: "1991-08-10T04:52:01Z"
-                description: Dolores qui quod exercitationem.
-                favorited: false
-                favoritesCount: 17499901648410200744
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Occaecati et.
+                createdAt: "1990-04-04T05:21:13Z"
+                description: Dolore qui facilis eligendi.
+                favorited: true
+                favoritesCount: 224764858838834740
                 tagList:
-                    - Commodi optio vel.
-                    - Repellendus voluptate tenetur itaque ab.
-                title: Voluptatum sed dolorum est temporibus excepturi dolorem.
-                updatedAt: "1981-01-05T19:44:09Z"
+                    - Excepturi et sapiente aut necessitatibus.
+                    - Aut in ut non quam rerum.
+                title: Asperiores pariatur et.
+                updatedAt: "2010-07-12T11:24:26Z"
         required:
             - article
     ArticleDeleteArticleBadRequest:
         title: ArticleDeleteArticleBadRequest
+        type: object
+        properties:
+            code:
+                type: string
+                example: ArticleNotFound
+                enum:
+                    - Unspecified
+                    - ArticleNotFound
+                    - ForbiddenOperation
+        example:
+            code: ForbiddenOperation
+        required:
+            - code
+    ArticleDeleteCommentsBadRequest:
+        title: ArticleDeleteCommentsBadRequest
         type: object
         properties:
             code:
@@ -553,69 +596,83 @@ definitions:
                     - ArticleNotFound
                     - ForbiddenOperation
         example:
-            code: Unspecified
+            code: ArticleNotFound
         required:
             - code
+    ArticleDeleteCommentsRequestBody:
+        title: ArticleDeleteCommentsRequestBody
+        type: object
+        properties:
+            commentId:
+                type: string
+                example: 09fc2c03-2da9-4265-b948-707a0b5d82a7
+                format: uuid
+        example:
+            commentId: 208eff4a-b790-4185-8140-1fc2f314b75b
+        required:
+            - commentId
     ArticleDetail:
         title: ArticleDetail
         type: object
         properties:
             articleId:
                 type: string
-                example: d1a2c247-a627-4c65-aedd-af9b4185abf1
+                example: e6b9a3ad-51b0-47ae-b032-d1a203314174
                 format: uuid
             author:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Impedit magnam.
+                example: Qui quod inventore nam sit.
             createdAt:
                 type: string
-                example: "1998-12-07T23:16:13Z"
+                example: "1979-08-29T20:49:10Z"
                 format: date-time
             description:
                 type: string
-                example: Quia sit dicta.
+                example: Culpa autem sed.
             favorited:
                 type: boolean
                 example: false
             favoritesCount:
                 type: integer
-                example: 14599684734761213904
+                example: 16887344525514970610
                 format: int64
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Necessitatibus qui corporis.
+                    example: Ratione et aperiam consectetur veniam quos.
                 example:
-                    - Ut vitae id est.
-                    - Quis dignissimos sed quibusdam doloribus consectetur est.
+                    - Quam laborum.
+                    - Ut quidem dignissimos.
+                    - Velit et iure hic nobis et.
             title:
                 type: string
-                example: Molestiae facilis.
+                example: Ea id aut et ut.
             updatedAt:
                 type: string
-                example: "2011-06-21T12:37:50Z"
+                example: "2014-05-27T02:11:03Z"
                 format: date-time
         example:
-            articleId: 5a366134-b311-447e-815d-041bc3692b2c
+            articleId: 935c45e7-64fb-44f0-98dc-1bec62e8c87e
             author:
-                bio: Quidem sed.
-                following: true
-                image: Iure quo.
-                username: Eligendi voluptatem expedita impedit.
-            body: Rerum qui.
-            createdAt: "2005-01-03T23:42:55Z"
-            description: Voluptas quaerat eius velit.
+                bio: Est autem sed.
+                following: false
+                image: Ut excepturi ut et similique.
+                username: Excepturi minima delectus asperiores est rerum quaerat.
+            body: Libero molestiae est dolorum.
+            createdAt: "2010-11-16T14:57:52Z"
+            description: Iusto harum in ex quae id.
             favorited: true
-            favoritesCount: 9732166982352385105
+            favoritesCount: 12546220638715331353
             tagList:
-                - Blanditiis maiores dolor minima debitis iure vel.
-                - Sint dolores impedit dolor.
-                - Ut voluptas.
-            title: Blanditiis et.
-            updatedAt: "1987-06-12T15:53:04Z"
+                - Dolorum quidem cupiditate.
+                - Error est aspernatur mollitia dolorem dolores.
+                - Et rem quae blanditiis.
+                - Consectetur ab ut sit.
+            title: Earum quis quisquam.
+            updatedAt: "2010-12-20T05:38:58Z"
         required:
             - articleId
             - title
@@ -638,7 +695,7 @@ definitions:
                     - Unspecified
                     - ArticleNotFound
         example:
-            code: ArticleNotFound
+            code: Unspecified
         required:
             - code
     ArticleFavoriteResponseBody:
@@ -649,22 +706,22 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: e68dbbc1-6e77-4914-b0b9-3a57030389c1
+                articleId: 42565c6e-bd38-4e2b-9b0b-b6ee9b1f803e
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Accusamus assumenda.
-                createdAt: "1991-08-10T04:52:01Z"
-                description: Dolores qui quod exercitationem.
-                favorited: false
-                favoritesCount: 17499901648410200744
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Occaecati et.
+                createdAt: "1990-04-04T05:21:13Z"
+                description: Dolore qui facilis eligendi.
+                favorited: true
+                favoritesCount: 224764858838834740
                 tagList:
-                    - Commodi optio vel.
-                    - Repellendus voluptate tenetur itaque ab.
-                title: Voluptatum sed dolorum est temporibus excepturi dolorem.
-                updatedAt: "1981-01-05T19:44:09Z"
+                    - Excepturi et sapiente aut necessitatibus.
+                    - Aut in ut non quam rerum.
+                title: Asperiores pariatur et.
+                updatedAt: "2010-07-12T11:24:26Z"
         required:
             - article
     ArticleFeedRequestBody:
@@ -674,19 +731,19 @@ definitions:
             limit:
                 type: integer
                 default: 20
-                example: 679
+                example: 126
                 format: int32
                 minimum: 1
                 maximum: 1000
             offset:
                 type: integer
                 default: 0
-                example: 592976942
+                example: 801708931
                 format: int32
                 minimum: 0
         example:
-            limit: 590
-            offset: 1076248662
+            limit: 833
+            offset: 1839589374
     ArticleFeedResponseBody:
         title: ArticleFeedResponseBody
         type: object
@@ -696,98 +753,127 @@ definitions:
                 items:
                     $ref: '#/definitions/ArticleSummary'
                 example:
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
-                      author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
-                      favorited: true
-                      favoritesCount: 10787359605214526159
-                      tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
         example:
             articles:
-                - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                   author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  createdAt: "2010-07-08T21:59:27Z"
-                  description: Id qui voluptatem quod.
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
                   favorited: true
-                  favoritesCount: 10787359605214526159
+                  favoritesCount: 14942198129168287479
                   tagList:
-                    - Provident praesentium deserunt illo voluptatem.
-                    - Excepturi minima delectus asperiores est rerum quaerat.
-                  title: Hic mollitia ut.
-                  updatedAt: "2009-05-14T20:31:03Z"
-                - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                   author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  createdAt: "2010-07-08T21:59:27Z"
-                  description: Id qui voluptatem quod.
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
                   favorited: true
-                  favoritesCount: 10787359605214526159
+                  favoritesCount: 14942198129168287479
                   tagList:
-                    - Provident praesentium deserunt illo voluptatem.
-                    - Excepturi minima delectus asperiores est rerum quaerat.
-                  title: Hic mollitia ut.
-                  updatedAt: "2009-05-14T20:31:03Z"
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
+                  author:
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
+                  favorited: true
+                  favoritesCount: 14942198129168287479
+                  tagList:
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
+                  author:
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
+                  favorited: true
+                  favoritesCount: 14942198129168287479
+                  tagList:
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
         required:
             - articles
     ArticleGetArticleBadRequest:
@@ -828,61 +914,70 @@ definitions:
                     $ref: '#/definitions/Comment'
                 example:
                     - author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      body: Rerum aut nemo sunt sit.
-                      createdAt: "1982-11-24T16:19:50Z"
-                      id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                      updatedAt: "1970-06-18T17:38:12Z"
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      body: Nam officiis quas eum perferendis quaerat eum.
+                      createdAt: "2008-02-14T13:15:51Z"
+                      id: 37854643-bb8c-463e-b842-84228b908a42
+                      updatedAt: "1982-02-07T01:26:22Z"
                     - author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      body: Rerum aut nemo sunt sit.
-                      createdAt: "1982-11-24T16:19:50Z"
-                      id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                      updatedAt: "1970-06-18T17:38:12Z"
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      body: Nam officiis quas eum perferendis quaerat eum.
+                      createdAt: "2008-02-14T13:15:51Z"
+                      id: 37854643-bb8c-463e-b842-84228b908a42
+                      updatedAt: "1982-02-07T01:26:22Z"
                     - author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      body: Rerum aut nemo sunt sit.
-                      createdAt: "1982-11-24T16:19:50Z"
-                      id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                      updatedAt: "1970-06-18T17:38:12Z"
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      body: Nam officiis quas eum perferendis quaerat eum.
+                      createdAt: "2008-02-14T13:15:51Z"
+                      id: 37854643-bb8c-463e-b842-84228b908a42
+                      updatedAt: "1982-02-07T01:26:22Z"
         example:
             comments:
                 - author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  body: Rerum aut nemo sunt sit.
-                  createdAt: "1982-11-24T16:19:50Z"
-                  id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                  updatedAt: "1970-06-18T17:38:12Z"
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  body: Nam officiis quas eum perferendis quaerat eum.
+                  createdAt: "2008-02-14T13:15:51Z"
+                  id: 37854643-bb8c-463e-b842-84228b908a42
+                  updatedAt: "1982-02-07T01:26:22Z"
                 - author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  body: Rerum aut nemo sunt sit.
-                  createdAt: "1982-11-24T16:19:50Z"
-                  id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                  updatedAt: "1970-06-18T17:38:12Z"
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  body: Nam officiis quas eum perferendis quaerat eum.
+                  createdAt: "2008-02-14T13:15:51Z"
+                  id: 37854643-bb8c-463e-b842-84228b908a42
+                  updatedAt: "1982-02-07T01:26:22Z"
                 - author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  body: Rerum aut nemo sunt sit.
-                  createdAt: "1982-11-24T16:19:50Z"
-                  id: b23b5086-7110-4ebf-8360-eb4e27c04699
-                  updatedAt: "1970-06-18T17:38:12Z"
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  body: Nam officiis quas eum perferendis quaerat eum.
+                  createdAt: "2008-02-14T13:15:51Z"
+                  id: 37854643-bb8c-463e-b842-84228b908a42
+                  updatedAt: "1982-02-07T01:26:22Z"
+                - author:
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  body: Nam officiis quas eum perferendis quaerat eum.
+                  createdAt: "2008-02-14T13:15:51Z"
+                  id: 37854643-bb8c-463e-b842-84228b908a42
+                  updatedAt: "1982-02-07T01:26:22Z"
         required:
             - comments
     ArticleGetResponseBody:
@@ -893,22 +988,22 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: e68dbbc1-6e77-4914-b0b9-3a57030389c1
+                articleId: 42565c6e-bd38-4e2b-9b0b-b6ee9b1f803e
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Accusamus assumenda.
-                createdAt: "1991-08-10T04:52:01Z"
-                description: Dolores qui quod exercitationem.
-                favorited: false
-                favoritesCount: 17499901648410200744
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Occaecati et.
+                createdAt: "1990-04-04T05:21:13Z"
+                description: Dolore qui facilis eligendi.
+                favorited: true
+                favoritesCount: 224764858838834740
                 tagList:
-                    - Commodi optio vel.
-                    - Repellendus voluptate tenetur itaque ab.
-                title: Voluptatum sed dolorum est temporibus excepturi dolorem.
-                updatedAt: "1981-01-05T19:44:09Z"
+                    - Excepturi et sapiente aut necessitatibus.
+                    - Aut in ut non quam rerum.
+                title: Asperiores pariatur et.
+                updatedAt: "2010-07-12T11:24:26Z"
         required:
             - article
     ArticleListRequestBody:
@@ -917,32 +1012,32 @@ definitions:
         properties:
             author:
                 type: string
-                example: Nostrum deserunt aspernatur officia non distinctio.
+                example: Rerum ea reprehenderit.
             favorited:
                 type: string
-                example: Recusandae in.
+                example: Et eum nobis modi rerum.
             limit:
                 type: integer
                 default: 20
-                example: 918
+                example: 795
                 format: int32
                 minimum: 1
                 maximum: 1000
             offset:
                 type: integer
                 default: 0
-                example: 1228364370
+                example: 1682199253
                 format: int32
                 minimum: 0
             tag:
                 type: string
-                example: Asperiores provident nam ab esse vitae nihil.
+                example: Reiciendis voluptas assumenda ab minus qui.
         example:
-            author: Voluptas sed in sed quis.
-            favorited: Consequatur repellat voluptatem nobis.
-            limit: 285
-            offset: 1465466771
-            tag: Facilis aperiam recusandae sed reiciendis.
+            author: Rerum eos dolorem laboriosam.
+            favorited: Ducimus minus earum iure eaque vel.
+            limit: 471
+            offset: 1160368821
+            tag: Et aut dolores exercitationem ut quaerat voluptas.
     ArticleListResponseBody:
         title: ArticleListResponseBody
         type: object
@@ -952,98 +1047,127 @@ definitions:
                 items:
                     $ref: '#/definitions/ArticleSummary'
                 example:
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
-                    - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
+                    - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                       author:
-                        bio: Quidem sed.
-                        following: true
-                        image: Iure quo.
-                        username: Eligendi voluptatem expedita impedit.
-                      createdAt: "2010-07-08T21:59:27Z"
-                      description: Id qui voluptatem quod.
+                        bio: Est autem sed.
+                        following: false
+                        image: Ut excepturi ut et similique.
+                        username: Excepturi minima delectus asperiores est rerum quaerat.
+                      createdAt: "1975-05-18T08:56:25Z"
+                      description: Sit ab veritatis optio.
                       favorited: true
-                      favoritesCount: 10787359605214526159
+                      favoritesCount: 14942198129168287479
                       tagList:
-                        - Provident praesentium deserunt illo voluptatem.
-                        - Excepturi minima delectus asperiores est rerum quaerat.
-                      title: Hic mollitia ut.
-                      updatedAt: "2009-05-14T20:31:03Z"
+                        - Amet nihil.
+                        - Eos libero aut.
+                        - Nihil ipsam.
+                        - Possimus et quidem voluptatem ut.
+                      title: Ipsam fugit optio harum sit sunt sunt.
+                      updatedAt: "2016-01-19T11:28:17Z"
         example:
             articles:
-                - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                   author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  createdAt: "2010-07-08T21:59:27Z"
-                  description: Id qui voluptatem quod.
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
                   favorited: true
-                  favoritesCount: 10787359605214526159
+                  favoritesCount: 14942198129168287479
                   tagList:
-                    - Provident praesentium deserunt illo voluptatem.
-                    - Excepturi minima delectus asperiores est rerum quaerat.
-                  title: Hic mollitia ut.
-                  updatedAt: "2009-05-14T20:31:03Z"
-                - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                   author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  createdAt: "2010-07-08T21:59:27Z"
-                  description: Id qui voluptatem quod.
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
                   favorited: true
-                  favoritesCount: 10787359605214526159
+                  favoritesCount: 14942198129168287479
                   tagList:
-                    - Provident praesentium deserunt illo voluptatem.
-                    - Excepturi minima delectus asperiores est rerum quaerat.
-                  title: Hic mollitia ut.
-                  updatedAt: "2009-05-14T20:31:03Z"
-                - articleId: 658c33f9-149b-4292-a13f-2bc9abd46283
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
                   author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                  createdAt: "2010-07-08T21:59:27Z"
-                  description: Id qui voluptatem quod.
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
                   favorited: true
-                  favoritesCount: 10787359605214526159
+                  favoritesCount: 14942198129168287479
                   tagList:
-                    - Provident praesentium deserunt illo voluptatem.
-                    - Excepturi minima delectus asperiores est rerum quaerat.
-                  title: Hic mollitia ut.
-                  updatedAt: "2009-05-14T20:31:03Z"
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
+                - articleId: c5d95f27-8c4d-4545-8799-71de1650f5ee
+                  author:
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                  createdAt: "1975-05-18T08:56:25Z"
+                  description: Sit ab veritatis optio.
+                  favorited: true
+                  favoritesCount: 14942198129168287479
+                  tagList:
+                    - Amet nihil.
+                    - Eos libero aut.
+                    - Nihil ipsam.
+                    - Possimus et quidem voluptatem ut.
+                  title: Ipsam fugit optio harum sit sunt sunt.
+                  updatedAt: "2016-01-19T11:28:17Z"
         required:
             - articles
     ArticleSummary:
@@ -1052,57 +1176,57 @@ definitions:
         properties:
             articleId:
                 type: string
-                example: e62b7b78-a2d6-4a92-b098-ec5db2b9e12d
+                example: 23ef6127-fc2e-4192-a442-f8d83110f19e
                 format: uuid
             author:
                 $ref: '#/definitions/Profile'
             createdAt:
                 type: string
-                example: "1987-04-26T15:10:32Z"
+                example: "2006-08-17T22:28:47Z"
                 format: date-time
             description:
                 type: string
-                example: Est asperiores harum quam aperiam.
+                example: Ipsa facilis porro incidunt repudiandae.
             favorited:
                 type: boolean
                 example: false
             favoritesCount:
                 type: integer
-                example: 15969260752730997789
+                example: 12005053601211792403
                 format: int64
             tagList:
                 type: array
                 items:
                     type: string
-                    example: Sed rem quod.
+                    example: Provident deleniti.
                 example:
-                    - Blanditiis reprehenderit autem velit omnis debitis.
-                    - Voluptates quam dolorem laborum commodi sint pariatur.
-                    - Iure cum nam a recusandae.
-                    - Ut vel eum unde doloremque earum dicta.
+                    - Veritatis et laborum.
+                    - Natus et iste voluptatem quae.
+                    - Architecto iusto iste deleniti placeat.
             title:
                 type: string
-                example: Ullam qui.
+                example: Esse sit et architecto laudantium.
             updatedAt:
                 type: string
-                example: "1978-10-24T12:54:58Z"
+                example: "1991-11-28T21:51:34Z"
                 format: date-time
         example:
-            articleId: fb0f9fe3-845e-4954-add3-2437f51cf0be
+            articleId: bd10cd66-3244-49f7-83c3-de0e67ec0aa8
             author:
-                bio: Quidem sed.
-                following: true
-                image: Iure quo.
-                username: Eligendi voluptatem expedita impedit.
-            createdAt: "1973-07-31T21:16:01Z"
-            description: Saepe ratione earum quo.
-            favorited: false
-            favoritesCount: 13438143764008156116
+                bio: Est autem sed.
+                following: false
+                image: Ut excepturi ut et similique.
+                username: Excepturi minima delectus asperiores est rerum quaerat.
+            createdAt: "1981-09-25T15:38:58Z"
+            description: Quia impedit quod nesciunt natus dolorum.
+            favorited: true
+            favoritesCount: 13855041859984514705
             tagList:
-                - Debitis omnis sit officiis porro eos.
-                - Ad quo dolorem facere qui magni.
-            title: Consequatur dignissimos ducimus nihil tenetur voluptatem veritatis.
-            updatedAt: "2014-05-23T10:02:45Z"
+                - Eum et consequatur doloremque qui.
+                - Minus maiores inventore totam.
+                - Numquam minima quas similique facilis.
+            title: Tempore est quia ex consequuntur unde.
+            updatedAt: "1977-10-24T15:10:14Z"
         required:
             - articleId
             - title
@@ -1119,7 +1243,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: ArticleNotFound
                 enum:
                     - Unspecified
                     - ArticleNotFound
@@ -1135,22 +1259,22 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: e68dbbc1-6e77-4914-b0b9-3a57030389c1
+                articleId: 42565c6e-bd38-4e2b-9b0b-b6ee9b1f803e
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Accusamus assumenda.
-                createdAt: "1991-08-10T04:52:01Z"
-                description: Dolores qui quod exercitationem.
-                favorited: false
-                favoritesCount: 17499901648410200744
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Occaecati et.
+                createdAt: "1990-04-04T05:21:13Z"
+                description: Dolore qui facilis eligendi.
+                favorited: true
+                favoritesCount: 224764858838834740
                 tagList:
-                    - Commodi optio vel.
-                    - Repellendus voluptate tenetur itaque ab.
-                title: Voluptatum sed dolorum est temporibus excepturi dolorem.
-                updatedAt: "1981-01-05T19:44:09Z"
+                    - Excepturi et sapiente aut necessitatibus.
+                    - Aut in ut non quam rerum.
+                title: Asperiores pariatur et.
+                updatedAt: "2010-07-12T11:24:26Z"
         required:
             - article
     ArticleUpdateArticleBadRequest:
@@ -1159,13 +1283,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: ForbiddenOperation
+                example: ArticleNotFound
                 enum:
                     - Unspecified
                     - ArticleNotFound
                     - ForbiddenOperation
         example:
-            code: ForbiddenOperation
+            code: ArticleNotFound
         required:
             - code
     ArticleUpdateRequestBody:
@@ -1174,18 +1298,18 @@ definitions:
         properties:
             body:
                 type: string
-                example: Sequi ut quasi.
+                example: Nesciunt consequuntur necessitatibus possimus quo cupiditate.
             description:
                 type: string
-                example: Aut harum veritatis eius error vel non.
+                example: Omnis ab facere rerum nihil.
             title:
                 type: string
-                example: v53
+                example: jml
                 maxLength: 128
         example:
-            body: Temporibus quia impedit.
-            description: Vel tempore est quia ex consequuntur.
-            title: p47
+            body: Magni natus debitis eligendi odit recusandae voluptas.
+            description: Nihil excepturi autem.
+            title: jcs
     ArticleUpdateResponseBody:
         title: ArticleUpdateResponseBody
         type: object
@@ -1194,22 +1318,22 @@ definitions:
                 $ref: '#/definitions/ArticleDetail'
         example:
             article:
-                articleId: e68dbbc1-6e77-4914-b0b9-3a57030389c1
+                articleId: 42565c6e-bd38-4e2b-9b0b-b6ee9b1f803e
                 author:
-                    bio: Quidem sed.
-                    following: true
-                    image: Iure quo.
-                    username: Eligendi voluptatem expedita impedit.
-                body: Accusamus assumenda.
-                createdAt: "1991-08-10T04:52:01Z"
-                description: Dolores qui quod exercitationem.
-                favorited: false
-                favoritesCount: 17499901648410200744
+                    bio: Est autem sed.
+                    following: false
+                    image: Ut excepturi ut et similique.
+                    username: Excepturi minima delectus asperiores est rerum quaerat.
+                body: Occaecati et.
+                createdAt: "1990-04-04T05:21:13Z"
+                description: Dolore qui facilis eligendi.
+                favorited: true
+                favoritesCount: 224764858838834740
                 tagList:
-                    - Commodi optio vel.
-                    - Repellendus voluptate tenetur itaque ab.
-                title: Voluptatum sed dolorum est temporibus excepturi dolorem.
-                updatedAt: "1981-01-05T19:44:09Z"
+                    - Excepturi et sapiente aut necessitatibus.
+                    - Aut in ut non quam rerum.
+                title: Asperiores pariatur et.
+                updatedAt: "2010-07-12T11:24:26Z"
         required:
             - article
     Comment:
@@ -1220,29 +1344,29 @@ definitions:
                 $ref: '#/definitions/Profile'
             body:
                 type: string
-                example: Consectetur placeat repellat consequatur omnis qui.
+                example: Et accusantium perspiciatis quos.
             createdAt:
                 type: string
-                example: "2014-08-17T06:53:45Z"
+                example: "2010-04-09T20:58:30Z"
                 format: date-time
             id:
                 type: string
-                example: 44419bce-8838-4783-b668-abe9a92ec9ab
+                example: 9f3417d6-1d15-44d0-99b6-2724fa7e4c42
                 format: uuid
             updatedAt:
                 type: string
-                example: "1988-02-23T20:25:35Z"
+                example: "1983-06-13T08:30:51Z"
                 format: date-time
         example:
             author:
-                bio: Quidem sed.
-                following: true
-                image: Iure quo.
-                username: Eligendi voluptatem expedita impedit.
-            body: Molestiae dolor non.
-            createdAt: "2009-04-25T06:41:38Z"
-            id: 55707e5a-f306-4041-8a2c-b16d997c7b91
-            updatedAt: "1985-08-21T13:02:11Z"
+                bio: Est autem sed.
+                following: false
+                image: Ut excepturi ut et similique.
+                username: Excepturi minima delectus asperiores est rerum quaerat.
+            body: Quo error commodi quis ducimus veritatis.
+            createdAt: "1988-04-27T21:14:34Z"
+            id: df0337a1-3923-419e-88df-0cdde64a198c
+            updatedAt: "1999-02-25T21:10:49Z"
         required:
             - id
             - createdAt
@@ -1255,21 +1379,21 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Atque quia optio non voluptatem a.
+                example: Enim voluptatem eligendi ea fugit.
             following:
                 type: boolean
-                example: true
+                example: false
             image:
                 type: string
-                example: Ad quaerat id suscipit illum temporibus dignissimos.
+                example: Incidunt repellendus omnis.
             username:
                 type: string
-                example: Molestiae dolor qui tenetur.
+                example: Porro sunt quod optio cupiditate adipisci.
         example:
-            bio: Voluptatem quam deserunt tempora ut voluptatem.
+            bio: Est asperiores harum quam aperiam.
             following: false
-            image: Dolorem tempora nostrum.
-            username: Voluptas quia asperiores quasi non.
+            image: Sed rem quod.
+            username: Id tempore quia omnis ullam qui.
         required:
             - username
             - bio
@@ -1288,7 +1412,7 @@ definitions:
                     - UserAlreadyFollowing
                     - CannotFollowYourself
         example:
-            code: CannotFollowYourself
+            code: UserNotFound
         required:
             - code
     ProfileFollowUserRequestBody:
@@ -1297,10 +1421,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: edF
+                example: 5Ey
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: MLb
+            username: 0yPi
         required:
             - username
     ProfileFollowUserResponseBody:
@@ -1311,10 +1435,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Quidem sed.
-                following: true
-                image: Iure quo.
-                username: Eligendi voluptatem expedita impedit.
+                bio: Est autem sed.
+                following: false
+                image: Ut excepturi ut et similique.
+                username: Excepturi minima delectus asperiores est rerum quaerat.
         required:
             - profile
     ProfileUnfollowUserBadRequest:
@@ -1323,13 +1447,13 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: UserNotFollowing
                 enum:
                     - Unspecified
                     - UserNotFound
                     - UserNotFollowing
         example:
-            code: UserNotFollowing
+            code: Unspecified
         required:
             - code
     ProfileUnfollowUserRequestBody:
@@ -1338,10 +1462,10 @@ definitions:
         properties:
             username:
                 type: string
-                example: F78
+                example: 6N6
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            username: nEI81
+            username: n1x
         required:
             - username
     ProfileUnfollowUserResponseBody:
@@ -1352,10 +1476,10 @@ definitions:
                 $ref: '#/definitions/Profile'
         example:
             profile:
-                bio: Quidem sed.
-                following: true
-                image: Iure quo.
-                username: Eligendi voluptatem expedita impedit.
+                bio: Est autem sed.
+                following: false
+                image: Ut excepturi ut et similique.
+                username: Excepturi minima delectus asperiores est rerum quaerat.
         required:
             - profile
     User:
@@ -1364,25 +1488,25 @@ definitions:
         properties:
             bio:
                 type: string
-                example: Cupiditate aspernatur delectus molestias voluptatem quibusdam earum.
+                example: Numquam tenetur non.
             email:
                 type: string
-                example: Sit amet blanditiis veniam adipisci soluta.
+                example: Assumenda fugit nihil nam aliquam at.
             image:
                 type: string
-                example: Facere quo exercitationem tempora.
+                example: Consequatur porro quod.
             token:
                 type: string
-                example: Incidunt dolor.
+                example: Ad blanditiis aperiam quam.
             username:
                 type: string
-                example: Aut est non saepe voluptas.
+                example: Inventore enim quam voluptatem.
         example:
-            bio: Et error temporibus quia voluptatibus laborum.
-            email: Amet vel enim ut eos odio.
-            image: Excepturi et eum suscipit.
-            token: Ex ut ut quia natus ipsa.
-            username: Harum dolorum.
+            bio: Ipsum repellendus voluptatem cum qui sed.
+            email: Ratione neque quia hic.
+            image: Autem in atque placeat magnam.
+            token: Perspiciatis magni officia quo voluptate dolor ea.
+            username: Est aliquid labore corporis expedita quaerat iste.
         required:
             - email
             - token
@@ -1397,11 +1521,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Minima ut nam perferendis delectus ducimus qui.
-                email: Sapiente perferendis ducimus provident perferendis.
-                image: Et mollitia eius molestias consequatur explicabo.
-                token: Qui voluptatem sit.
-                username: Esse vel dolores sunt est totam vel.
+                bio: Sit et et optio vel et.
+                email: Dolorem provident fugit tempore omnis voluptas.
+                image: Commodi rem dolores in distinctio eum vero.
+                token: Optio officiis dolores quo non.
+                username: Dolorem corporis in repellat.
         required:
             - user
     UserLoginBadRequest:
@@ -1410,7 +1534,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: EmailNotFound
+                example: PasswordIsIncorrect
                 enum:
                     - Unspecified
                     - EmailNotFound
@@ -1425,16 +1549,16 @@ definitions:
         properties:
             email:
                 type: string
-                example: melvin.mosciski@morissettedaugherty.com
+                example: bertram.hartmann@lemke.com
                 format: email
             password:
                 type: string
-                example: 90y
+                example: f9s
                 minLength: 6
                 maxLength: 128
         example:
-            email: adolph.kemmer@wunsch.com
-            password: 7s1
+            email: lawrence.emard@schoen.name
+            password: kvw
         required:
             - email
             - password
@@ -1446,11 +1570,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Minima ut nam perferendis delectus ducimus qui.
-                email: Sapiente perferendis ducimus provident perferendis.
-                image: Et mollitia eius molestias consequatur explicabo.
-                token: Qui voluptatem sit.
-                username: Esse vel dolores sunt est totam vel.
+                bio: Sit et et optio vel et.
+                email: Dolorem provident fugit tempore omnis voluptas.
+                image: Commodi rem dolores in distinctio eum vero.
+                token: Optio officiis dolores quo non.
+                username: Dolorem corporis in repellat.
         required:
             - user
     UserRegisterBadRequest:
@@ -1459,7 +1583,7 @@ definitions:
         properties:
             code:
                 type: string
-                example: Unspecified
+                example: UsernameAlreadyUsed
                 enum:
                     - Unspecified
                     - UsernameAlreadyUsed
@@ -1474,21 +1598,21 @@ definitions:
         properties:
             email:
                 type: string
-                example: janelle@ruecker.net
+                example: francesco@lakinwolff.org
                 format: email
             password:
                 type: string
-                example: dxj
+                example: s50
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: VPucO
+                example: uhm
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            email: kyra@effertz.name
-            password: 43b
-            username: JWcUh3EC
+            email: oceane_o'kon@breitenberg.biz
+            password: b6f
+            username: bUM
         required:
             - username
             - email
@@ -1501,11 +1625,11 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Minima ut nam perferendis delectus ducimus qui.
-                email: Sapiente perferendis ducimus provident perferendis.
-                image: Et mollitia eius molestias consequatur explicabo.
-                token: Qui voluptatem sit.
-                username: Esse vel dolores sunt est totam vel.
+                bio: Sit et et optio vel et.
+                email: Dolorem provident fugit tempore omnis voluptas.
+                image: Commodi rem dolores in distinctio eum vero.
+                token: Optio officiis dolores quo non.
+                username: Dolorem corporis in repellat.
         required:
             - user
     UserUpdateRequestBody:
@@ -1514,31 +1638,31 @@ definitions:
         properties:
             bio:
                 type: string
-                example: s9s
+                example: xzw
                 maxLength: 4096
             email:
                 type: string
-                example: emmitt@bernhard.org
+                example: brittany.turcotte@jewessturcotte.info
                 format: email
             image:
                 type: string
-                example: https://8
+                example: http://g
                 pattern: ^https?://.+$
             password:
                 type: string
-                example: fbx
+                example: w83
                 minLength: 6
                 maxLength: 128
             username:
                 type: string
-                example: JCSAmt
+                example: e125
                 pattern: ^[a-zA-Z0-9_]{3,32}$
         example:
-            bio: 65v
-            email: tod.upton@bayer.info
-            image: https://8r
-            password: dtf
-            username: oN7BK
+            bio: 7oc
+            email: elfrieda@browndamore.biz
+            image: http://7f
+            password: di7
+            username: 43x
     UserUpdateResponseBody:
         title: UserUpdateResponseBody
         type: object
@@ -1547,10 +1671,10 @@ definitions:
                 $ref: '#/definitions/User'
         example:
             user:
-                bio: Minima ut nam perferendis delectus ducimus qui.
-                email: Sapiente perferendis ducimus provident perferendis.
-                image: Et mollitia eius molestias consequatur explicabo.
-                token: Qui voluptatem sit.
-                username: Esse vel dolores sunt est totam vel.
+                bio: Sit et et optio vel et.
+                email: Dolorem provident fugit tempore omnis voluptas.
+                image: Commodi rem dolores in distinctio eum vero.
+                token: Optio officiis dolores quo non.
+                username: Dolorem corporis in repellat.
         required:
             - user

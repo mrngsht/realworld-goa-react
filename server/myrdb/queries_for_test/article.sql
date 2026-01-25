@@ -33,3 +33,10 @@ SELECT * FROM article_deleted_
 WHERE article_id_ = $1
 LIMIT 1;
 
+
+-- name: GetArticleCommentDeletedByCommentID :one
+SELECT 
+  created_at_,
+  article_comment_id_
+FROM article_comment_deleted_
+WHERE article_comment_id_ = $1;

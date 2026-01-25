@@ -197,3 +197,22 @@ SELECT
 FROM article_comment_content_
 WHERE article_id_ = $1
 ORDER BY created_at_ DESC;
+
+-- name: GetArticleCommentContentByCommentID :one
+SELECT 
+  created_at_,
+  article_comment_id_,
+  article_id_,
+  body_,
+  user_id_
+FROM article_comment_content_
+WHERE article_comment_id_ = $1;
+
+-- name: DeleteArticleCommentContent :exec
+DELETE FROM article_comment_content_
+WHERE article_comment_id_ = $1;
+
+-- name: InsertArticleCommentDeleted :exec
+INSERT INTO article_comment_deleted_
+(created_at_, article_comment_id_)
+VALUES ($1, $2);

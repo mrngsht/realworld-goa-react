@@ -824,6 +824,91 @@ func DecodeGetCommentsResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildDeleteCommentsRequest instantiates a HTTP request object with method
+// and path set to call the "article" service "deleteComments" endpoint
+func (c *Client) BuildDeleteCommentsRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		articleID string
+	)
+	{
+		p, ok := v.(*article.DeleteCommentsPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("article", "deleteComments", "*article.DeleteCommentsPayload", v)
+		}
+		articleID = p.ArticleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteCommentsArticlePath(articleID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("article", "deleteComments", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteCommentsRequest returns an encoder for requests sent to the
+// article deleteComments server.
+func EncodeDeleteCommentsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*article.DeleteCommentsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("article", "deleteComments", "*article.DeleteCommentsPayload", v)
+		}
+		body := NewDeleteCommentsRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("article", "deleteComments", err)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteCommentsResponse returns a decoder for responses returned by the
+// article deleteComments endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeDeleteCommentsResponse may return the following errors:
+//   - "ArticleDeleteCommentsBadRequest" (type *article.ArticleDeleteCommentsBadRequest): http.StatusBadRequest
+//   - error: internal error
+func DecodeDeleteCommentsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body DeleteCommentsArticleDeleteCommentsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("article", "deleteComments", err)
+			}
+			err = ValidateDeleteCommentsArticleDeleteCommentsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("article", "deleteComments", err)
+			}
+			return nil, NewDeleteCommentsArticleDeleteCommentsBadRequest(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("article", "deleteComments", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalArticleDetailResponseBodyToArticleArticleDetail builds a value of
 // type *article.ArticleDetail from a value of type *ArticleDetailResponseBody.
 func unmarshalArticleDetailResponseBodyToArticleArticleDetail(v *ArticleDetailResponseBody) *article.ArticleDetail {

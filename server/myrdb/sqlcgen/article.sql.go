@@ -12,6 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteArticleCommentContent = `-- name: DeleteArticleCommentContent :exec
+DELETE FROM article_comment_content_
+WHERE article_comment_id_ = $1
+`
+
+func (q *Queries) DeleteArticleCommentContent(ctx context.Context, db DBTX, articleCommentID uuid.UUID) error {
+	_, err := db.Exec(ctx, deleteArticleCommentContent, articleCommentID)
+	return err
+}
+
 const deleteArticleContent = `-- name: DeleteArticleContent :exec
 DELETE FROM article_content_ 
 WHERE article_id_ = $1
@@ -35,6 +45,30 @@ type DeleteArticleFavoriteParams struct {
 func (q *Queries) DeleteArticleFavorite(ctx context.Context, db DBTX, arg DeleteArticleFavoriteParams) error {
 	_, err := db.Exec(ctx, deleteArticleFavorite, arg.ArticleID, arg.UserID)
 	return err
+}
+
+const getArticleCommentContentByCommentID = `-- name: GetArticleCommentContentByCommentID :one
+SELECT 
+  created_at_,
+  article_comment_id_,
+  article_id_,
+  body_,
+  user_id_
+FROM article_comment_content_
+WHERE article_comment_id_ = $1
+`
+
+func (q *Queries) GetArticleCommentContentByCommentID(ctx context.Context, db DBTX, articleCommentID uuid.UUID) (ArticleCommentContent, error) {
+	row := db.QueryRow(ctx, getArticleCommentContentByCommentID, articleCommentID)
+	var i ArticleCommentContent
+	err := row.Scan(
+		&i.CreatedAt,
+		&i.ArticleCommentID,
+		&i.ArticleID,
+		&i.Body,
+		&i.UserID,
+	)
+	return i, err
 }
 
 const getArticleContentByArticleID = `-- name: GetArticleContentByArticleID :one
@@ -188,6 +222,22 @@ func (q *Queries) InsertArticleCommentContentMutation(ctx context.Context, db DB
 		arg.Body,
 		arg.UserID,
 	)
+	return err
+}
+
+const insertArticleCommentDeleted = `-- name: InsertArticleCommentDeleted :exec
+INSERT INTO article_comment_deleted_
+(created_at_, article_comment_id_)
+VALUES ($1, $2)
+`
+
+type InsertArticleCommentDeletedParams struct {
+	CreatedAt        time.Time
+	ArticleCommentID uuid.UUID
+}
+
+func (q *Queries) InsertArticleCommentDeleted(ctx context.Context, db DBTX, arg InsertArticleCommentDeletedParams) error {
+	_, err := db.Exec(ctx, insertArticleCommentDeleted, arg.CreatedAt, arg.ArticleCommentID)
 	return err
 }
 

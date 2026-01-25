@@ -847,3 +847,67 @@ func (s *Article) GetComments(ctx context.Context, payload *goa.GetCommentsPaylo
 
 	return &goa.GetCommentsResult{Comments: resComments}, nil
 }
+
+func (s *Article) DeleteComments(ctx context.Context, payload *goa.DeleteCommentsPayload) (err error) {
+	defer func() {
+		if apErr, ok := myerr.AsAppErr(err); ok {
+			switch apErr {
+			case article.ErrArticleNotFound:
+				err = &goa.ArticleDeleteCommentsBadRequest{Code: design.ErrCode_Article_ArticleNotFound}
+			case article.ErrRequestUserIsNotAuthor:
+				err = &goa.ArticleDeleteCommentsBadRequest{Code: design.ErrCode_Article_ForbiddenOperation}
+			}
+		}
+	}()
+
+	userID, err := myctx.ShouldGetAuthenticatedUserID(ctx)
+	if err != nil {
+		return err
+	}
+
+	db := s.db
+	articleID := uuid.MustParse(payload.ArticleID)
+	commentID := uuid.MustParse(payload.CommentID)
+
+	// Check if article exists
+	_, err = s.getArticleDetail(ctx, articleID, &userID, false)
+	if err != nil {
+		return err
+	}
+
+	comment, err := sqlcgen.Q.GetArticleCommentContentByCommentID(ctx, db, commentID)
+	if err != nil {
+		if myrdb.IsErrNoRows(err) {
+			// If comment not found, treat as ArticleNotFound (or should we use a specific CommentNotFound? Spec says 200 OK generally but usually 404 if path param not found).
+			// Design has ArticleNotFound. Let's use that.
+			return article.ErrArticleNotFound
+		}
+		return errors.WithStack(err)
+	}
+
+	if comment.UserID != userID {
+		return article.ErrRequestUserIsNotAuthor
+	}
+
+	now := mytime.Now(ctx)
+	if err := myrdb.Tx(ctx, db, func(ctx context.Context, txdb myrdb.TxDB) error {
+		db := txdb
+
+		if err := sqlcgen.Q.DeleteArticleCommentContent(ctx, db, commentID); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if err := sqlcgen.Q.InsertArticleCommentDeleted(ctx, db, sqlcgen.InsertArticleCommentDeletedParams{
+			CreatedAt:        now,
+			ArticleCommentID: commentID,
+		}); err != nil {
+			return errors.WithStack(err)
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}

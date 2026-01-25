@@ -15,31 +15,33 @@ import (
 
 // Client is the "article" service client.
 type Client struct {
-	GetEndpoint         goa.Endpoint
-	ListEndpoint        goa.Endpoint
-	FeedEndpoint        goa.Endpoint
-	CreateEndpoint      goa.Endpoint
-	UpdateEndpoint      goa.Endpoint
-	DeleteEndpoint      goa.Endpoint
-	FavoriteEndpoint    goa.Endpoint
-	UnfavoriteEndpoint  goa.Endpoint
-	AddCommentsEndpoint goa.Endpoint
-	GetCommentsEndpoint goa.Endpoint
+	GetEndpoint            goa.Endpoint
+	ListEndpoint           goa.Endpoint
+	FeedEndpoint           goa.Endpoint
+	CreateEndpoint         goa.Endpoint
+	UpdateEndpoint         goa.Endpoint
+	DeleteEndpoint         goa.Endpoint
+	FavoriteEndpoint       goa.Endpoint
+	UnfavoriteEndpoint     goa.Endpoint
+	AddCommentsEndpoint    goa.Endpoint
+	GetCommentsEndpoint    goa.Endpoint
+	DeleteCommentsEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "article" service client given the endpoints.
-func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, addComments, getComments goa.Endpoint) *Client {
+func NewClient(get, list, feed, create, update, delete_, favorite, unfavorite, addComments, getComments, deleteComments goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint:         get,
-		ListEndpoint:        list,
-		FeedEndpoint:        feed,
-		CreateEndpoint:      create,
-		UpdateEndpoint:      update,
-		DeleteEndpoint:      delete_,
-		FavoriteEndpoint:    favorite,
-		UnfavoriteEndpoint:  unfavorite,
-		AddCommentsEndpoint: addComments,
-		GetCommentsEndpoint: getComments,
+		GetEndpoint:            get,
+		ListEndpoint:           list,
+		FeedEndpoint:           feed,
+		CreateEndpoint:         create,
+		UpdateEndpoint:         update,
+		DeleteEndpoint:         delete_,
+		FavoriteEndpoint:       favorite,
+		UnfavoriteEndpoint:     unfavorite,
+		AddCommentsEndpoint:    addComments,
+		GetCommentsEndpoint:    getComments,
+		DeleteCommentsEndpoint: deleteComments,
 	}
 }
 
@@ -158,4 +160,13 @@ func (c *Client) GetComments(ctx context.Context, p *GetCommentsPayload) (res *G
 		return
 	}
 	return ires.(*GetCommentsResult), nil
+}
+
+// DeleteComments calls the "deleteComments" endpoint of the "article" service.
+// DeleteComments may return the following errors:
+//   - "ArticleDeleteCommentsBadRequest" (type *ArticleDeleteCommentsBadRequest)
+//   - error: internal error
+func (c *Client) DeleteComments(ctx context.Context, p *DeleteCommentsPayload) (err error) {
+	_, err = c.DeleteCommentsEndpoint(ctx, p)
+	return
 }

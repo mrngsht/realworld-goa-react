@@ -959,6 +959,99 @@ func TestArticle_GetComments(t *testing.T) {
 	})
 }
 
+func TestArticle_DeleteComments(t *testing.T) {
+	ctx := servicetest.NewContext()
+	db := rdbtest.OpenDB(t, ctx)
+
+	svc := service.NewArticle(db)
+
+	createArticle := func(t *testing.T, ctx context.Context, author servicetest.CreateUserResult) string {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		payload := &goa.CreatePayload{
+			Title:       "title",
+			Description: "description",
+			Body:        "body",
+			TagList:     []string{"tag1"},
+		}
+		res, err := svc.Create(ctx, payload)
+		require.NoError(t, err)
+		return res.Article.ArticleID
+	}
+	addComment := func(t *testing.T, ctx context.Context, articleID string, author servicetest.CreateUserResult, body string) *goa.Comment {
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, author.Username)
+		res, err := svc.AddComments(ctx, &goa.AddCommentsPayload{
+			ArticleID: articleID,
+			Body:      body,
+		})
+		require.NoError(t, err)
+		return res.Comment
+	}
+
+	t.Run("succeed", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		commenter := servicetest.CreateUser(t, ctx, db)
+
+		articleID := createArticle(t, ctx, author)
+
+		c := addComment(t, ctx, articleID, commenter, "comment")
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, commenter.Username)
+		err := svc.DeleteComments(ctx, &goa.DeleteCommentsPayload{
+			ArticleID: articleID,
+			CommentID: c.ID,
+		}) // Act
+		require.NoError(t, err)
+
+		// Verify deletion
+		res, err := svc.GetComments(ctx, &goa.GetCommentsPayload{ArticleID: articleID})
+		require.NoError(t, err)
+		assert.Len(t, res.Comments, 0)
+
+		// Verify soft delete
+		deleted, err := sqlctest.Q.GetArticleCommentDeletedByCommentID(ctx, db, uuid.MustParse(c.ID))
+		require.NoError(t, err)
+		assert.NotNil(t, deleted)
+	})
+
+	t.Run("try to delete other's comment", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		commenter := servicetest.CreateUser(t, ctx, db)
+		other := servicetest.CreateUser(t, ctx, db)
+
+		articleID := createArticle(t, ctx, author)
+		c := addComment(t, ctx, articleID, commenter, "comment")
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, other.Username)
+		err := svc.DeleteComments(ctx, &goa.DeleteCommentsPayload{
+			ArticleID: articleID,
+			CommentID: c.ID,
+		}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleDeleteCommentsBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ForbiddenOperation, badRequest.Code)
+	})
+
+	t.Run("comment not exists", func(t *testing.T) {
+		author := servicetest.CreateUser(t, ctx, db)
+		commenter := servicetest.CreateUser(t, ctx, db)
+
+		articleID := createArticle(t, ctx, author)
+
+		ctx = servicetest.SetAuthenticatedUser(t, ctx, db, commenter.Username)
+		err := svc.DeleteComments(ctx, &goa.DeleteCommentsPayload{
+			ArticleID: articleID,
+			CommentID: uuid.NewString(),
+		}) // Act
+		require.Error(t, err)
+
+		var badRequest *goa.ArticleDeleteCommentsBadRequest
+		require.ErrorAs(t, err, &badRequest)
+		assert.Equal(t, design.ErrCode_Article_ArticleNotFound, badRequest.Code)
+	})
+}
+
 func TestArticle_Unfavoite(t *testing.T) {
 	ctx := servicetest.NewContext()
 	db := rdbtest.OpenDB(t, ctx)

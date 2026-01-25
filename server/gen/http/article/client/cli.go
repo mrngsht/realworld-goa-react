@@ -42,7 +42,7 @@ func BuildListPayload(articleListBody string) (*article.ListPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleListBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Neque nemo sunt ullam.\",\n      \"favorited\": \"Dolor quae eligendi incidunt quis et.\",\n      \"limit\": 995,\n      \"offset\": 468191918,\n      \"tag\": \"Vero et inventore necessitatibus similique.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Qui dignissimos et et architecto fugiat.\",\n      \"favorited\": \"Quis aut ea rerum.\",\n      \"limit\": 390,\n      \"offset\": 1181800705,\n      \"tag\": \"Cupiditate mollitia dolores ad magni blanditiis.\"\n   }'")
 		}
 	}
 	v := &article.ListPayload{
@@ -76,7 +76,7 @@ func BuildFeedPayload(articleFeedBody string) (*article.FeedPayload, error) {
 	{
 		err = json.Unmarshal([]byte(articleFeedBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 35,\n      \"offset\": 1819389581\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"limit\": 752,\n      \"offset\": 843303561\n   }'")
 		}
 	}
 	v := &article.FeedPayload{
@@ -107,7 +107,7 @@ func BuildCreatePayload(articleCreateBody string) (*article.CreatePayload, error
 	{
 		err = json.Unmarshal([]byte(articleCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Minima quas sapiente reprehenderit sed autem id.\",\n      \"description\": \"Labore rerum similique voluptas molestiae.\",\n      \"tagList\": [\n         \"Numquam odio blanditiis eligendi qui tenetur.\",\n         \"Facilis in alias.\",\n         \"Totam voluptatibus velit quis assumenda est deserunt.\",\n         \"Tenetur quia sunt.\"\n      ],\n      \"title\": \"9lk\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Officia perferendis tempore et rerum.\",\n      \"description\": \"Et sit.\",\n      \"tagList\": [\n         \"Eaque totam cum et repellat.\",\n         \"Earum quasi quam ducimus voluptatibus cum assumenda.\"\n      ],\n      \"title\": \"djb\"\n   }'")
 		}
 		if body.TagList == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tagList", "body"))
@@ -144,7 +144,7 @@ func BuildUpdatePayload(articleUpdateBody string, articleUpdateArticleID string)
 	{
 		err = json.Unmarshal([]byte(articleUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Omnis eos facere est qui odio nostrum.\",\n      \"description\": \"Amet id perferendis voluptas nihil tempora consequatur.\",\n      \"title\": \"jd7\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Voluptas cupiditate doloremque et.\",\n      \"description\": \"Dolorem ratione aperiam quam consectetur sint.\",\n      \"title\": \"bkq\"\n   }'")
 		}
 		if body.Title != nil {
 			if utf8.RuneCountInString(*body.Title) > 128 {
@@ -235,7 +235,7 @@ func BuildAddCommentsPayload(articleAddCommentsBody string, articleAddCommentsAr
 	{
 		err = json.Unmarshal([]byte(articleAddCommentsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Optio distinctio ut qui ipsam quia.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Nihil molestias repudiandae esse doloremque numquam sed.\"\n   }'")
 		}
 	}
 	var articleID string
@@ -267,6 +267,37 @@ func BuildGetCommentsPayload(articleGetCommentsArticleID string) (*article.GetCo
 		}
 	}
 	v := &article.GetCommentsPayload{}
+	v.ArticleID = articleID
+
+	return v, nil
+}
+
+// BuildDeleteCommentsPayload builds the payload for the article deleteComments
+// endpoint from CLI flags.
+func BuildDeleteCommentsPayload(articleDeleteCommentsBody string, articleDeleteCommentsArticleID string) (*article.DeleteCommentsPayload, error) {
+	var err error
+	var body DeleteCommentsRequestBody
+	{
+		err = json.Unmarshal([]byte(articleDeleteCommentsBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"commentId\": \"5050fde3-719e-44fc-a205-67462414b0dc\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.commentId", body.CommentID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	var articleID string
+	{
+		articleID = articleDeleteCommentsArticleID
+		err = goa.MergeErrors(err, goa.ValidateFormat("articleId", articleID, goa.FormatUUID))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &article.DeleteCommentsPayload{
+		CommentID: body.CommentID,
+	}
 	v.ArticleID = articleID
 
 	return v, nil

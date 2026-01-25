@@ -54,6 +54,12 @@ type AddCommentsRequestBody struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// DeleteCommentsRequestBody is the type of the "article" service
+// "deleteComments" endpoint HTTP request body.
+type DeleteCommentsRequestBody struct {
+	CommentID *string `form:"commentId,omitempty" json:"commentId,omitempty" xml:"commentId,omitempty"`
+}
+
 // GetResponseBody is the type of the "article" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
@@ -154,6 +160,13 @@ type AddCommentsArticleAddCommentsBadRequestResponseBody struct {
 // "article" service "getComments" endpoint HTTP response body for the
 // "ArticleGetCommentsBadRequest" error.
 type GetCommentsArticleGetCommentsBadRequestResponseBody struct {
+	Code string `form:"code" json:"code" xml:"code"`
+}
+
+// DeleteCommentsArticleDeleteCommentsBadRequestResponseBody is the type of the
+// "article" service "deleteComments" endpoint HTTP response body for the
+// "ArticleDeleteCommentsBadRequest" error.
+type DeleteCommentsArticleDeleteCommentsBadRequestResponseBody struct {
 	Code string `form:"code" json:"code" xml:"code"`
 }
 
@@ -373,6 +386,16 @@ func NewGetCommentsArticleGetCommentsBadRequestResponseBody(res *article.Article
 	return body
 }
 
+// NewDeleteCommentsArticleDeleteCommentsBadRequestResponseBody builds the HTTP
+// response body from the result of the "deleteComments" endpoint of the
+// "article" service.
+func NewDeleteCommentsArticleDeleteCommentsBadRequestResponseBody(res *article.ArticleDeleteCommentsBadRequest) *DeleteCommentsArticleDeleteCommentsBadRequestResponseBody {
+	body := &DeleteCommentsArticleDeleteCommentsBadRequestResponseBody{
+		Code: res.Code,
+	}
+	return body
+}
+
 // NewGetPayload builds a article service get endpoint payload.
 func NewGetPayload(articleID string) *article.GetPayload {
 	v := &article.GetPayload{}
@@ -492,6 +515,17 @@ func NewGetCommentsPayload(articleID string) *article.GetCommentsPayload {
 	return v
 }
 
+// NewDeleteCommentsPayload builds a article service deleteComments endpoint
+// payload.
+func NewDeleteCommentsPayload(body *DeleteCommentsRequestBody, articleID string) *article.DeleteCommentsPayload {
+	v := &article.DeleteCommentsPayload{
+		CommentID: *body.CommentID,
+	}
+	v.ArticleID = articleID
+
+	return v
+}
+
 // ValidateListRequestBody runs the validations defined on ListRequestBody
 func ValidateListRequestBody(body *ListRequestBody) (err error) {
 	if body.Limit != nil {
@@ -569,6 +603,18 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 func ValidateAddCommentsRequestBody(body *AddCommentsRequestBody) (err error) {
 	if body.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
+	}
+	return
+}
+
+// ValidateDeleteCommentsRequestBody runs the validations defined on
+// DeleteCommentsRequestBody
+func ValidateDeleteCommentsRequestBody(body *DeleteCommentsRequestBody) (err error) {
+	if body.CommentID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("commentId", "body"))
+	}
+	if body.CommentID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.commentId", *body.CommentID, goa.FormatUUID))
 	}
 	return
 }
